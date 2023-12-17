@@ -4,6 +4,15 @@
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageId>JST.$(AssemblyName)</PackageId>
+		<Title>Utilities for games</Title>
+		<Authors>John Strand</Authors>
+		<Company />
+		<Description>A library containing a bunch of methods and types that might be helpful for game development</Description>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/johnstrand/gameutils</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/johnstrand/gameutils</PackageProjectUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -16,6 +25,13 @@
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
 		<Compile Remove="Program.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
