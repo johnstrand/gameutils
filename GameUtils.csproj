@@ -28,10 +28,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="C:\dev\private\gameutils\.editorconfig" />
+		<None Include="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EditorConfigFiles Remove="C:\dev\private\gameutils\.editorconfig" />
 	</ItemGroup>
 
 </Project>

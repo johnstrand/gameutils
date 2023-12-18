@@ -1,4 +1,4 @@
-﻿namespace GameUtils.Types;
+﻿namespace GameUtils.Entity;
 public class Dijkstra<T> where T : notnull
 {
     private readonly Dictionary<T, HashSet<T>> _edges = [];
