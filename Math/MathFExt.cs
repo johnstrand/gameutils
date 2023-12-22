@@ -24,4 +24,25 @@ public static class MathFExt
     {
         return (MathF.Sin((t + 1.5f) * MathF.PI) + 1f) / 2f;
     }
+
+    public static float Remap(float value, float sourceRangeStart, float sourceRangeEnd, float targetRangeStart, float targetRangeEnd)
+    {
+        return (value - sourceRangeStart) / (sourceRangeEnd - sourceRangeStart) * (targetRangeEnd - targetRangeStart) + targetRangeStart;
+    }
+
+    public static float RemapClamped(float value, float sourceRangeStart, float sourceRangeEnd, float targetRangeStart, float targetRangeEnd)
+    {
+        return Math.Clamp(Remap(value, sourceRangeStart, sourceRangeEnd, targetRangeStart, targetRangeEnd), targetRangeStart, targetRangeEnd);
+    }
+
+    public static float Wrap(float value, float min, float max)
+    {
+        var range = max - min;
+        return value - MathF.Floor((value - min) / range) * range;
+    }
+
+    public static float Normalize(float value, float min, float max)
+    {
+        return (value - min) / (max - min);
+    }
 }

@@ -3,6 +3,8 @@
 This is a collection of utilities for game development (and other things). It is a work in progress.
 
 The library is split into several modules:
+
+
 	* `Animation` - Easing, offsetting, and other animation utilities
 	* `Console` - Various utilities for using ANSI escape codes to format console output
 	* `Extensions`- A collection of extension methods for various types
