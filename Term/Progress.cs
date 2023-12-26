@@ -1,6 +1,6 @@
 ﻿using GameUtils.Extensions;
 
-namespace GameUtils.Console;
+namespace GameUtils.Term;
 public static class Progress
 {
     public static TimeSpan TimeRemaining(int current, int total, DateTimeOffset start)

@@ -1,4 +1,7 @@
-﻿using GameUtils.Console;
+﻿using System.IO.Compression;
+using System.Numerics;
+using GameUtils.Types;
+using GameUtils.Types.Geometry;
 
 namespace GameUtils;
 
@@ -7,23 +10,57 @@ internal static class Program
 {
     private static void Main()
     {
-        var step = 5;
-        for (var b = 0; b <= 255; b += step)
+        var r = new Random();
+        var vertices = new List<Vector2>();
+        var image = new Bitmap(90, 90);
+        for(var i = 0; i < 90 ;i++)
         {
-            System.Console.Write($"{b:000} ");
-            for (var r = 0; r <= 255; r += step)
+            image[i, 0] = Vector3.One;
+            image[i, 89] = Vector3.One;
+            image[0, i] = Vector3.One;
+            image[89, i] = Vector3.One;
+            image[i, i] = Vector3.UnitX;
+        }
+        /*
+        for (var y = 0; y < 3; y++)
+        {
+            for (var x = 0; x < 3; x++)
             {
-                Ansi.Write($"[#{r},0,{b}]█");
+                if (x == 1 && y == 1)
+                {
+                    continue;
+                }
+                var yp = y * 30 + r.Next(30);
+                var xp = x * 30 + r.Next(30);
+                vertices.Add(new Vector2(xp, yp));
+                image[xp, yp] = Vector3.One;
             }
-            for (var g = 0; g <= 255; g += step)
+        }
+        */
+        var polygon = new Polygon2D([.. vertices]);
+        /*
+        for(var i = 0; i < polygon.Edges.Length; i++)
+        {
+            var edge = polygon.Edges[i];
+            var normal = polygon.Normals[i];
+            var start = edge.Start;
+            var end = edge.End;
+            foreach (var point in Steps(start, end, 100))
             {
-                Ansi.Write($"[#255,{g},{b}]█");
+                image[point] = Vector3.One;
             }
-            for (var r = 255; r >= 0; r -= step)
-            {
-                Ansi.Write($"[#{r},255,{b}]█");
-            }
-            System.Console.WriteLine();
+        }
+        */
+
+        image.Write("polygon.bmp");
+    }
+
+    static IEnumerable<Vector2> Steps(Vector2 start, Vector2 end, int steps)
+    {
+        var step = (end - start) / steps;
+        for (var i = 0; i < steps; i++)
+        {
+            yield return start + step * i;
         }
     }
 }

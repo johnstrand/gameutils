@@ -80,4 +80,9 @@ public static class Vector2Ext
     {
         (x, y) = (value.X, value.Y);
     }
+
+    public static Vector3 ToVector3(this Vector2 value, float z = 0)
+    {
+        return new Vector3(value.X, value.Y, z);
+    }
 }

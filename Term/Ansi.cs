@@ -1,7 +1,8 @@
 ﻿using GameUtils.Extensions;
 using System.Text;
 
-namespace GameUtils.Console;
+namespace GameUtils.Term;
+
 public static class Ansi
 {
     public const string SequenceStart = "\u001b[";
