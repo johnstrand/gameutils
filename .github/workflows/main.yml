@@ -1,0 +1,18 @@
+on:
+  push:
+    branches:
+    - main
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4.1.1
+    - name: Build
+      run: dotnet build --configuration Release
+    - name: Publish
+      run: dotnet nuget push "/home/runner/work/gameutils/gameutils/bin/Release/*.nupkg" --api-key "${NUGET_TOKEN}" -s https://api.nuget.org/v3/index.json
+      env:
+        NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
