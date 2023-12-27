@@ -12,14 +12,20 @@ internal static class Program
         var r = new Random();
         var vertices = new List<Vector2>();
         var image = new Bitmap(90, 90);
+
+        image.Clear(Color.PeachPuff);
+
         for (var i = 0; i < 90; i++)
         {
             image[i, 0] = Vector3.One;
             image[i, 89] = Vector3.One;
             image[0, i] = Vector3.One;
             image[89, i] = Vector3.One;
-            image[i, i] = Vector3.UnitX;
         }
+
+        image[0, 0] = Vector3.UnitX;
+        //image[89, 89] = Vector3.UnitY;
+        //image[0, 89] = Vector3.UnitZ;
         /*
         for (var y = 0; y < 3; y++)
         {
