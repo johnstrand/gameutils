@@ -13,6 +13,6 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release
     - name: Publish
-      run: dotnet nuget push "/home/runner/work/gameutils/gameutils/bin/Release/*.nupkg" --api-key "${NUGET_TOKEN}"
+      run: dotnet nuget push "/home/runner/work/gameutils/gameutils/bin/Release/*.nupkg" --api-key "${NUGET_TOKEN}" -s https://api.nuget.org/v3/index.json
       env:
         NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
