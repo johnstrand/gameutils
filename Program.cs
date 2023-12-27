@@ -1,7 +1,6 @@
-﻿using System.IO.Compression;
-using System.Numerics;
-using GameUtils.Types;
+﻿using GameUtils.Types;
 using GameUtils.Types.Geometry;
+using System.Numerics;
 
 namespace GameUtils;
 
@@ -13,7 +12,7 @@ internal static class Program
         var r = new Random();
         var vertices = new List<Vector2>();
         var image = new Bitmap(90, 90);
-        for(var i = 0; i < 90 ;i++)
+        for (var i = 0; i < 90; i++)
         {
             image[i, 0] = Vector3.One;
             image[i, 89] = Vector3.One;
@@ -55,12 +54,12 @@ internal static class Program
         image.Write("polygon.bmp");
     }
 
-    static IEnumerable<Vector2> Steps(Vector2 start, Vector2 end, int steps)
+    private static IEnumerable<Vector2> Steps(Vector2 start, Vector2 end, int steps)
     {
         var step = (end - start) / steps;
         for (var i = 0; i < steps; i++)
         {
-            yield return start + step * i;
+            yield return start + (step * i);
         }
     }
 }

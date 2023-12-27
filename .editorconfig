@@ -3,6 +3,9 @@
 #### Naming styles ####
 
 # Naming rules
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = const
+dotnet_naming_rule.locals_should_be_camel_case.style = all_upper_style
 
 dotnet_naming_rule.private_or_internal_static_field_should_be_camel_case__private_.severity = suggestion
 dotnet_naming_rule.private_or_internal_static_field_should_be_camel_case__private_.symbols = private_or_internal_static_field
@@ -22,6 +25,9 @@ dotnet_naming_symbols.private_or_internal_field.applicable_kinds = field
 dotnet_naming_symbols.private_or_internal_field.applicable_accessibilities = internal, private, private_protected
 dotnet_naming_symbols.private_or_internal_field.required_modifiers = 
 
+dotnet_naming_symbols.const.applicable_kinds = property, field, local
+dotnet_naming_symbols.const.required_modifiers = const
+
 # Naming styles
 
 dotnet_naming_style.camel_case__private_.required_prefix = _
@@ -33,6 +39,11 @@ dotnet_naming_style.camel_case__private_.required_prefix = _
 dotnet_naming_style.camel_case__private_.required_suffix = 
 dotnet_naming_style.camel_case__private_.word_separator = 
 dotnet_naming_style.camel_case__private_.capitalization = camel_case
+
+dotnet_naming_style.all_upper_style.capitalization = all_upper
+dotnet_naming_style.all_upper_style.word_separator = _
+
+# Code styles
 csharp_indent_labels = no_change
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
@@ -71,6 +82,7 @@ csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental
 csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true:silent
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
 csharp_style_conditional_delegate_call = true:suggestion
+csharp_space_around_binary_operators = before_and_after
 
 [*.{cs,vb}]
 #### Naming styles ####

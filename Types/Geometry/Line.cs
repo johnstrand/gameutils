@@ -1,76 +1,31 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
-namespace GameUtils;
+namespace GameUtils.Types.Geometry;
 
-public record struct Quad
-{
-    public Vector2 TopLeft;
-    public Vector2 TopRight;
-    public Vector2 BottomLeft;
-    public Vector2 BottomRight;
-
-    private readonly Line[] _edges = new Line[4];
-
-    public Quad(Vector2 topLeft, Vector2 topRight, Vector2 bottomLeft, Vector2 bottomRight)
-    {
-        TopLeft = topLeft;
-        TopRight = topRight;
-        BottomLeft = bottomLeft;
-        BottomRight = bottomRight;
-
-        SetEdges();
-    }
-
-    public Quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
-    {
-        TopLeft = new(x1, y1);
-        TopRight = new(x2, y2);
-        BottomLeft = new(x3, y3);
-        BottomRight = new(x4, y4);
-
-        SetEdges();
-    }
-
-    public Quad(float x, float y, float width, float height)
-    {
-        TopLeft = new(x, y);
-        TopRight = new(x + width, y);
-        BottomLeft = new(x, y + height);
-        BottomRight = new(x + width, y + height);
-
-        SetEdges();
-    }
-
-    public Quad(Vector2 position, Vector2 size)
-    {
-        TopLeft = position;
-        TopRight = position + new Vector2(size.X, 0);
-        BottomLeft = position + new Vector2(0, size.Y);
-        BottomRight = position + size;
-
-        SetEdges();
-    }
-
-    private readonly void SetEdges()
-    {
-        _edges[0] = new Line(TopLeft, TopRight);
-        _edges[1] = new Line(TopRight, BottomRight);
-        _edges[2] = new Line(BottomRight, BottomLeft);
-        _edges[3] = new Line(BottomLeft, TopLeft);
-    }
-
-    public readonly bool Intersects(Line line, [NotNullWhen(true)] out Vector2? nearest)
-    {
-        return line.IntersectsAny(_edges, out nearest);
-    }
-}
-
+/// <summary>
+/// Represents a line from <see cref="Start"/> to <see cref="End"/>
+/// </summary>
 public readonly record struct Line
 {
+    /// <summary>
+    /// Start point of the line
+    /// </summary>
     public readonly Vector2 Start;
+
+    /// <summary>
+    /// End point of the line
+    /// </summary>
     public readonly Vector2 End;
+
+    /// <summary>
+    /// Length of the line
+    /// </summary>
     public readonly float Length;
+
+    /// <summary>
+    /// Midpoint of the line
+    /// </summary>
     public readonly Vector2 Midpoint => (Start + End) / 2f;
 
     /// <summary>
@@ -100,7 +55,7 @@ public readonly record struct Line
     {
         var (sin, cos) = MathF.SinCos(angle);
         Start = start;
-        End = start + new Vector2(cos, sin) * length;
+        End = start + (new Vector2(cos, sin) * length);
         Length = length;
     }
 
@@ -196,6 +151,9 @@ public readonly record struct Line
         return true;
     }
 
+    /// <summary>
+    /// Returns true if this line intersects the given line and sets <paramref name="intersectionPoint"/> to the intersection point
+    /// </summary>
     public readonly bool Intersects(Line other, [NotNullWhen(true)] out Vector2? intersectionPoint)
     {
         var thisDelta = End - Start;

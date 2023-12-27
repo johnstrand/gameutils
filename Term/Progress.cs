@@ -1,8 +1,15 @@
 ﻿using GameUtils.Extensions;
 
 namespace GameUtils.Term;
+
+/// <summary>
+/// Utility method for calculating and displying progress.
+/// </summary>
 public static class Progress
 {
+    /// <summary>
+    /// Given the current count, total cound, and start time, returns the estimated time remaining.
+    /// </summary>
     public static TimeSpan TimeRemaining(int current, int total, DateTimeOffset start)
     {
         var rate = Rate(current, start);
@@ -10,12 +17,18 @@ public static class Progress
         return TimeSpan.FromSeconds(remaining);
     }
 
+    /// <summary>
+    /// Given the current count and start time, returns the current rate.
+    /// </summary>
     public static double Rate(int current, DateTimeOffset start)
     {
         var elapsed = DateTimeOffset.UtcNow - start;
         return current / elapsed.TotalSeconds;
     }
 
+    /// <summary>
+    /// Given the current count and total count, returns the percent complete.
+    /// </summary>
     public static int PercentComplete(int current, int total)
     {
         return current * 100 / total;
@@ -39,6 +52,6 @@ public static class Progress
         var doneWidth = current * width / total;
         var pendingWidth = width - doneWidth;
 
-        return $"{completed.Repeat(doneWidth)}{pending.Repeat(pendingWidth)}";
+        return completed.Repeat(doneWidth) + pending.Repeat(pendingWidth);
     }
 }

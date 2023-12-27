@@ -2,41 +2,65 @@
 
 namespace GameUtils;
 
+/// <summary>
+/// Extension methods for Vector2.
+/// </summary>
 public static class Vector2Ext
 {
+    /// <summary>
+    /// Rotates a vector around origin (0,0) by the specified angle in radians.
+    /// </summary>
     public static Vector2 Rotate(this Vector2 value, float radians)
     {
         var (sin, cos) = MathF.SinCos(radians);
-        return new Vector2(value.X * cos - value.Y * sin, value.X * sin + value.Y * cos);
+        return new Vector2((value.X * cos) - (value.Y * sin), (value.X * sin) + (value.Y * cos));
     }
 
+    /// <summary>
+    /// Rotates a vector around origin by the specified angle in radians.
+    /// </summary>
     public static Vector2 Rotate(this Vector2 value, float radians, Vector2 origin)
     {
         var (sin, cos) = MathF.SinCos(radians);
         var (x, y) = (value.X - origin.X, value.Y - origin.Y);
-        return new Vector2(x * cos - y * sin + origin.X, x * sin + y * cos + origin.Y);
+        return new Vector2((x * cos) - (y * sin) + origin.X, (x * sin) + (y * cos) + origin.Y);
     }
 
+    /// <summary>
+    /// Adds <paramref name="v"/> to both X and Y of <paramref name="value"/>
+    /// </summary>
     public static Vector2 Add(this Vector2 value, float v)
     {
         return new Vector2(value.X + v, value.Y + v);
     }
 
+    /// <summary>
+    /// Adds <paramref name="x"/> and <paramref name="y"/> to X and Y of <paramref name="value"/>
+    /// </summary>
     public static Vector2 Add(this Vector2 value, float x, float y)
     {
         return new Vector2(value.X + x, value.Y + y);
     }
 
+    /// <summary>
+    /// Returns a new vector with the X and Y values rounded down to the nearest integer
+    /// </summary>
     public static Vector2 Floor(this Vector2 value)
     {
         return new Vector2(MathF.Floor(value.X), MathF.Floor(value.Y));
     }
 
+    /// <summary>
+    /// Returns a new vector with the X and Y values rounded up to the nearest integer
+    /// </summary>
     public static Vector2 Ceil(this Vector2 value)
     {
         return new Vector2(MathF.Ceiling(value.X), MathF.Ceiling(value.Y));
     }
 
+    /// <summary>
+    /// Returns a new vector with the X and Y values rounded to the nearest integer
+    /// </summary>
     public static Vector2 Round(this Vector2 value)
     {
         return new Vector2(MathF.Round(value.X), MathF.Round(value.Y));
@@ -76,11 +100,17 @@ public static class Vector2Ext
         return MathF.Atan2(det, dot);
     }
 
+    /// <summary>
+    /// Deconstructs a vector into its X and Y components
+    /// </summary>
     public static void Deconstruct(this Vector2 value, out float x, out float y)
     {
         (x, y) = (value.X, value.Y);
     }
 
+    /// <summary>
+    /// Converts a Vector2 to a Vector3, with the default Z value of 0
+    /// </summary>
     public static Vector3 ToVector3(this Vector2 value, float z = 0)
     {
         return new Vector3(value.X, value.Y, z);

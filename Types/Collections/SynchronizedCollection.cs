@@ -2,14 +2,31 @@
 using System.Collections.Concurrent;
 
 namespace GameUtils.Types.Collections;
+
+/// <summary>
+/// Type of operation to perform on a collection.
+/// </summary>
 public enum OperationKind
 {
+    /// <summary>
+    /// Add an entity to the collection.
+    /// </summary>
     Add,
+
+    /// <summary>
+    /// Remove an entity from the collection.
+    /// </summary>
     Remove
 }
 
+/// <summary>
+/// Represents an operation to perform on a collection with an entity.
+/// </summary>
 public record Operation<T>(OperationKind Kind, T Entity);
 
+/// <summary>
+/// Abstract class for a thread-safe collection that can be modified from multiple threads.
+/// </summary>
 public abstract class SyncronizedCollection<T> : IEnumerable<T> where T : notnull
 {
     private readonly ConcurrentQueue<Operation<T>> _pending = new();
@@ -80,7 +97,6 @@ public abstract class SyncronizedCollection<T> : IEnumerable<T> where T : notnul
     /// <summary>
     /// This method is called by the <c>Get</c> method to get a snapshot of the collection.
     /// </summary>
-    /// <returns></returns>
     protected abstract IEnumerable<T> GetInternal();
 
     /// <summary>
@@ -88,6 +104,7 @@ public abstract class SyncronizedCollection<T> : IEnumerable<T> where T : notnul
     /// </summary>
     protected abstract void HandleOperation(Operation<T> operation);
 
+    /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator()
     {
         return Get().GetEnumerator();

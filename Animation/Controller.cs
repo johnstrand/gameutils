@@ -5,13 +5,21 @@ internal class Controller(int frameCount, bool isLooping = true, float framesPer
     public int FrameCount { get; set; } = frameCount;
     public bool IsPlaying { get; private set; }
     public bool IsLooping { get; set; } = isLooping;
-    public float FramesPerSecond { get; set; } = framesPerSecond;
+    public float FramesPerSecond
+    {
+        get => framesPerSecond;
+        set
+        {
+            framesPerSecond = value;
+            _frameDuration = 1 / value;
+        }
+    }
 
     public Action<int>? OnFrameChanged { get; set; }
     public Action? OnStopped { get; set; }
 
     private float _subFrame;
-    private float _frameDuration => 1 / FramesPerSecond;
+    private float _frameDuration = 1 / framesPerSecond;
 
     public void Play()
     {
@@ -58,5 +66,3 @@ internal class Controller(int frameCount, bool isLooping = true, float framesPer
         OnFrameChanged?.Invoke(CurrentFrame);
     }
 }
-
-
