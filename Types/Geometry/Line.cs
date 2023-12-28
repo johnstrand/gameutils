@@ -26,7 +26,17 @@ public readonly record struct Line
     /// <summary>
     /// Midpoint of the line
     /// </summary>
-    public readonly Vector2 Midpoint => (Start + End) / 2f;
+    public readonly Vector2 Midpoint;
+
+    /// <summary>
+    /// Normal of the line (inverse of <see cref="NormalB"/>)
+    /// </summary>
+    public readonly Vector2 NormalA;
+
+    /// <summary>
+    /// Normal of the line (inverse of <see cref="NormalA"/>)
+    /// </summary>
+    public readonly Vector2 NormalB;
 
     /// <summary>
     /// Creates a line from <paramref name="start"/> to <paramref name="end"/>
@@ -36,6 +46,9 @@ public readonly record struct Line
         Start = start;
         End = end;
         Length = Vector2.Distance(start, end);
+        Midpoint = (Start + End) / 2;
+        NormalA = new Vector2(-(End.Y - Start.Y), End.X - Start.X);
+        NormalB = new Vector2(End.Y - Start.Y, -(End.X - Start.X));
     }
 
     /// <summary>
@@ -46,6 +59,9 @@ public readonly record struct Line
         Start = start;
         End = start + (Vector2.Normalize(direction) * length);
         Length = length;
+        Midpoint = (Start + End) / 2;
+        NormalA = new Vector2(-(End.Y - Start.Y), End.X - Start.X);
+        NormalB = new Vector2(End.Y - Start.Y, -(End.X - Start.X));
     }
 
     /// <summary>
@@ -57,6 +73,9 @@ public readonly record struct Line
         Start = start;
         End = start + (new Vector2(cos, sin) * length);
         Length = length;
+        Midpoint = (Start + End) / 2;
+        NormalA = new Vector2(-(End.Y - Start.Y), End.X - Start.X);
+        NormalB = new Vector2(End.Y - Start.Y, -(End.X - Start.X));
     }
 
     /// <summary>
@@ -67,16 +86,9 @@ public readonly record struct Line
         Start = new(x1, y1);
         End = new(x2, y2);
         Length = Vector2.Distance(Start, End);
-    }
-
-    /// <summary>
-    /// Gets the normal vectors for this line
-    /// </summary>
-    public readonly (Vector2 a, Vector2 b) GetNormals()
-    {
-        var direction = Vector2.Normalize(End - Start);
-        var normal = new Vector2(-direction.Y, direction.X);
-        return (normal, -normal);
+        Midpoint = (Start + End) / 2;
+        NormalA = new Vector2(-(End.Y - Start.Y), End.X - Start.X);
+        NormalB = new Vector2(End.Y - Start.Y, -(End.X - Start.X));
     }
 
     /// <summary>
