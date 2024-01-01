@@ -67,6 +67,22 @@ public static class Vector2Ext
     }
 
     /// <summary>
+    /// Calculates the midpoint (average) of a list of vectors
+    /// </summary>
+    public static Vector2 Midpoint(this IEnumerable<Vector2> source)
+    {
+        var sum = Vector2.Zero;
+        var count = 0;
+        foreach (var item in source)
+        {
+            sum += item;
+            count++;
+        }
+
+        return sum / count;
+    }
+
+    /// <summary>
     /// Returns the normalized result of <paramref name="target"/> - <paramref name="source"/>
     /// </summary>
     public static Vector2 GetDirection(this Vector2 source, Vector2 target)
@@ -114,5 +130,23 @@ public static class Vector2Ext
     public static Vector3 ToVector3(this Vector2 value, float z = 0)
     {
         return new Vector3(value.X, value.Y, z);
+    }
+
+    /// <summary>
+    /// Sorts a list of vectors clockwise (or counter clockwise, if so desired) around the average center of the vectors.
+    /// </summary>
+    public static IEnumerable<Vector2> Sort(this IEnumerable<Vector2> source, bool clockwise = true)
+    {
+        var center = source.Midpoint();
+        return Sort(source, center, clockwise);
+    }
+
+    /// <summary>
+    /// Sorts a list of vectors clockwise (or counter clockwise, if so desired) around the specified center.
+    /// </summary>
+    public static IEnumerable<Vector2> Sort(this IEnumerable<Vector2> source, Vector2 center, bool clockwise = true)
+    {
+        var sortMultiplier = clockwise ? 1 : -1;
+        return source.OrderBy(v => MathF.Atan2(v.Y - center.Y, v.X - center.X) * sortMultiplier);
     }
 }
