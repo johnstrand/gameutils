@@ -1,4 +1,5 @@
 ﻿namespace GameUtils.Animation;
+
 internal class Controller(int frameCount, bool isLooping = true, float framesPerSecond = 30)
 {
     public int CurrentFrame { get; private set; }
@@ -57,7 +58,7 @@ internal class Controller(int frameCount, bool isLooping = true, float framesPer
 
         if (!IsLooping && CurrentFrame == FrameCount - 1)
         {
-            IsPlaying = false;
+            Stop();
             return;
         }
 

@@ -139,7 +139,7 @@ public class ImageData
         var magic = reader.ReadUInt32();
         if (magic != 0x44474D49) // IMGD as a little-endian uint32
         {
-            throw new Exception("Invalid magic number");
+            throw new InvalidDataException("Invalid magic number");
         }
 
         var width = reader.ReadInt32();
