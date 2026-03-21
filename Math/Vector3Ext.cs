@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace GameUtils;
+namespace GameUtils.Math;
 
 /// <summary>
 /// Extension methods for Vector3.

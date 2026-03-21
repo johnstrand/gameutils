@@ -24,6 +24,14 @@ public static class CollectionExtensions
     }
 
     /// <summary>
+    /// Gets a random element from the read-only list.
+    /// </summary>
+    public static T GetRandom<T>(this IReadOnlyList<T> list)
+    {
+        return list[_random.Next(list.Count)];
+    }
+
+    /// <summary>
     /// Shuffles the list, returning a new list using a Fisher-Yates shuffle.
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
@@ -96,14 +104,6 @@ public static class CollectionExtensions
     public static IEnumerable<TOutput> SelectWhere<TInput, TOutput>(this IEnumerable<TInput> source, Func<TInput, int, bool> predicate, Func<TInput, TOutput> selector)
     {
         return source.SelectWhere(predicate, (item, _) => selector(item));
-    }
-
-    /// <summary>
-    /// Gets a random element from the read-only list.
-    /// </summary>
-    public static T GetRandom<T>(this IReadOnlyList<T> list)
-    {
-        return list[_random.Next(list.Count)];
     }
 
     /// <summary>

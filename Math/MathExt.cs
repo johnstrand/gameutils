@@ -1,4 +1,4 @@
-﻿namespace GameUtils;
+﻿namespace GameUtils.Math;
 
 /// <summary>
 /// A collection of math-related extra methods.

@@ -110,8 +110,8 @@ public readonly record struct Ray2D
         point = null;
 
         var invDir = new Vector2(
-            Direction.X != 0 ? 1f / Direction.X : float.MaxValue,
-            Direction.Y != 0 ? 1f / Direction.Y : float.MaxValue);
+            MathF.Abs(Direction.X) > float.Epsilon ? 1f / Direction.X : float.MaxValue,
+            MathF.Abs(Direction.Y) > float.Epsilon ? 1f / Direction.Y : float.MaxValue);
 
         var tmin = (aabb.Min - Origin) * invDir;
         var tmax = (aabb.Max - Origin) * invDir;

@@ -258,21 +258,23 @@ public static class Ansi
     public static string Format(string text)
     {
         var result = new StringBuilder();
+        var i = 0;
 
-        for (var i = 0; i < text.Length; i++)
+        while (i < text.Length)
         {
             var c = text[i];
 
             if (c != '[')
             {
                 result.Append(c);
+                i++;
                 continue;
             }
 
             if (text.TryGet(i + 1, out var next) && next == '[')
             {
                 result.Append('[');
-                i++;
+                i += 2;
                 continue;
             }
 
@@ -284,7 +286,7 @@ public static class Ansi
             }
 
             var sequence = text.Substring(i + 1, endOfSequence - i - 1);
-            i = endOfSequence;
+            i = endOfSequence + 1;
 
             if (sequence is "/" or "")
             {
@@ -366,7 +368,7 @@ public static class Ansi
                 continue;
             }
 
-            throw new Exception($"Unknown ANSI sequence '{sequence}' starting at position {i}");
+            throw new ArgumentException($"Unknown ANSI sequence '{sequence}' starting at position {i}");
         }
 
         return result.ToString();

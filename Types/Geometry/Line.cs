@@ -143,7 +143,7 @@ public readonly record struct Line
         var betaNumerator = (a.X * c.Y) - (a.Y * c.X);
         var denominator = (a.Y * b.X) - (a.X * b.Y);
 
-        if (denominator == 0)
+        if (MathF.Abs(denominator) < float.Epsilon)
         {
             return false;
         }
@@ -176,7 +176,7 @@ public readonly record struct Line
         var betaNumerator = (thisDelta.X * startDelta.Y) - (thisDelta.Y * startDelta.X);
         var denominator = (thisDelta.Y * otherDelta.X) - (thisDelta.X * otherDelta.Y);
 
-        if (denominator == 0)
+        if (MathF.Abs(denominator) < float.Epsilon)
         {
             intersectionPoint = null;
             return false;

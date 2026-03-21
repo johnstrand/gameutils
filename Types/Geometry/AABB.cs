@@ -1,3 +1,4 @@
+#pragma warning disable S101 // AABB is a well-established acronym for Axis-Aligned Bounding Box
 using System.Numerics;
 
 namespace GameUtils.Types.Geometry;

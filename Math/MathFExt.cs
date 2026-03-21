@@ -1,4 +1,4 @@
-﻿namespace GameUtils;
+﻿namespace GameUtils.Math;
 
 /// <summary>
 /// A collection of math-related extra methods for floats
@@ -58,7 +58,7 @@ public static class MathFExt
     /// </summary>
     public static float RemapClamped(float value, float sourceRangeStart, float sourceRangeEnd, float targetRangeStart, float targetRangeEnd)
     {
-        return Math.Clamp(Remap(value, sourceRangeStart, sourceRangeEnd, targetRangeStart, targetRangeEnd), targetRangeStart, targetRangeEnd);
+        return System.Math.Clamp(Remap(value, sourceRangeStart, sourceRangeEnd, targetRangeStart, targetRangeEnd), targetRangeStart, targetRangeEnd);
     }
 
     /// <summary>

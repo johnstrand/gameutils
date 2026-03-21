@@ -79,7 +79,7 @@ public class Dijkstra<T> where T : notnull
         }
 
         var current = (T?)end;
-        while (current != null)
+        while (current is not null)
         {
             path.Insert(0, current);
             current = previousNodes[current];

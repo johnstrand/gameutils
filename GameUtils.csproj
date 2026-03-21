@@ -4,7 +4,6 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageId>JST.$(AssemblyName)</PackageId>
 		<Title>Utilities for games</Title>
 		<Authors>John Strand</Authors>
@@ -14,7 +13,8 @@
 		<RepositoryUrl>https://github.com/johnstrand/gameutils</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/johnstrand/gameutils</PackageProjectUrl>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.0.4</Version>
+		<Version>1.0.5</Version>
+		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -23,6 +23,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<OutputType>Library</OutputType>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -38,10 +39,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="SonarAnalyzer.CSharp" Version="10.21.0.135717">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.21.0.135717">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

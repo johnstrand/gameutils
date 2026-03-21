@@ -50,7 +50,7 @@ public class Circle(Vector2 center, float radius)
     {
         var dir = line.End - line.Start;
         var t = Vector2.Dot(Center - line.Start, dir) / Vector2.Dot(dir, dir);
-        t = Math.Clamp(t, 0f, 1f);
+        t = System.Math.Clamp(t, 0f, 1f);
         var closest = line.Start + (dir * t);
         var distance = Vector2.DistanceSquared(Center, closest);
         return distance <= RadiusSquared;

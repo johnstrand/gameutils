@@ -6,27 +6,27 @@ namespace GameUtils.Types.Geometry;
 /// <summary>
 /// Represents a 2D quad
 /// </summary>
-public record struct Quad
+public readonly record struct Quad
 {
     /// <summary>
     /// Top left corner of the quad
     /// </summary>
-    public Vector2 TopLeft;
+    public Vector2 TopLeft { get; }
 
     /// <summary>
     /// Top right corner of the quad
     /// </summary>
-    public Vector2 TopRight;
+    public Vector2 TopRight { get; }
 
     /// <summary>
     /// Bottom left corner of the quad
     /// </summary>
-    public Vector2 BottomLeft;
+    public Vector2 BottomLeft { get; }
 
     /// <summary>
     /// Bottom right corner of the quad
     /// </summary>
-    public Vector2 BottomRight;
+    public Vector2 BottomRight { get; }
 
     private readonly Line[] _edges = new Line[4];
 
@@ -40,7 +40,7 @@ public record struct Quad
         {
             if (index < 0 || index > 3)
             {
-                throw new IndexOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
 
             return index switch

@@ -31,10 +31,10 @@ public readonly partial struct Color
     /// <summary>Creates a color from normalised float channel values (0–1).</summary>
     public Color(float r, float g, float b, float a = 1.0f)
     {
-        R = (byte)(Math.Clamp(r, 0, 1) * 255.0f);
-        G = (byte)(Math.Clamp(g, 0, 1) * 255.0f);
-        B = (byte)(Math.Clamp(b, 0, 1) * 255.0f);
-        A = (byte)(Math.Clamp(a, 0, 1) * 255.0f);
+        R = (byte)(System.Math.Clamp(r, 0, 1) * 255.0f);
+        G = (byte)(System.Math.Clamp(g, 0, 1) * 255.0f);
+        B = (byte)(System.Math.Clamp(b, 0, 1) * 255.0f);
+        A = (byte)(System.Math.Clamp(a, 0, 1) * 255.0f);
     }
 
     /// <summary>Creates an opaque color from a normalised RGB vector and an optional alpha value (0–1).</summary>
@@ -45,7 +45,7 @@ public readonly partial struct Color
         R = (byte)color.X;
         G = (byte)color.Y;
         B = (byte)color.Z;
-        A = (byte)(Math.Clamp(alpha, 0, 1) * 255);
+        A = (byte)(System.Math.Clamp(alpha, 0, 1) * 255);
     }
 
     /// <summary>Creates a color from a normalised RGBA vector.</summary>

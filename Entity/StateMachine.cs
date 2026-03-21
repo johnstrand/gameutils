@@ -3,7 +3,10 @@ namespace GameUtils.Entity;
 /// <summary>
 /// A lightweight generic finite state machine. Transitions are evaluated in the order they were added.
 /// </summary>
-public class StateMachine<TState> where TState : notnull
+/// <remarks>
+/// Creates a new state machine with the given initial state.
+/// </remarks>
+public class StateMachine<TState>(TState initialState) where TState : notnull
 {
     private readonly record struct Transition(TState From, TState To, Func<bool> Condition);
 
@@ -14,15 +17,7 @@ public class StateMachine<TState> where TState : notnull
     /// <summary>
     /// The current state of the machine.
     /// </summary>
-    public TState CurrentState { get; private set; }
-
-    /// <summary>
-    /// Creates a new state machine with the given initial state.
-    /// </summary>
-    public StateMachine(TState initialState)
-    {
-        CurrentState = initialState;
-    }
+    public TState CurrentState { get; private set; } = initialState;
 
     /// <summary>
     /// Registers an automatic transition from <paramref name="from"/> to <paramref name="to"/>

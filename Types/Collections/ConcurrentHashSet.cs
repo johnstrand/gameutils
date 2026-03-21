@@ -94,12 +94,9 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
 
         var keys = other.ToHashSet();
 
-        foreach (var item in _dictionary.Keys)
+        foreach (var item in _dictionary.Keys.Where(k => !keys.Contains(k)).ToList())
         {
-            if (!keys.Contains(item))
-            {
-                _dictionary.TryRemove(item, out _);
-            }
+            _dictionary.TryRemove(item, out _);
         }
     }
 

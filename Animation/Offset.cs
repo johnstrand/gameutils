@@ -11,7 +11,9 @@ public static class Offset
     /// </summary>
     public static float Jagged(float x)
     {
+#pragma warning disable S3358 // Ternary operators should not be nested
         return x < .25f ? -x : x < .75f ? x - .5f : -x + 1;
+#pragma warning restore S3358 // Ternary operators should not be nested
     }
 
     /// <summary>

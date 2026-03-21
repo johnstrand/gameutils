@@ -1,4 +1,6 @@
 ﻿namespace GameUtils.Animation;
+#pragma warning disable S3358 // Ternary operators should not be nested
+#pragma warning disable S1121 // Assignments should not be made from within sub-expressions
 
 /// <summary>
 /// Easing functions for interpolation. Based on <see href="https://easings.net/"/>, check them out for visual samples of most of the functions.
@@ -160,9 +162,9 @@ public static class Ease
     {
         const float C_4 = 2 * MathF.PI / 3;
 
-        return x == 0
+        return x <= 0
           ? 0
-          : x == 1
+          : x >= 1
           ? 1
           : -MathF.Pow(2, (10 * x) - 10) * MathF.Sin(((x * 10) - 10.75f) * C_4);
     }
@@ -182,9 +184,9 @@ public static class Ease
     {
         const float C_5 = MathF.PI * 4f / 9f;
 
-        return x == 0
+        return x <= 0
           ? 0
-          : x == 1
+          : x >= 1
           ? 1
           : x < 0.5f
           ? -(MathF.Pow(2, (20 * x) - 10) * MathF.Sin(((20f * x) - 11.125f) * C_5)) / 2
@@ -250,7 +252,7 @@ public static class Ease
     /// </summary>
     public static float ExponentialIn(float x)
     {
-        return x == 0 ? 0 : MathF.Pow(2, (10 * x) - 10);
+        return x <= 0 ? 0 : MathF.Pow(2, (10 * x) - 10);
     }
 
     /// <summary>
@@ -266,9 +268,9 @@ public static class Ease
     /// </summary>
     public static float ExponentialInOut(float x)
     {
-        return x == 0
+        return x <= 0
       ? 0
-      : x == 1
+      : x >= 1
       ? 1
       : x < 0.5f ? MathF.Pow(2, (20 * x) - 10) / 2
       : (2 - MathF.Pow(2, (-20 * x) + 10)) / 2;
@@ -355,3 +357,5 @@ public static class Ease
     }
     #endregion
 }
+#pragma warning restore S1121 // Assignments should not be made from within sub-expressions
+#pragma warning restore S3358 // Ternary operators should not be nested

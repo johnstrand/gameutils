@@ -8,6 +8,8 @@ namespace GameUtils.Types.Geometry;
 /// </summary>
 public readonly struct Polygon2D
 {
+    // S3887: Arrays are intentionally mutable — TranslateBy and other methods modify them in place
+#pragma warning disable S3887
     /// <summary>
     /// Vertices of the polygon
     /// </summary>
@@ -22,6 +24,7 @@ public readonly struct Polygon2D
     /// Normals of each edge of the polygon
     /// </summary>
     public readonly Vector2[] Normals;
+#pragma warning restore S3887
 
     /// <summary>
     /// Creates a new polygon from the specified vertices. If <paramref name="sort"/> is true, the vertices will be sorted clockwise before creating the polygon.
@@ -64,26 +67,6 @@ public readonly struct Polygon2D
 
         return inside;
     }
-
-    // TODO: Implement these, they need to take the center of the polygon into account, as well as recalculating the normals
-    /*
-    public void RotateBy(float angle)
-    {
-        for (var i = 0; i < Vertices.Length; i++)
-        {
-            Vertices[i] = Vector2.Transform(Vertices[i], Matrix3x2.CreateRotation(angle));
-        }
-    }
-
-    public void RotateTo(float angle)
-    {
-        var center = new Vector2(Vertices.Sum(v => v.X) / Vertices.Length, Vertices.Sum(v => v.Y) / Vertices.Length);
-        for (var i = 0; i < Vertices.Length; i++)
-        {
-            Vertices[i] = Vector2.Transform(Vertices[i] - center, Matrix3x2.CreateRotation(angle)) + center;
-        }
-    }
-    */
 
     /// <summary>
     /// Moves the polygon by the specified translation
@@ -149,15 +132,7 @@ public readonly struct Polygon2D
     /// </summary>
     public bool Intersects(Line line)
     {
-        foreach (var edge in Edges)
-        {
-            if (Intersects(edge.Start, edge.End, line.Start, line.End))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return Edges.Any(edge => Intersects(edge.Start, edge.End, line.Start, line.End));
     }
 
     /// <summary>

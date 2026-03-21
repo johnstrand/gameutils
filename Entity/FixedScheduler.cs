@@ -1,15 +1,19 @@
+using System.Diagnostics;
+
 namespace GameUtils.Entity;
 
 /// <summary>
-/// Base class for a scheduler that runs at a fixed rate.
+/// Base class for a scheduler that calls <see cref="Update"/> at a fixed rate.
 /// </summary>
 /// <remarks>
-/// Initializes a new instance of the <see cref="FixedScheduler"/> class.
+/// Timing uses a <see cref="Stopwatch"/> (high-resolution monotonic clock) with a hybrid
+/// sleep + spin-wait strategy: the thread sleeps for the bulk of each idle period, then
+/// spin-waits the last millisecond to achieve sub-millisecond frame precision.
 /// </remarks>
 public abstract class FixedScheduler(int targetRatePerSecond)
 {
-    private float _targetFrameTime = 1f / targetRatePerSecond;
-    private bool _isRunning;
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(1.0 / targetRatePerSecond);
+    private volatile bool _isRunning;
     private Task? _runningTask;
 
     /// <summary>
@@ -22,48 +26,34 @@ public abstract class FixedScheduler(int targetRatePerSecond)
             return;
         }
 
+        _isRunning = true;
         _runningTask = Task.Run(() =>
         {
-            _isRunning = true;
+            var stopwatch = Stopwatch.StartNew();
+            var nextTick = _interval;
 
-            // Keep track of how many frames we've processed. We'll use this to adjust the target frame time over time
-            var frameCount = 0;
-
-            // We'll also keep track of when we started, so we can calculate the drift
-            var startTime = DateTime.Now;
-
-            // We'll also keep track of how many seconds we will have expected to pass
-            var expected = 0;
             while (_isRunning)
             {
-                // Mark the start of the frame
-                var frameStart = DateTime.Now;
-
-                // Run the update
                 Update();
 
-                // Wait until the frame is over
-                while ((DateTime.Now - frameStart).TotalSeconds < _targetFrameTime)
+                // Sleep for the bulk of the remaining time, leaving ~1ms for spin-wait precision
+                var remaining = nextTick - stopwatch.Elapsed;
+                var sleepTime = remaining - TimeSpan.FromMilliseconds(1);
+
+                if (sleepTime > TimeSpan.Zero)
                 {
-                    Thread.Sleep(1);
+                    Thread.Sleep(sleepTime);
                 }
 
-                // If we have processed the number of frames we expected to process in a second, let's see what the drift is
-                if (++frameCount % targetRatePerSecond == 0)
+                // Spin-wait for the final millisecond
+                while (stopwatch.Elapsed < nextTick && _isRunning)
                 {
-                    // Increment expected number of seconds
-                    expected++;
-
-                    // The drift is the difference between the time it took us to process targetRatePerSecond frames, and the time we expected it to take
-                    var drift = (DateTime.Now - startTime).TotalSeconds - expected;
-
-                    // If there is a drift, adjust the target frame time
-                    if (drift != 0)
-                    {
-                        // We'll adjust the target frame time by 1/120th of the drift, so that we don't over-correct
-                        _targetFrameTime -= (float)drift / 120f;
-                    }
+                    Thread.SpinWait(1);
                 }
+
+                // Advance to the next absolute tick time.
+                // If Update() ran long and we're already past nextTick, the next frame fires immediately.
+                nextTick += _interval;
             }
         });
     }
@@ -84,7 +74,7 @@ public abstract class FixedScheduler(int targetRatePerSecond)
     }
 
     /// <summary>
-    /// Updates the scheduler. This method is called at the target rate.
+    /// Called at the target rate. Override to implement per-tick logic.
     /// </summary>
     public abstract void Update();
 }

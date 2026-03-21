@@ -4,27 +4,30 @@ namespace GameUtils.Animation;
 /// A time-driven animated float value that interpolates from <see cref="From"/> to <see cref="To"/> over
 /// <see cref="Duration"/> seconds using a configurable easing function.
 /// </summary>
-public class Tweener
+/// <remarks>
+/// Creates a new tweener.
+/// </remarks>
+public class Tweener(float from, float to, float duration, Func<float, float>? easingFunction = null)
 {
     /// <summary>
     /// The starting value.
     /// </summary>
-    public float From { get; set; }
+    public float From { get; set; } = from;
 
     /// <summary>
     /// The ending value.
     /// </summary>
-    public float To { get; set; }
+    public float To { get; set; } = to;
 
     /// <summary>
     /// The total duration of the tween in seconds.
     /// </summary>
-    public float Duration { get; set; }
+    public float Duration { get; set; } = duration;
 
     /// <summary>
     /// The easing function applied to the normalized time. Defaults to linear.
     /// </summary>
-    public Func<float, float> EasingFunction { get; set; } = Ease.Linear;
+    public Func<float, float> EasingFunction { get; set; } = easingFunction ?? Ease.Linear;
 
     /// <summary>
     /// Whether the tween loops back to the start when complete.
@@ -34,7 +37,7 @@ public class Tweener
     /// <summary>
     /// The current interpolated value.
     /// </summary>
-    public float Value { get; private set; }
+    public float Value { get; private set; } = from;
 
     /// <summary>
     /// True when the tween has reached <see cref="To"/> and is no longer updating.
@@ -47,18 +50,6 @@ public class Tweener
     public Action? OnComplete { get; set; }
 
     private float _elapsed;
-
-    /// <summary>
-    /// Creates a new tweener.
-    /// </summary>
-    public Tweener(float from, float to, float duration, Func<float, float>? easingFunction = null)
-    {
-        From = from;
-        To = to;
-        Duration = duration;
-        EasingFunction = easingFunction ?? Ease.Linear;
-        Value = from;
-    }
 
     /// <summary>
     /// Advances the tween by <paramref name="deltaTime"/> seconds.

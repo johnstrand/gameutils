@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace GameUtils;
+namespace GameUtils.Math;
 
 /// <summary>
 /// Extension methods for Vector2.
@@ -189,7 +189,7 @@ public static class Vector2Ext
     {
         var delta = target - current;
         var distance = delta.Length();
-        return distance <= maxDelta || distance == 0f
+        return distance <= maxDelta || distance < float.Epsilon
             ? target
             : current + (delta / distance * maxDelta);
     }

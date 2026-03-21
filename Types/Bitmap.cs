@@ -63,6 +63,14 @@ public class Bitmap(int width, int height)
     }
 
     /// <summary>
+    /// Clears the image to the specified color
+    /// </summary>
+    public void Clear(Color color)
+    {
+        Clear((Vector3)color);
+    }
+
+    /// <summary>
     /// Draw a rectangle with the specified color
     /// </summary>
     public void Rectangle(Vector2 position, Vector2 size, Vector3 color)
@@ -94,8 +102,8 @@ public class Bitmap(int width, int height)
         var x1 = (int)end.X;
         var y1 = (int)end.Y;
 
-        var dx = Math.Abs(x1 - x0);
-        var dy = Math.Abs(y1 - y0);
+        var dx = System.Math.Abs(x1 - x0);
+        var dy = System.Math.Abs(y1 - y0);
         var sx = x0 < x1 ? 1 : -1;
         var sy = y0 < y1 ? 1 : -1;
         var err = dx - dy;
@@ -150,14 +158,6 @@ public class Bitmap(int width, int height)
                 }
             }
         }
-    }
-
-    /// <summary>
-    /// Clears the image to the specified color
-    /// </summary>
-    public void Clear(Color color)
-    {
-        Clear((Vector3)color);
     }
 
     /// <summary>
