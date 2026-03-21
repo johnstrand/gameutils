@@ -149,4 +149,48 @@ public static class Vector2Ext
         var sortMultiplier = clockwise ? 1 : -1;
         return source.OrderBy(v => MathF.Atan2(v.Y - center.Y, v.X - center.X) * sortMultiplier);
     }
+
+    /// <summary>
+    /// Returns the left-hand perpendicular of the vector (rotated 90° counter-clockwise).
+    /// </summary>
+    public static Vector2 Perpendicular(this Vector2 value)
+    {
+        return new Vector2(-value.Y, value.X);
+    }
+
+    /// <summary>
+    /// Returns a copy of the vector with the X component replaced.
+    /// </summary>
+    public static Vector2 WithX(this Vector2 value, float x)
+    {
+        return new Vector2(x, value.Y);
+    }
+
+    /// <summary>
+    /// Returns a copy of the vector with the Y component replaced.
+    /// </summary>
+    public static Vector2 WithY(this Vector2 value, float y)
+    {
+        return new Vector2(value.X, y);
+    }
+
+    /// <summary>
+    /// Returns true if both X and Y are zero.
+    /// </summary>
+    public static bool IsZero(this Vector2 value)
+    {
+        return value == Vector2.Zero;
+    }
+
+    /// <summary>
+    /// Moves <paramref name="current"/> towards <paramref name="target"/> by at most <paramref name="maxDelta"/> units.
+    /// </summary>
+    public static Vector2 MoveTowards(this Vector2 current, Vector2 target, float maxDelta)
+    {
+        var delta = target - current;
+        var distance = delta.Length();
+        return distance <= maxDelta || distance == 0f
+            ? target
+            : current + (delta / distance * maxDelta);
+    }
 }

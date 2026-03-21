@@ -1,4 +1,5 @@
-﻿namespace GameUtils.Term;
+﻿#pragma warning disable CS0649 // Fields are populated by P/Invoke marshaling
+namespace GameUtils.Term;
 internal static class PInvoke
 {
     [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
@@ -44,13 +45,13 @@ internal static class PInvoke
     internal static extern IntPtr CreateConsoleScreenBuffer(uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
 }
 
-public struct Coord
+internal struct Coord
 {
     public short X;
     public short Y;
 }
 
-public struct SmallRectangle
+internal struct SmallRectangle
 {
     public short Left;
     public short Top;
@@ -58,7 +59,7 @@ public struct SmallRectangle
     public short Bottom;
 }
 
-public struct ConsoleScreenBufferInfo
+internal struct ConsoleScreenBufferInfo
 {
     public Coord Size;
     public Coord CursorPosition;
@@ -67,13 +68,13 @@ public struct ConsoleScreenBufferInfo
     public Coord MaximumWindowSize;
 }
 
-public struct ConsoleCursorInfo
+internal struct ConsoleCursorInfo
 {
     public uint Size;
     public bool Visible;
 }
 
-public enum ConsoleMode : uint
+internal enum ConsoleMode : uint
 {
     ENABLE_PROCESSED_INPUT = 0x0001,
     ENABLE_LINE_INPUT = 0x0002,

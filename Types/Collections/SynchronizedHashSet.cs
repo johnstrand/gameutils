@@ -4,7 +4,7 @@
 /// Hash set implementation of a synchronized collection.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class SynchronizedHashSet<T> : SyncronizedCollection<T> where T : notnull
+public class SynchronizedHashSet<T> : SynchronizedCollection<T> where T : notnull
 {
     private readonly HashSet<T> _set = [];
 

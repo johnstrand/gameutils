@@ -62,4 +62,36 @@ public static class Vector3Ext
     {
         return new Vector2(value.Y, value.Z);
     }
+
+    /// <summary>
+    /// Returns a copy of the vector with the X component replaced.
+    /// </summary>
+    public static Vector3 WithX(this Vector3 value, float x)
+    {
+        return new Vector3(x, value.Y, value.Z);
+    }
+
+    /// <summary>
+    /// Returns a copy of the vector with the Y component replaced.
+    /// </summary>
+    public static Vector3 WithY(this Vector3 value, float y)
+    {
+        return new Vector3(value.X, y, value.Z);
+    }
+
+    /// <summary>
+    /// Returns a copy of the vector with the Z component replaced.
+    /// </summary>
+    public static Vector3 WithZ(this Vector3 value, float z)
+    {
+        return new Vector3(value.X, value.Y, z);
+    }
+
+    /// <summary>
+    /// Returns true if X, Y and Z are all zero.
+    /// </summary>
+    public static bool IsZero(this Vector3 value)
+    {
+        return value == Vector3.Zero;
+    }
 }

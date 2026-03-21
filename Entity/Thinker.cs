@@ -38,7 +38,7 @@ public class Thinker(float interval)
             return;
         }
 
-        UntilNextThink += UntilNextThink;
+        UntilNextThink += _thinkInterval;
         OnThink?.Invoke();
     }
 

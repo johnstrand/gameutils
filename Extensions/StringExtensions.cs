@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace GameUtils.Extensions;
+﻿namespace GameUtils.Extensions;
 
 /// <summary>
 /// Extension methods for strings.
@@ -29,13 +27,6 @@ public static class StringExtensions
     public static string Repeat(this string str, int count)
     {
         ArgumentNullException.ThrowIfNull(str);
-        var result = new StringBuilder();
-
-        for (var i = 0; i < count; i++)
-        {
-            result.Append(str);
-        }
-
-        return result.ToString();
+        return string.Concat(Enumerable.Repeat(str, count));
     }
 }

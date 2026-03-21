@@ -1,4 +1,4 @@
-﻿namespace GameUtils;
+﻿namespace GameUtils.Animation;
 
 /// <summary>
 /// Math functions for offsetting animations. The functions are in the form of f(x) = y, where x is a value from 0 to 1 and y is a value from -1 to 1.

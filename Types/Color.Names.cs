@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 
 namespace GameUtils;
-internal readonly partial struct Color
+public readonly partial struct Color
 {
     /// <summary>rgb(240, 248, 255)</summary>
     public static readonly Vector3 AliceBlue = new(0.9411765f, 0.972549f, 1f);

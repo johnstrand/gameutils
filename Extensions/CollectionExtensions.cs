@@ -24,11 +24,17 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// Shuffles the list, returning a new list.
+    /// Shuffles the list, returning a new list using a Fisher-Yates shuffle.
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
-        return source.OrderBy(_ => _random.Next());
+        var buffer = source.ToArray();
+        for (var i = buffer.Length - 1; i > 0; i--)
+        {
+            var j = _random.Next(i + 1);
+            (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
+        }
+        return buffer;
     }
 
     /// <summary>
@@ -93,10 +99,55 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// Combines map and filter into a single operation.
+    /// Gets a random element from the read-only list.
     /// </summary>
-    public static IEnumerable<TOutput> SelectWhere<TInput, TOutput>(this IEnumerable<TInput> source, Func<TInput, bool> predicate, Func<TInput, int, TOutput> selector)
+    public static T GetRandom<T>(this IReadOnlyList<T> list)
     {
-        return source.SelectWhere((item, _) => predicate(item), selector);
+        return list[_random.Next(list.Count)];
+    }
+
+    /// <summary>
+    /// Calls <paramref name="action"/> on each element in the sequence.
+    /// </summary>
+    public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+    {
+        foreach (var item in source)
+        {
+            action(item);
+        }
+    }
+
+    /// <summary>
+    /// Picks a random element from the sequence using the specified weight selector.
+    /// Higher weights increase the chance of selection.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the sequence is empty or all weights are zero.</exception>
+    public static T WeightedRandom<T>(this IEnumerable<T> source, Func<T, float> weightSelector)
+    {
+        var items = source.ToList();
+        if (items.Count == 0)
+        {
+            throw new InvalidOperationException("Sequence contains no elements.");
+        }
+
+        var totalWeight = items.Sum(weightSelector);
+        if (totalWeight <= 0)
+        {
+            throw new InvalidOperationException("Total weight must be greater than zero.");
+        }
+
+        var target = (float)(_random.NextDouble() * totalWeight);
+        var cumulative = 0f;
+
+        foreach (var item in items)
+        {
+            cumulative += weightSelector(item);
+            if (target <= cumulative)
+            {
+                return item;
+            }
+        }
+
+        return items[^1];
     }
 }

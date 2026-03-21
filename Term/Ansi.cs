@@ -215,7 +215,7 @@ public static class Ansi
     /// <param name="amount"></param>
     public static void ScrollDown(int amount = 1)
     {
-        Console.Write(CreateSequence("TResult", amount));
+        Console.Write(CreateSequence("T", amount));
     }
 
     /// <summary>
@@ -362,7 +362,7 @@ public static class Ansi
                 var r = byte.Parse(rgb[0]);
                 var g = byte.Parse(rgb[1]);
                 var b = byte.Parse(rgb[2]);
-                result.Append(Foreground(r, g, b));
+                result.Append(Background(r, g, b));
                 continue;
             }
 

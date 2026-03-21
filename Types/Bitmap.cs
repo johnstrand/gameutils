@@ -85,16 +85,42 @@ public class Bitmap(int width, int height)
     }
 
     /// <summary>
-    /// Draw a line with the specified color
+    /// Draw a line with the specified color using Bresenham's line algorithm
     /// </summary>
     public void Line(Vector2 start, Vector2 end, Vector3 color)
     {
-        // This is bad, but it works for now
-        var length = (end - start).Length();
-        var step = (end - start) / length;
-        for (var i = 0; i < length; i++)
+        var x0 = (int)start.X;
+        var y0 = (int)start.Y;
+        var x1 = (int)end.X;
+        var y1 = (int)end.Y;
+
+        var dx = Math.Abs(x1 - x0);
+        var dy = Math.Abs(y1 - y0);
+        var sx = x0 < x1 ? 1 : -1;
+        var sy = y0 < y1 ? 1 : -1;
+        var err = dx - dy;
+
+        while (true)
         {
-            this[start + (step * i)] = color;
+            this[x0, y0] = color;
+
+            if (x0 == x1 && y0 == y1)
+            {
+                break;
+            }
+
+            var e2 = 2 * err;
+            if (e2 > -dy)
+            {
+                err -= dy;
+                x0 += sx;
+            }
+
+            if (e2 < dx)
+            {
+                err += dx;
+                y0 += sy;
+            }
         }
     }
 
@@ -111,17 +137,27 @@ public class Bitmap(int width, int height)
     /// </summary>
     public void Circle(Vector2 position, float radius, Vector3 color)
     {
+        var radiusSq = radius * radius;
         for (var y = position.Y - radius; y < position.Y + radius; y++)
         {
             for (var x = position.X - radius; x < position.X + radius; x++)
             {
-                var point = new Vector2(x, y);
-                if ((point - position).Length() <= radius)
+                var dx = x - position.X;
+                var dy = y - position.Y;
+                if ((dx * dx) + (dy * dy) <= radiusSq)
                 {
-                    this[point] = color;
+                    this[(int)x, (int)y] = color;
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Clears the image to the specified color
+    /// </summary>
+    public void Clear(Color color)
+    {
+        Clear((Vector3)color);
     }
 
     /// <summary>

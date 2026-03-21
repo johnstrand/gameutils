@@ -27,7 +27,7 @@ public record Operation<T>(OperationKind Kind, T Entity);
 /// <summary>
 /// Abstract class for a thread-safe collection that can be modified from multiple threads.
 /// </summary>
-public abstract class SyncronizedCollection<T> : IEnumerable<T> where T : notnull
+public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnull
 {
     private readonly ConcurrentQueue<Operation<T>> _pending = new();
     private readonly SemaphoreSlim _integrating = new(1, 1);

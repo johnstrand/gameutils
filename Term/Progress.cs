@@ -44,7 +44,7 @@ public static class Progress
     /// <param name="pending">The character or string to be used to indicate the remaining part</param>
     public static string Bar(int current, int total, int width, string completed, string pending = " ")
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(current, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(current);
         ArgumentOutOfRangeException.ThrowIfLessThan(total, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(current, total);

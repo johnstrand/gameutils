@@ -45,8 +45,7 @@ public abstract class FixedScheduler(int targetRatePerSecond)
                 // Wait until the frame is over
                 while ((DateTime.Now - frameStart).TotalSeconds < _targetFrameTime)
                 {
-                    // Just yield over and over until the frame is over
-                    Thread.Yield();
+                    Thread.Sleep(1);
                 }
 
                 // If we have processed the number of frames we expected to process in a second, let's see what the drift is
