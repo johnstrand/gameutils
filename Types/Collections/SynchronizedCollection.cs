@@ -55,13 +55,17 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
     public void Integrate()
     {
         _integrating.Wait();
-
-        while (_pending.TryDequeue(out var operation))
+        try
         {
-            HandleOperation(operation);
+            while (_pending.TryDequeue(out var operation))
+            {
+                HandleOperation(operation);
+            }
         }
-
-        _integrating.Release();
+        finally
+        {
+            _integrating.Release();
+        }
     }
 
     /// <summary>
@@ -79,8 +83,14 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
     public void ClearPending()
     {
         _integrating.Wait();
-        _pending.Clear();
-        _integrating.Release();
+        try
+        {
+            _pending.Clear();
+        }
+        finally
+        {
+            _integrating.Release();
+        }
     }
 
     /// <summary>
@@ -89,9 +99,14 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
     public IEnumerable<T> Get()
     {
         _integrating.Wait();
-        var items = GetInternal().ToList();
-        _integrating.Release();
-        return items;
+        try
+        {
+            return GetInternal().ToList();
+        }
+        finally
+        {
+            _integrating.Release();
+        }
     }
 
     /// <summary>

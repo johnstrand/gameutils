@@ -8,6 +8,7 @@ namespace GameUtils.Types.Geometry;
 /// <remarks>
 /// Constructs a new circle
 /// </remarks>
+/// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="radius"/> is negative.</exception>
 public class Circle(Vector2 center, float radius)
 {
     /// <summary>
@@ -18,7 +19,7 @@ public class Circle(Vector2 center, float radius)
     /// <summary>
     /// Radius of the circle
     /// </summary>
-    public float Radius { get; } = radius;
+    public float Radius { get; } = radius >= 0 ? radius : throw new ArgumentOutOfRangeException(nameof(radius), "Radius must be non-negative.");
 
     /// <summary>
     /// The radius squared, for faster calculations

@@ -187,9 +187,10 @@ public class Bitmap(int width, int height)
             .SelectMany(c => new[] { c.B, c.G, c.R })
             .ToArray();
 
-        var padding = (4 - (Width * 3 % 4)) % 4;
         var rowSize = Width * 3;
-        var dataSize = rowSize * Height;
+        var padding = (4 - (rowSize % 4)) % 4;
+        var paddedRowSize = rowSize + padding;
+        var dataSize = paddedRowSize * Height;
         var fileSize = 54 + dataSize;
 
         using var writer = new BinaryWriter(stream);

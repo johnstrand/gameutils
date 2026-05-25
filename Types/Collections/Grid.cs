@@ -1,11 +1,12 @@
-﻿using System.Numerics;
+﻿using System.Collections;
+using System.Numerics;
 
 namespace GameUtils.Types.Collections;
 
 /// <summary>
 /// A 2D grid of values
 /// </summary>
-public class Grid<T>
+public class Grid<T> : IEnumerable<T>
 {
     /// <summary>
     /// Width of the grid
@@ -24,6 +25,8 @@ public class Grid<T>
     /// </summary>
     public Grid(int width, int height)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(width, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(height, 0);
         Width = width;
         Height = height;
         _data = new T[width * height];
@@ -34,6 +37,8 @@ public class Grid<T>
     /// </summary>
     public Grid(int width, int height, T[] data)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(width, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(height, 0);
         if (data.Length != width * height)
         {
             throw new ArgumentException("Data length must be equal to width * height");
@@ -185,5 +190,16 @@ public class Grid<T>
     public Grid<T> Fill(Func<Vector2, T> factory)
     {
         return Fill((x, y) => factory(new Vector2(x, y)));
+    }
+
+    /// <inheritdoc/>
+    public IEnumerator<T> GetEnumerator()
+    {
+        return ((IEnumerable<T>)_data).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _data.GetEnumerator();
     }
 }

@@ -10,6 +10,7 @@ public static class StringExtensions
     /// </summary>
     public static bool TryGet(this string str, int index, out char c)
     {
+        ArgumentNullException.ThrowIfNull(str);
         c = '\0';
 
         if (index < 0 || index >= str.Length)
@@ -27,6 +28,7 @@ public static class StringExtensions
     public static string Repeat(this string str, int count)
     {
         ArgumentNullException.ThrowIfNull(str);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
         return string.Concat(Enumerable.Repeat(str, count));
     }
 }

@@ -8,29 +8,47 @@ namespace GameUtils.Term;
 public static class Progress
 {
     /// <summary>
-    /// Given the current count, total cound, and start time, returns the estimated time remaining.
+    /// Given the current count, total count, and start time, returns the estimated time remaining.
+    /// Returns <see cref="TimeSpan.MaxValue"/> when the rate is zero (i.e., no progress yet).
     /// </summary>
     public static TimeSpan TimeRemaining(int current, int total, DateTimeOffset start)
     {
         var rate = Rate(current, start);
+        if (rate <= 0)
+        {
+            return TimeSpan.MaxValue;
+        }
+
         var remaining = (total - current) / rate;
         return TimeSpan.FromSeconds(remaining);
     }
 
     /// <summary>
     /// Given the current count and start time, returns the current rate.
+    /// Returns 0 when elapsed time is zero or negative.
     /// </summary>
     public static double Rate(int current, DateTimeOffset start)
     {
         var elapsed = DateTimeOffset.UtcNow - start;
+        if (elapsed.TotalSeconds <= 0)
+        {
+            return 0;
+        }
+
         return current / elapsed.TotalSeconds;
     }
 
     /// <summary>
     /// Given the current count and total count, returns the percent complete.
+    /// Returns 0 when total is zero.
     /// </summary>
     public static int PercentComplete(int current, int total)
     {
+        if (total == 0)
+        {
+            return 0;
+        }
+
         return current * 100 / total;
     }
 

@@ -79,6 +79,11 @@ public class StateMachine<TState>(TState initialState) where TState : notnull
 
     private void ChangeState(TState next)
     {
+        if (next.Equals(CurrentState))
+        {
+            return;
+        }
+
         if (_onExit.TryGetValue(CurrentState, out var exitCallback))
         {
             exitCallback();

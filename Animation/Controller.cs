@@ -72,21 +72,18 @@ public class Controller(int frameCount, bool isLooping = true, float framesPerSe
 
         _subFrame += deltaTime;
 
-        if (_subFrame < _frameDuration)
+        while (_subFrame >= _frameDuration)
         {
-            return;
+            _subFrame -= _frameDuration;
+
+            if (!IsLooping && CurrentFrame == FrameCount - 1)
+            {
+                Stop();
+                return;
+            }
+
+            CurrentFrame = (CurrentFrame + 1) % FrameCount;
+            OnFrameChanged?.Invoke(CurrentFrame);
         }
-
-        _subFrame -= _frameDuration;
-
-        if (!IsLooping && CurrentFrame == FrameCount - 1)
-        {
-            Stop();
-            return;
-        }
-
-        CurrentFrame++;
-
-        OnFrameChanged?.Invoke(CurrentFrame);
     }
 }

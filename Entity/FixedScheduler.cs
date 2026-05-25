@@ -21,7 +21,7 @@ public abstract class FixedScheduler(int targetRatePerSecond)
     /// </summary>
     public void Start()
     {
-        if (_runningTask != null)
+        if (_runningTask != null && !_runningTask.IsCompleted)
         {
             return;
         }
@@ -34,7 +34,14 @@ public abstract class FixedScheduler(int targetRatePerSecond)
 
             while (_isRunning)
             {
-                Update();
+                try
+                {
+                    Update();
+                }
+                catch (Exception)
+                {
+                    // Swallow exceptions to keep the loop alive; override Update to handle errors.
+                }
 
                 // Sleep for the bulk of the remaining time, leaving ~1ms for spin-wait precision
                 var remaining = nextTick - stopwatch.Elapsed;

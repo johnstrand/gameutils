@@ -9,18 +9,26 @@ namespace GameUtils.Procedural;
 public static class Diamond
 {
     /// <summary>
-    /// Creates a new diamond-square map from the specified parameters
+    /// Creates a new diamond-square map from the specified parameters.
     /// </summary>
-    /// <param name="size">Height and width</param>
+    /// <param name="size">Height and width. Must be a power-of-two plus one (e.g. 129, 257, 513).</param>
     /// <param name="min">Min value of the initial seed</param>
     /// <param name="max">Max value of the initial seed</param>
     /// <param name="range">The initial range for the next step</param>
-    /// <param name="nextRange">A method that will be passed the current range and is expected to return the range for hte next iteration</param>
+    /// <param name="nextRange">A method that will be passed the current range and is expected to return the range for the next iteration</param>
     /// <param name="valueFactory">A method that will be passed an average value and a range, and is expected to return an integer map value</param>
-    public static Grid<int> Create(int size, int min, int max, float range, Func<float, float> nextRange, Func<float, float, int> valueFactory)
+    /// <param name="seed">Optional random seed for reproducible generation. Uses a thread-safe shared instance when null.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="size"/> is not a power-of-two plus one.</exception>
+    public static Grid<int> Create(int size, int min, int max, float range, Func<float, float> nextRange, Func<float, float, int> valueFactory, int? seed = null)
     {
+        var n = size - 1;
+        if (n < 1 || (n & (n - 1)) != 0)
+        {
+            throw new ArgumentException("Size must be a power-of-two plus one (e.g. 3, 5, 9, 17, 33, ...).", nameof(size));
+        }
+
+        var r = seed.HasValue ? new Random(seed.Value) : Random.Shared;
         var map = new Grid<int>(size, size);
-        var r = new Random();
         map[0, 0] = r.Next(min, max);
         map[0, size - 1] = r.Next(min, max);
         map[size - 1, 0] = r.Next(min, max);

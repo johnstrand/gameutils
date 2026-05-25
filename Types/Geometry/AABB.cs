@@ -29,12 +29,13 @@ public class AABB
     public Vector2 Size { get; }
 
     /// <summary>
-    /// Creates a new AABB from the specified minimum and maximum points
+    /// Creates a new AABB from the specified minimum and maximum points.
+    /// If <paramref name="min"/> is greater than <paramref name="max"/> in either axis, the values are swapped.
     /// </summary>
     public AABB(Vector2 min, Vector2 max)
     {
-        Min = min;
-        Max = max;
+        Min = Vector2.Min(min, max);
+        Max = Vector2.Max(min, max);
         Center = (Min + Max) / 2f;
         Size = Max - Min;
     }

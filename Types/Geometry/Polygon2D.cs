@@ -29,8 +29,14 @@ public readonly struct Polygon2D
     /// <summary>
     /// Creates a new polygon from the specified vertices. If <paramref name="sort"/> is true, the vertices will be sorted clockwise before creating the polygon.
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="vertices"/> is empty.</exception>
     public Polygon2D(Vector2[] vertices, bool sort = true)
     {
+        if (vertices.Length == 0)
+        {
+            throw new ArgumentException("Vertices array must not be empty.", nameof(vertices));
+        }
+
         Vertices = sort ? SortClockwise(vertices) : [.. vertices];
 
         Edges = new Line[Vertices.Length];

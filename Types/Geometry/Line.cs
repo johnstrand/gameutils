@@ -54,8 +54,14 @@ public readonly record struct Line
     /// <summary>
     /// Creates a line from <paramref name="start"/> in the direction of <paramref name="direction"/> with a length of <paramref name="length"/>
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="direction"/> is the zero vector.</exception>
     public Line(Vector2 start, Vector2 direction, float length)
     {
+        if (direction == Vector2.Zero)
+        {
+            throw new ArgumentException("Direction cannot be the zero vector.", nameof(direction));
+        }
+
         Start = start;
         End = start + (Vector2.Normalize(direction) * length);
         Length = length;

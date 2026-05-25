@@ -9,6 +9,15 @@
 /// </summary>
 public static class Ease
 {
+    /// <summary>
+    /// Wraps any easing function to clamp the input to [0, 1] before evaluating.
+    /// </summary>
+    public static Func<float, float> Clamp(Func<float, float> easingFunction)
+    {
+        ArgumentNullException.ThrowIfNull(easingFunction);
+        return x => easingFunction(System.Math.Clamp(x, 0f, 1f));
+    }
+
     #region Linear
     /// <summary>
     /// Linear interpolation (no easing). This method is included for completeness.

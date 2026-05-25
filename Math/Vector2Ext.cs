@@ -67,8 +67,9 @@ public static class Vector2Ext
     }
 
     /// <summary>
-    /// Calculates the midpoint (average) of a list of vectors
+    /// Calculates the midpoint (average) of a list of vectors.
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the sequence is empty.</exception>
     public static Vector2 Midpoint(this IEnumerable<Vector2> source)
     {
         var sum = Vector2.Zero;
@@ -77,6 +78,11 @@ public static class Vector2Ext
         {
             sum += item;
             count++;
+        }
+
+        if (count == 0)
+        {
+            throw new ArgumentException("Sequence contains no elements.", nameof(source));
         }
 
         return sum / count;

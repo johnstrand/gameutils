@@ -5,14 +5,12 @@
 /// </summary>
 public static class MathExt
 {
-    private static readonly Random _random = new();
-
     /// <summary>
     /// Returns a random float between 0 and 1.
     /// </summary>
     public static float RandomFloat()
     {
-        return _random.NextSingle();
+        return Random.Shared.NextSingle();
     }
 
     /// <summary>
@@ -20,7 +18,7 @@ public static class MathExt
     /// </summary>
     public static float RandomFloat(float min, float max)
     {
-        return MathFExt.Remap(_random.NextSingle(), 0, 1, min, max);
+        return MathFExt.Remap(Random.Shared.NextSingle(), 0, 1, min, max);
     }
 
     /// <summary>
@@ -28,7 +26,7 @@ public static class MathExt
     /// </summary>
     public static int RandomInt(int min, int max)
     {
-        return _random.Next(min, max);
+        return Random.Shared.Next(min, max);
     }
 
     /// <summary>
@@ -36,7 +34,7 @@ public static class MathExt
     /// </summary>
     public static bool RandomBool(float probability = 0.5f)
     {
-        return _random.NextSingle() < probability;
+        return Random.Shared.NextSingle() < probability;
     }
 
     /// <summary>
@@ -44,8 +42,8 @@ public static class MathExt
     /// </summary>
     public static float RandomGaussian(float mean = 0f, float stdDev = 1f)
     {
-        var u1 = 1f - _random.NextSingle();
-        var u2 = 1f - _random.NextSingle();
+        var u1 = 1f - Random.Shared.NextSingle();
+        var u2 = 1f - Random.Shared.NextSingle();
         var normal = MathF.Sqrt(-2f * MathF.Log(u1)) * MathF.Sin(MathF.Tau * u2);
         return mean + (stdDev * normal);
     }
@@ -55,8 +53,8 @@ public static class MathExt
     /// </summary>
     public static System.Numerics.Vector2 RandomInCircle(float radius = 1f)
     {
-        var angle = _random.NextSingle() * MathF.Tau;
-        var r = radius * MathF.Sqrt(_random.NextSingle());
+        var angle = Random.Shared.NextSingle() * MathF.Tau;
+        var r = radius * MathF.Sqrt(Random.Shared.NextSingle());
         return new System.Numerics.Vector2(r * MathF.Cos(angle), r * MathF.Sin(angle));
     }
 
@@ -65,7 +63,7 @@ public static class MathExt
     /// </summary>
     public static System.Numerics.Vector2 RandomOnCircle(float radius = 1f)
     {
-        var angle = _random.NextSingle() * MathF.Tau;
+        var angle = Random.Shared.NextSingle() * MathF.Tau;
         return new System.Numerics.Vector2(radius * MathF.Cos(angle), radius * MathF.Sin(angle));
     }
 }

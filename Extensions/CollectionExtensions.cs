@@ -5,30 +5,46 @@
 /// </summary>
 public static class CollectionExtensions
 {
-    private static readonly Random _random = new();
-
     /// <summary>
     /// Gets a random element from the array.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the array is empty.</exception>
     public static T GetRandom<T>(this T[] array)
     {
-        return array[_random.Next(array.Length)];
+        if (array.Length == 0)
+        {
+            throw new InvalidOperationException("Sequence contains no elements.");
+        }
+
+        return array[Random.Shared.Next(array.Length)];
     }
 
     /// <summary>
     /// Gets a random element from the list.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the list is empty.</exception>
     public static T GetRandom<T>(this List<T> list)
     {
-        return list[_random.Next(list.Count)];
+        if (list.Count == 0)
+        {
+            throw new InvalidOperationException("Sequence contains no elements.");
+        }
+
+        return list[Random.Shared.Next(list.Count)];
     }
 
     /// <summary>
     /// Gets a random element from the read-only list.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when the list is empty.</exception>
     public static T GetRandom<T>(this IReadOnlyList<T> list)
     {
-        return list[_random.Next(list.Count)];
+        if (list.Count == 0)
+        {
+            throw new InvalidOperationException("Sequence contains no elements.");
+        }
+
+        return list[Random.Shared.Next(list.Count)];
     }
 
     /// <summary>
@@ -39,7 +55,7 @@ public static class CollectionExtensions
         var buffer = source.ToArray();
         for (var i = buffer.Length - 1; i > 0; i--)
         {
-            var j = _random.Next(i + 1);
+            var j = Random.Shared.Next(i + 1);
             (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
         }
         return buffer;
@@ -136,7 +152,7 @@ public static class CollectionExtensions
             throw new InvalidOperationException("Total weight must be greater than zero.");
         }
 
-        var target = (float)(_random.NextDouble() * totalWeight);
+        var target = (float)(Random.Shared.NextDouble() * totalWeight);
         var cumulative = 0f;
 
         foreach (var item in items)

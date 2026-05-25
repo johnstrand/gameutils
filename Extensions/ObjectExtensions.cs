@@ -10,6 +10,7 @@ public static class ObjectExtensions
     /// </summary>
     public static T Mutate<T>(this T obj, Func<T, T> action) where T : struct
     {
+        ArgumentNullException.ThrowIfNull(action);
         return action(obj);
     }
 
@@ -18,6 +19,7 @@ public static class ObjectExtensions
     /// </summary>
     public static T Mutate<T>(this T obj, Action<T> action) where T : class
     {
+        ArgumentNullException.ThrowIfNull(action);
         action(obj);
         return obj;
     }
@@ -37,6 +39,7 @@ public static class ObjectExtensions
     /// <returns></returns>
     public static Func<TResult> Curry<T, TResult>(this Func<T, TResult> func, T arg)
     {
+        ArgumentNullException.ThrowIfNull(func);
         return () => func(arg);
     }
 
@@ -45,6 +48,7 @@ public static class ObjectExtensions
     /// </summary>
     public static Func<T2, TResult> Curry<T1, T2, TResult>(this Func<T1, T2, TResult> func, T1 arg)
     {
+        ArgumentNullException.ThrowIfNull(func);
         return arg2 => func(arg, arg2);
     }
 
@@ -53,6 +57,7 @@ public static class ObjectExtensions
     /// </summary>
     public static Func<T2, T3, TResult> Curry<T1, T2, T3, TResult>(this Func<T1, T2, T3, TResult> func, T1 arg)
     {
+        ArgumentNullException.ThrowIfNull(func);
         return (arg2, arg3) => func(arg, arg2, arg3);
     }
 
@@ -61,6 +66,7 @@ public static class ObjectExtensions
     /// </summary>
     public static Func<T2, T3, T4, TResult> Curry<T1, T2, T3, T4, TResult>(this Func<T1, T2, T3, T4, TResult> func, T1 arg)
     {
+        ArgumentNullException.ThrowIfNull(func);
         return (arg2, arg3, arg4) => func(arg, arg2, arg3, arg4);
     }
 
@@ -69,6 +75,7 @@ public static class ObjectExtensions
     /// </summary>
     public static Func<T2, T3, T4, T5, TResult> Curry<T1, T2, T3, T4, T5, TResult>(this Func<T1, T2, T3, T4, T5, TResult> func, T1 arg)
     {
+        ArgumentNullException.ThrowIfNull(func);
         return (arg2, arg3, arg4, arg5) => func(arg, arg2, arg3, arg4, arg5);
     }
 }

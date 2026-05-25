@@ -61,13 +61,22 @@ public class Tweener(float from, float to, float duration, Func<float, float>? e
             return;
         }
 
+        if (Duration <= 0)
+        {
+            Value = To;
+            IsComplete = true;
+            OnComplete?.Invoke();
+            return;
+        }
+
         _elapsed += deltaTime;
 
         if (_elapsed >= Duration)
         {
             if (IsLooping)
             {
-                _elapsed -= Duration;
+                _elapsed %= Duration;
+                OnComplete?.Invoke();
             }
             else
             {
@@ -76,7 +85,7 @@ public class Tweener(float from, float to, float duration, Func<float, float>? e
             }
         }
 
-        var t = Duration > 0 ? EasingFunction(_elapsed / Duration) : 1f;
+        var t = EasingFunction(_elapsed / Duration);
         Value = From + ((To - From) * t);
 
         if (IsComplete)

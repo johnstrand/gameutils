@@ -3,6 +3,10 @@ namespace GameUtils.Entity;
 /// <summary>
 /// A generic object pool that reuses instances to reduce garbage collection pressure.
 /// </summary>
+/// <remarks>
+/// This class is <b>not thread-safe</b>. Do not call <see cref="Rent"/> or <see cref="Return"/> concurrently
+/// from multiple threads without external synchronisation.
+/// </remarks>
 public class ObjectPool<T>
 {
     private readonly Func<T> _factory;

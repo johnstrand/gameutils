@@ -336,9 +336,9 @@ public static class Ansi
                 continue;
             }
 
-            if (sequence[0] == '#' || sequence.StartsWith("#fg"))
+            if (sequence.StartsWith("#fg:"))
             {
-                var rgb = sequence[(sequence[0] == '#' ? 1 : 3)..].Split(',');
+                var rgb = sequence[4..].Split(',');
 
                 if (rgb.Length != 3)
                 {
@@ -354,7 +354,7 @@ public static class Ansi
 
             if (sequence.StartsWith("#bg:"))
             {
-                var rgb = sequence[3..].Split(',');
+                var rgb = sequence[4..].Split(',');
 
                 if (rgb.Length != 3)
                 {
@@ -365,6 +365,22 @@ public static class Ansi
                 var g = byte.Parse(rgb[1]);
                 var b = byte.Parse(rgb[2]);
                 result.Append(Background(r, g, b));
+                continue;
+            }
+
+            if (sequence[0] == '#')
+            {
+                var rgb = sequence[1..].Split(',');
+
+                if (rgb.Length != 3)
+                {
+                    throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
+                }
+
+                var r = byte.Parse(rgb[0]);
+                var g = byte.Parse(rgb[1]);
+                var b = byte.Parse(rgb[2]);
+                result.Append(Foreground(r, g, b));
                 continue;
             }
 

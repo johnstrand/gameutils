@@ -22,8 +22,14 @@ public readonly record struct Ray2D
     /// <summary>
     /// Creates a ray from <paramref name="origin"/> pointing in <paramref name="direction"/> (normalised automatically).
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="direction"/> is the zero vector.</exception>
     public Ray2D(Vector2 origin, Vector2 direction)
     {
+        if (direction == Vector2.Zero)
+        {
+            throw new ArgumentException("Direction cannot be the zero vector.", nameof(direction));
+        }
+
         Origin = origin;
         Direction = Vector2.Normalize(direction);
     }

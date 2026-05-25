@@ -44,7 +44,8 @@ public class Dijkstra<T> where T : notnull
         }
 
         var distances = _nodes.ToDictionary(k => k, _ => float.MaxValue);
-        var previousNodes = _nodes.ToDictionary(k => k, _ => default(T));
+        var previousNodes = new Dictionary<T, T?>();
+        var visited = new HashSet<T>();
 
         distances[start] = 0;
 
@@ -54,6 +55,11 @@ public class Dijkstra<T> where T : notnull
         while (queue.Count > 0)
         {
             var next = queue.Dequeue();
+
+            if (!visited.Add(next))
+            {
+                continue; // stale priority-queue entry
+            }
 
             if (next.Equals(end))
             {
@@ -67,6 +73,11 @@ public class Dijkstra<T> where T : notnull
 
             foreach (var n in neighbors)
             {
+                if (visited.Contains(n))
+                {
+                    continue;
+                }
+
                 var distance = distances[next] + _weights[(next, n)];
 
                 if (distance < distances[n])
@@ -78,20 +89,26 @@ public class Dijkstra<T> where T : notnull
             }
         }
 
-        var current = (T?)end;
-        while (current is not null)
+        // Reconstruct path
+        var current = end;
+        while (true)
         {
             path.Insert(0, current);
-            current = previousNodes[current];
+            if (current.Equals(start))
+            {
+                break;
+            }
+
+            if (!previousNodes.TryGetValue(current, out var prev) || prev is null)
+            {
+                path = [];
+                return false;
+            }
+
+            current = prev;
         }
 
-        if (path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end))
-        {
-            return true;
-        }
-
-        path = [];
-        return false;
+        return path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end);
     }
 
     /// <summary>
@@ -155,9 +172,10 @@ public class Dijkstra<T> where T : notnull
     /// <param name="edge"></param>
     public void RemoveEdge(Edge<T> edge)
     {
-        if (!_edges.Remove(edge.From, out var nodes))
+        if (_edges.TryGetValue(edge.From, out var fromNeighbors))
         {
-            return;
+            fromNeighbors.Remove(edge.To);
+            _weights.Remove((edge.From, edge.To));
         }
 
         if (edge.IsDirected)
@@ -165,14 +183,10 @@ public class Dijkstra<T> where T : notnull
             return;
         }
 
-        foreach (var node in nodes)
+        if (_edges.TryGetValue(edge.To, out var toNeighbors))
         {
-            if (!_edges.TryGetValue(node, out var edges))
-            {
-                continue;
-            }
-
-            edges.Remove(edge.From);
+            toNeighbors.Remove(edge.From);
+            _weights.Remove((edge.To, edge.From));
         }
     }
 }
