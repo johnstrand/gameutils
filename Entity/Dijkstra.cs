@@ -43,7 +43,7 @@ public class Dijkstra<T> where T : notnull
             return false;
         }
 
-        var distances = _nodes.ToDictionary(k => k, _ => float.MaxValue);
+        var distances = new Dictionary<T, float>();
         var previousNodes = new Dictionary<T, T?>();
         var visited = new HashSet<T>();
 
@@ -78,9 +78,9 @@ public class Dijkstra<T> where T : notnull
                     continue;
                 }
 
-                var distance = distances[next] + _weights[(next, n)];
+                var distance = distances.GetValueOrDefault(next, float.MaxValue) + _weights[(next, n)];
 
-                if (distance < distances[n])
+                if (distance < distances.GetValueOrDefault(n, float.MaxValue))
                 {
                     distances[n] = distance;
                     previousNodes[n] = next;
@@ -90,10 +90,11 @@ public class Dijkstra<T> where T : notnull
         }
 
         // Reconstruct path
+        var stack = new Stack<T>();
         var current = end;
         while (true)
         {
-            path.Insert(0, current);
+            stack.Push(current);
             if (current.Equals(start))
             {
                 break;
@@ -107,6 +108,8 @@ public class Dijkstra<T> where T : notnull
 
             current = prev;
         }
+
+        path = new List<T>(stack);
 
         return path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end);
     }

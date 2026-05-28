@@ -63,6 +63,7 @@ public class QuadTree<T>
     /// <summary>
     /// Returns all items whose positions fall within <paramref name="region"/>.
     /// </summary>
+#pragma warning disable S3267 // LINQ would reintroduce allocations on a hot spatial query path
     public IEnumerable<T> Query(AABB region)
     {
         if (!_bounds.Intersects(region))
@@ -70,9 +71,12 @@ public class QuadTree<T>
             yield break;
         }
 
-        foreach (var (_, item) in _items.Where(e => region.Contains(e.position)))
+        foreach (var (pos, itm) in _items)
         {
-            yield return item;
+            if (region.Contains(pos))
+            {
+                yield return itm;
+            }
         }
 
         if (_children == null)
@@ -88,10 +92,12 @@ public class QuadTree<T>
             }
         }
     }
+#pragma warning restore S3267
 
     /// <summary>
     /// Returns all items within <paramref name="radius"/> of <paramref name="center"/>.
     /// </summary>
+#pragma warning disable S3267 // LINQ would reintroduce allocations on a hot spatial query path
     public IEnumerable<T> Query(Vector2 center, float radius)
     {
         var searchArea = new AABB(
@@ -100,9 +106,12 @@ public class QuadTree<T>
 
         var radiusSq = radius * radius;
 
-        foreach (var (_, item) in _items.Where(e => searchArea.Contains(e.position) && Vector2.DistanceSquared(center, e.position) <= radiusSq))
+        foreach (var (pos, itm) in _items)
         {
-            yield return item;
+            if (searchArea.Contains(pos) && Vector2.DistanceSquared(center, pos) <= radiusSq)
+            {
+                yield return itm;
+            }
         }
 
         if (_children == null)
@@ -118,6 +127,7 @@ public class QuadTree<T>
             }
         }
     }
+#pragma warning restore S3267
 
     /// <summary>
     /// Removes an item at the given position. Returns <see langword="true"/> if removed.
@@ -131,7 +141,17 @@ public class QuadTree<T>
 
         if (_children != null)
         {
-            return _children.Any(child => child.Remove(item, position));
+#pragma warning disable S3267 // early-return loop avoids LINQ allocation on insert hot path
+            foreach (var child in _children)
+            {
+                if (child.Remove(item, position))
+                {
+                    return true;
+                }
+            }
+#pragma warning restore S3267
+
+            return false;
         }
 
         var index = _items.FindIndex(e => EqualityComparer<T>.Default.Equals(e.item, item) && e.position == position);
@@ -155,7 +175,17 @@ public class QuadTree<T>
 
     private bool InsertIntoChildren(T item, Vector2 position)
     {
-        return _children!.Any(child => child.Insert(item, position));
+#pragma warning disable S3267 // early-return loop avoids LINQ allocation on insert hot path
+        foreach (var child in _children!)
+        {
+            if (child.Insert(item, position))
+            {
+                return true;
+            }
+        }
+#pragma warning restore S3267
+
+        return false;
     }
 
     private void Subdivide()

@@ -137,10 +137,11 @@ public class AStar<T> where T : notnull
         }
 
         // Reconstruct path
+        var stack = new Stack<T>();
         var node = end;
         while (true)
         {
-            path.Insert(0, node);
+            stack.Push(node);
             if (node.Equals(start))
             {
                 break;
@@ -154,6 +155,8 @@ public class AStar<T> where T : notnull
 
             node = prev;
         }
+
+        path = new List<T>(stack);
 
         return path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end);
     }

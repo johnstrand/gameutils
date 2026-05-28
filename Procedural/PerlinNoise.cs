@@ -45,7 +45,11 @@ public class PerlinNoise
     /// <summary>Creates a seeded <see cref="PerlinNoise"/> instance with a deterministically shuffled permutation table.</summary>
     public PerlinNoise(int seed)
     {
-        var perm = Enumerable.Range(0, 256).ToArray();
+        var perm = new int[256];
+        for (var i = 0; i < 256; i++)
+        {
+            perm[i] = i;
+        }
         var rng = new Random(seed);
         for (var i = perm.Length - 1; i > 0; i--)
         {

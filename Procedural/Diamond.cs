@@ -69,8 +69,14 @@ public static class Diamond
         return map;
     }
 
-    private static float Average(Grid<int> map, params Vector2[] vector2s)
+    private static float Average(Grid<int> map, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
     {
-        return (float)vector2s.Where(map.IsInBounds).Select(v => map[v]).Average();
+        var sum = 0f;
+        var count = 0;
+        if (map.IsInBounds(a)) { sum += map[a]; count++; }
+        if (map.IsInBounds(b)) { sum += map[b]; count++; }
+        if (map.IsInBounds(c)) { sum += map[c]; count++; }
+        if (map.IsInBounds(d)) { sum += map[d]; count++; }
+        return count == 0 ? 0f : sum / count;
     }
 }

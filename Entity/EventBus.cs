@@ -7,6 +7,7 @@ namespace GameUtils.Entity;
 public class EventBus
 {
     private readonly Dictionary<Type, List<Delegate>> _handlers = [];
+    private readonly Dictionary<Type, Delegate[]> _snapshots = [];
 
     /// <summary>
     /// Subscribes <paramref name="handler"/> to events of type <typeparamref name="TEvent"/>.
@@ -22,6 +23,7 @@ public class EventBus
         }
 
         list.Add(handler);
+        _snapshots[type] = [.. list];
     }
 
     /// <summary>
@@ -31,25 +33,29 @@ public class EventBus
     public void Unsubscribe<TEvent>(Action<TEvent> handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
+        var type = typeof(TEvent);
 
-        if (_handlers.TryGetValue(typeof(TEvent), out var list))
+        if (_handlers.TryGetValue(type, out var list))
         {
             list.Remove(handler);
+            _snapshots[type] = [.. list];
         }
     }
 
     /// <summary>
     /// Publishes an event to all subscribers of type <typeparamref name="TEvent"/>.
     /// Handlers are invoked synchronously in subscription order.
+    /// Safe to call Subscribe/Unsubscribe from within a handler.
     /// </summary>
     public void Publish<TEvent>(TEvent eventData)
     {
-        if (!_handlers.TryGetValue(typeof(TEvent), out var list))
+        var type = typeof(TEvent);
+        if (!_snapshots.TryGetValue(type, out var snapshot))
         {
             return;
         }
 
-        foreach (var handler in list.ToArray()) // snapshot to allow safe un/subscribe during dispatch
+        foreach (var handler in snapshot)
         {
             ((Action<TEvent>)handler)(eventData);
         }
@@ -61,6 +67,7 @@ public class EventBus
     public void Clear()
     {
         _handlers.Clear();
+        _snapshots.Clear();
     }
 
     /// <summary>
@@ -68,6 +75,8 @@ public class EventBus
     /// </summary>
     public void Clear<TEvent>()
     {
-        _handlers.Remove(typeof(TEvent));
+        var type = typeof(TEvent);
+        _handlers.Remove(type);
+        _snapshots.Remove(type);
     }
 }

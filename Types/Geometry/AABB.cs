@@ -145,10 +145,22 @@ public class AABB
     /// <summary>
     /// Returns true if the specified polygon intersects with the box
     /// </summary>
+#pragma warning disable S3267 // LINQ would reintroduce allocations on a hot collision path
     public bool Intersects(Polygon2D polygon)
     {
-        return polygon.Vertices.Any(Contains) || polygon.Edges.Any(Intersects);
+        foreach (var v in polygon.Vertices)
+        {
+            if (Contains(v)) return true;
+        }
+
+        foreach (var e in polygon.Edges)
+        {
+            if (Intersects(e)) return true;
+        }
+
+        return false;
     }
+#pragma warning restore S3267
 
     /// <summary>
     /// Returns true if the specified circle intersects with the box
