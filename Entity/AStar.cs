@@ -6,8 +6,7 @@ namespace GameUtils.Entity;
 /// <typeparam name="T">Node type. Must be non-null and usable as a dictionary key.</typeparam>
 public class AStar<T> where T : notnull
 {
-    private readonly Dictionary<T, HashSet<T>> _edges = [];
-    private readonly Dictionary<(T from, T to), float> _weights = [];
+    private readonly Dictionary<T, List<(T neighbor, float weight)>> _adjacency = [];
     private readonly HashSet<T> _nodes = [];
 
     /// <summary>Creates an empty A* solver.</summary>
@@ -47,14 +46,13 @@ public class AStar<T> where T : notnull
     {
         _nodes.Add(edge.From);
         _nodes.Add(edge.To);
-        _weights[(edge.From, edge.To)] = edge.Weight;
 
-        if (!_edges.TryGetValue(edge.From, out var edges))
+        if (!_adjacency.TryGetValue(edge.From, out var neighbors))
         {
-            edges = _edges[edge.From] = [];
+            neighbors = _adjacency[edge.From] = [];
         }
 
-        edges.Add(edge.To);
+        neighbors.Add((edge.To, edge.Weight));
 
         if (!edge.IsDirected)
         {
@@ -113,19 +111,20 @@ public class AStar<T> where T : notnull
                 break;
             }
 
-            if (!_edges.TryGetValue(current, out var neighbors))
+            if (!_adjacency.TryGetValue(current, out var neighbors))
             {
                 continue;
             }
 
-            foreach (var neighbor in neighbors)
+            var currentG = gScore.GetValueOrDefault(current, float.MaxValue);
+            foreach (var (neighbor, weight) in neighbors)
             {
                 if (visited.Contains(neighbor))
                 {
                     continue;
                 }
 
-                var tentativeG = gScore.GetValueOrDefault(current, float.MaxValue) + _weights[(current, neighbor)];
+                var tentativeG = currentG + weight;
 
                 if (tentativeG < gScore.GetValueOrDefault(neighbor, float.MaxValue))
                 {

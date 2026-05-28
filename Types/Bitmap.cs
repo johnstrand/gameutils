@@ -182,41 +182,45 @@ public class Bitmap(int width, int height)
     /// </summary>
     public void Write(Stream stream)
     {
-        var byteArray = Data
-            .Select(v => (Color)v)
-            .SelectMany(c => new[] { c.B, c.G, c.R })
-            .ToArray();
-
         var rowSize = Width * 3;
         var padding = (4 - (rowSize % 4)) % 4;
-        var paddedRowSize = rowSize + padding;
-        var dataSize = paddedRowSize * Height;
+        var dataSize = (rowSize + padding) * Height;
         var fileSize = 54 + dataSize;
 
         using var writer = new BinaryWriter(stream);
-        writer.Write("BM"u8); // Magic number
-        writer.Write(fileSize); // File size
-        writer.Write(0); // Reserved
-        writer.Write(PIXEL_DATA_OFFSET); // Offset to pixel array
-        writer.Write(HEADER_SIZE); // Size of info header
-        writer.Write(Width); // Width
-        writer.Write(-Height); // Height, negative to flip the image
-        writer.Write(PLANE_COUNT); // Planes
-        writer.Write(BITS_PER_PIXEL); // Bits per pixel
-        writer.Write(0); // Compression
-        writer.Write(dataSize); // Image size
-        writer.Write(0); // X pixels per meter
-        writer.Write(0); // Y pixels per meter
-        writer.Write(0); // Colors in color table
-        writer.Write(0); // Important colors (0 = all)
+        writer.Write("BM"u8);
+        writer.Write(fileSize);
+        writer.Write(0);
+        writer.Write(PIXEL_DATA_OFFSET);
+        writer.Write(HEADER_SIZE);
+        writer.Write(Width);
+        writer.Write(-Height);
+        writer.Write(PLANE_COUNT);
+        writer.Write(BITS_PER_PIXEL);
+        writer.Write(0);
+        writer.Write(dataSize);
+        writer.Write(0);
+        writer.Write(0);
+        writer.Write(0);
+        writer.Write(0);
 
-        for (var offset = 0; offset < byteArray.Length; offset += rowSize)
+        var row = new byte[rowSize + padding];
+        var padOffset = rowSize;
+        for (var y = 0; y < Height; y++)
         {
-            writer.Write(byteArray[offset..(offset + rowSize)]);
-            if (padding > 0)
+            var rowStart = (Height - 1 - y) * Width;
+            for (var x = 0; x < Width; x++)
             {
-                writer.Write(new byte[padding]);
+                var v = Data[rowStart + x];
+                var col = (Color)v;
+                var i = x * 3;
+                row[i] = col.B;
+                row[i + 1] = col.G;
+                row[i + 2] = col.R;
             }
+
+            Array.Clear(row, padOffset, padding);
+            writer.Write(row);
         }
     }
 

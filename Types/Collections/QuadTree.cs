@@ -104,6 +104,11 @@ public class QuadTree<T>
             new Vector2(center.X - radius, center.Y - radius),
             new Vector2(center.X + radius, center.Y + radius));
 
+        if (!_bounds.Intersects(searchArea))
+        {
+            yield break;
+        }
+
         var radiusSq = radius * radius;
 
         foreach (var (pos, itm) in _items)

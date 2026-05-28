@@ -5,8 +5,7 @@
 /// </summary>
 public class Dijkstra<T> where T : notnull
 {
-    private readonly Dictionary<T, HashSet<T>> _edges = [];
-    private readonly Dictionary<(T from, T to), float> _weights = [];
+    private readonly Dictionary<T, List<(T neighbor, float weight)>> _adjacency = [];
     private readonly HashSet<T> _nodes = [];
 
     /// <summary>
@@ -66,19 +65,20 @@ public class Dijkstra<T> where T : notnull
                 break;
             }
 
-            if (!_edges.TryGetValue(next, out var neighbors))
+            if (!_adjacency.TryGetValue(next, out var neighbors))
             {
                 continue;
             }
 
-            foreach (var n in neighbors)
+            var nextDist = distances.GetValueOrDefault(next, float.MaxValue);
+            foreach (var (n, weight) in neighbors)
             {
                 if (visited.Contains(n))
                 {
                     continue;
                 }
 
-                var distance = distances.GetValueOrDefault(next, float.MaxValue) + _weights[(next, n)];
+                var distance = nextDist + weight;
 
                 if (distance < distances.GetValueOrDefault(n, float.MaxValue))
                 {
@@ -141,14 +141,12 @@ public class Dijkstra<T> where T : notnull
         _nodes.Add(edge.From);
         _nodes.Add(edge.To);
 
-        _weights[(edge.From, edge.To)] = edge.Weight;
-
-        if (!_edges.TryGetValue(edge.From, out var edges))
+        if (!_adjacency.TryGetValue(edge.From, out var neighbors))
         {
-            edges = _edges[edge.From] = [];
+            neighbors = _adjacency[edge.From] = [];
         }
 
-        edges.Add(edge.To);
+        neighbors.Add((edge.To, edge.Weight));
 
         if (edge.IsDirected)
         {
@@ -175,10 +173,9 @@ public class Dijkstra<T> where T : notnull
     /// <param name="edge"></param>
     public void RemoveEdge(Edge<T> edge)
     {
-        if (_edges.TryGetValue(edge.From, out var fromNeighbors))
+        if (_adjacency.TryGetValue(edge.From, out var fromNeighbors))
         {
-            fromNeighbors.Remove(edge.To);
-            _weights.Remove((edge.From, edge.To));
+            RemoveFromList(fromNeighbors, edge.To);
         }
 
         if (edge.IsDirected)
@@ -186,10 +183,21 @@ public class Dijkstra<T> where T : notnull
             return;
         }
 
-        if (_edges.TryGetValue(edge.To, out var toNeighbors))
+        if (_adjacency.TryGetValue(edge.To, out var toNeighbors))
         {
-            toNeighbors.Remove(edge.From);
-            _weights.Remove((edge.To, edge.From));
+            RemoveFromList(toNeighbors, edge.From);
+        }
+    }
+
+    private static void RemoveFromList(List<(T neighbor, float weight)> list, T target)
+    {
+        for (var i = 0; i < list.Count; i++)
+        {
+            if (EqualityComparer<T>.Default.Equals(list[i].neighbor, target))
+            {
+                list.RemoveAt(i);
+                return;
+            }
         }
     }
 }

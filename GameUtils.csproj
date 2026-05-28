@@ -13,7 +13,7 @@
 		<RepositoryUrl>https://github.com/johnstrand/gameutils</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/johnstrand/gameutils</PackageProjectUrl>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.0.6</Version>
+		<Version>1.0.7</Version>
 		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
 

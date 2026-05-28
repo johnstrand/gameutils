@@ -78,6 +78,7 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     }
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public void IntersectWith(IEnumerable<T> other)
     {
         ArgumentNullException.ThrowIfNull(other);
@@ -92,42 +93,47 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
             return;
         }
 
-        var keys = other.ToHashSet();
-
-        foreach (var item in _dictionary.Keys.Where(k => !keys.Contains(k)).ToList())
+        var otherSet = other as ICollection<T> ?? other.ToHashSet();
+        foreach (var item in _dictionary.Keys)
         {
-            _dictionary.TryRemove(item, out _);
+            if (!otherSet.Contains(item))
+            {
+                _dictionary.TryRemove(item, out _);
+            }
         }
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
     public bool IsProperSubsetOf(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().IsProperSubsetOf(other);
+        var otherSet = other.ToHashSet();
+        return otherSet.Count > _dictionary.Count && _dictionary.Keys.All(otherSet.Contains);
     }
 
     /// <inheritdoc/>
     public bool IsProperSupersetOf(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().IsProperSupersetOf(other);
+        return _dictionary.Count > other.Count() && other.All(_dictionary.ContainsKey);
     }
 
     /// <inheritdoc/>
     public bool IsSubsetOf(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().IsSubsetOf(other);
+        var otherSet = other.ToHashSet();
+        return _dictionary.Keys.All(otherSet.Contains);
     }
 
     /// <inheritdoc/>
     public bool IsSupersetOf(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().IsSupersetOf(other);
+        return other.All(_dictionary.ContainsKey);
     }
 
     /// <inheritdoc/>
     public bool Overlaps(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().Overlaps(other);
+        return other.Any(_dictionary.ContainsKey);
     }
 
     /// <inheritdoc/>
@@ -139,28 +145,37 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     /// <inheritdoc/>
     public bool SetEquals(IEnumerable<T> other)
     {
-        return _dictionary.Keys.ToHashSet().SetEquals(other);
+        var otherSet = other.ToHashSet();
+        return _dictionary.Count == otherSet.Count && _dictionary.Keys.All(otherSet.Contains);
     }
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public void SymmetricExceptWith(IEnumerable<T> other)
     {
-        var keys = _dictionary.Keys.ToHashSet();
-        keys.SymmetricExceptWith(other);
-        _dictionary.Clear();
-        foreach (var item in keys)
+        var otherSet = other.ToHashSet();
+        foreach (var item in otherSet)
         {
-            _dictionary.TryAdd(item, 0);
+            if (!_dictionary.TryRemove(item, out _))
+            {
+                _dictionary.TryAdd(item, 0);
+            }
+        }
+
+        foreach (var item in _dictionary.Keys.ToList())
+        {
+            if (!otherSet.Contains(item))
+            {
+                _dictionary.TryRemove(item, out _);
+            }
         }
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
     public void UnionWith(IEnumerable<T> other)
     {
-        var keys = _dictionary.Keys.ToHashSet();
-        keys.UnionWith(other);
-        _dictionary.Clear();
-        foreach (var item in keys)
+        foreach (var item in other)
         {
             _dictionary.TryAdd(item, 0);
         }

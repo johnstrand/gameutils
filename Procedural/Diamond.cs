@@ -1,5 +1,4 @@
 ﻿using GameUtils.Types.Collections;
-using System.Numerics;
 
 namespace GameUtils.Procedural;
 
@@ -38,45 +37,37 @@ public static class Diamond
 
         while (step > 1)
         {
+            var halfStep = step / 2;
             for (var y = 0; y < size - 1; y += step)
             {
                 for (var x = 0; x < size - 1; x += step)
                 {
-                    var topleft = new Vector2(x, y);
-                    var topright = new Vector2(x + step, y);
-                    var bottomleft = new Vector2(x, y + step);
-                    var bottomright = new Vector2(x + step, y + step);
+                    var mx = x + halfStep;
+                    var my = y + halfStep;
 
-                    var mid = new Vector2(x + (step / 2), y + (step / 2));
-
-                    var top = new Vector2(mid.X, y);
-                    var left = new Vector2(x, mid.Y);
-                    var right = new Vector2(x + step, mid.Y);
-                    var bottom = new Vector2(mid.X, y + step);
-
-                    map[mid] = valueFactory(Average(map, topleft, topright, bottomleft, bottomright), range);
-                    map[top] = valueFactory(Average(map, topleft, topright, mid, top + new Vector2(0, -step)), range);
-                    map[left] = valueFactory(Average(map, topleft, bottomleft, mid, left + new Vector2(-step, 0)), range);
-                    map[right] = valueFactory(Average(map, topright, bottomright, mid, right + new Vector2(step, 0)), range);
-                    map[bottom] = valueFactory(Average(map, bottomleft, bottomright, mid, bottom + new Vector2(0, step)), range);
+                    map[mx, my] = valueFactory(AverageInt(map, x, y, x + step, y, x, y + step, x + step, y + step), range);
+                    map[mx, y] = valueFactory(AverageInt(map, x, y, x + step, y, mx, my, mx, y - step), range);
+                    map[x, my] = valueFactory(AverageInt(map, x, y, x, y + step, mx, my, x - step, my), range);
+                    map[x + step, my] = valueFactory(AverageInt(map, x + step, y, x + step, y + step, mx, my, x + step + step, my), range);
+                    map[mx, y + step] = valueFactory(AverageInt(map, x, y + step, x + step, y + step, mx, my, mx, y + step + step), range);
                 }
             }
 
             range = nextRange(range);
-            step /= 2;
+            step = halfStep;
         }
 
         return map;
     }
 
-    private static float Average(Grid<int> map, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    private static float AverageInt(Grid<int> map, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy)
     {
         var sum = 0f;
         var count = 0;
-        if (map.IsInBounds(a)) { sum += map[a]; count++; }
-        if (map.IsInBounds(b)) { sum += map[b]; count++; }
-        if (map.IsInBounds(c)) { sum += map[c]; count++; }
-        if (map.IsInBounds(d)) { sum += map[d]; count++; }
+        if (ax >= 0 && ax < map.Width && ay >= 0 && ay < map.Height) { sum += map[ax, ay]; count++; }
+        if (bx >= 0 && bx < map.Width && by >= 0 && by < map.Height) { sum += map[bx, by]; count++; }
+        if (cx >= 0 && cx < map.Width && cy >= 0 && cy < map.Height) { sum += map[cx, cy]; count++; }
+        if (dx >= 0 && dx < map.Width && dy >= 0 && dy < map.Height) { sum += map[dx, dy]; count++; }
         return count == 0 ? 0f : sum / count;
     }
 }

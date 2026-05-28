@@ -90,10 +90,10 @@ public static class GridSearch
             return result;
         }
 
-        var visited = new HashSet<(int, int)>();
+        var visited = new bool[grid.Width * grid.Height];
         var queue = new Queue<(int x, int y)>();
         queue.Enqueue((startX, startY));
-        visited.Add((startX, startY));
+        visited[startX + (startY * grid.Width)] = true;
 
         var neighbors = diagonal ? AllNeighbors : CardinalNeighbors;
 
@@ -107,11 +107,18 @@ public static class GridSearch
                 var nx = cx + dx;
                 var ny = cy + dy;
 
-                if (!grid.IsInBounds(nx, ny) || !visited.Add((nx, ny)) || !passable(grid[nx, ny]))
+                if (!grid.IsInBounds(nx, ny))
                 {
                     continue;
                 }
 
+                var idx = nx + (ny * grid.Width);
+                if (visited[idx] || !passable(grid[nx, ny]))
+                {
+                    continue;
+                }
+
+                visited[idx] = true;
                 queue.Enqueue((nx, ny));
             }
         }
