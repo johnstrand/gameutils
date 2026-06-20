@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+		<DefaultItemExcludes>$(DefaultItemExcludes);GameUtils.Tests\**</DefaultItemExcludes>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>JST.$(AssemblyName)</PackageId>
@@ -31,13 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="GameUtils.Tests\**" />
-		<None Remove="GameUtils.Tests\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include=".editorconfig" />
-		<None Include="README.md">
+		<None Include="..\..\.editorconfig" />
+		<None Include="..\..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
@@ -50,4 +46,10 @@
 		</PackageReference>
 	</ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="GameUtils.Tests\**" />
+    <Content Remove="GameUtils.Tests\**" />
+    <EmbeddedResource Remove="GameUtils.Tests\**" />
+    <None Remove="GameUtils.Tests\**" />
+  </ItemGroup>
 </Project>
