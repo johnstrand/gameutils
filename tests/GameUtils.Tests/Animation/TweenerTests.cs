@@ -1,37 +1,38 @@
 using System;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameUtils.Animation;
 
 namespace GameUtils.Tests.Animation;
 
+[TestClass]
 public class TweenerTests
 {
-    [Fact]
+    [TestMethod]
     public void Initialization_DefaultValues_AreCorrect()
     {
         var tweener = new Tweener(0f, 10f, 2f);
 
-        Assert.Equal(0f, tweener.From);
-        Assert.Equal(10f, tweener.To);
-        Assert.Equal(2f, tweener.Duration);
-        Assert.Equal(0f, tweener.Value);
-        Assert.False(tweener.IsComplete);
-        Assert.False(tweener.IsLooping);
-        Assert.NotNull(tweener.EasingFunction);
+        Assert.AreEqual(0f, tweener.From);
+        Assert.AreEqual(10f, tweener.To);
+        Assert.AreEqual(2f, tweener.Duration);
+        Assert.AreEqual(0f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+        Assert.IsFalse(tweener.IsLooping);
+        Assert.IsNotNull(tweener.EasingFunction);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_AdvancesValue_BasedOnDuration()
     {
         var tweener = new Tweener(0f, 10f, 2f);
 
         tweener.Update(1f);
 
-        Assert.Equal(5f, tweener.Value);
-        Assert.False(tweener.IsComplete);
+        Assert.AreEqual(5f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_Completes_WhenDurationReached()
     {
         var tweener = new Tweener(0f, 10f, 2f);
@@ -40,12 +41,12 @@ public class TweenerTests
 
         tweener.Update(2f);
 
-        Assert.Equal(10f, tweener.Value);
-        Assert.True(tweener.IsComplete);
-        Assert.True(completed);
+        Assert.AreEqual(10f, tweener.Value);
+        Assert.IsTrue(tweener.IsComplete);
+        Assert.IsTrue(completed);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_DoesNotAdvance_IfAlreadyComplete()
     {
         var tweener = new Tweener(0f, 10f, 2f);
@@ -54,11 +55,11 @@ public class TweenerTests
 
         tweener.Update(1f); // Should do nothing
 
-        Assert.Equal(completedValue, tweener.Value);
-        Assert.True(tweener.IsComplete);
+        Assert.AreEqual(completedValue, tweener.Value);
+        Assert.IsTrue(tweener.IsComplete);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_ZeroDuration_CompletesImmediately()
     {
         var tweener = new Tweener(0f, 10f, 0f);
@@ -67,12 +68,12 @@ public class TweenerTests
 
         tweener.Update(1f);
 
-        Assert.Equal(10f, tweener.Value);
-        Assert.True(tweener.IsComplete);
-        Assert.True(completed);
+        Assert.AreEqual(10f, tweener.Value);
+        Assert.IsTrue(tweener.IsComplete);
+        Assert.IsTrue(completed);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_NegativeDuration_CompletesImmediately()
     {
         var tweener = new Tweener(0f, 10f, -1f);
@@ -81,12 +82,12 @@ public class TweenerTests
 
         tweener.Update(1f);
 
-        Assert.Equal(10f, tweener.Value);
-        Assert.True(tweener.IsComplete);
-        Assert.True(completed);
+        Assert.AreEqual(10f, tweener.Value);
+        Assert.IsTrue(tweener.IsComplete);
+        Assert.IsTrue(completed);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_Looping_WrapsAroundAndFiresEvent()
     {
         var tweener = new Tweener(0f, 10f, 2f) { IsLooping = true };
@@ -98,12 +99,12 @@ public class TweenerTests
 
         // Elapsed time should wrap, effectively being at 0.5f
         // Value should be 0 + (10 - 0) * (0.5 / 2.0) = 2.5
-        Assert.Equal(2.5f, tweener.Value);
-        Assert.False(tweener.IsComplete);
-        Assert.Equal(1, completionCount);
+        Assert.AreEqual(2.5f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+        Assert.AreEqual(1, completionCount);
     }
 
-    [Fact]
+    [TestMethod]
     public void Reset_RestoresInitialState_WithoutChangingConfig()
     {
         var tweener = new Tweener(0f, 10f, 2f);
@@ -111,14 +112,14 @@ public class TweenerTests
 
         tweener.Reset();
 
-        Assert.Equal(0f, tweener.Value);
-        Assert.False(tweener.IsComplete);
-        Assert.Equal(0f, tweener.From);
-        Assert.Equal(10f, tweener.To);
-        Assert.Equal(2f, tweener.Duration);
+        Assert.AreEqual(0f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+        Assert.AreEqual(0f, tweener.From);
+        Assert.AreEqual(10f, tweener.To);
+        Assert.AreEqual(2f, tweener.Duration);
     }
 
-    [Fact]
+    [TestMethod]
     public void Restart_ChangesBounds_AndResetsState()
     {
         var tweener = new Tweener(0f, 10f, 2f);
@@ -126,14 +127,14 @@ public class TweenerTests
 
         tweener.Restart(5f, 15f);
 
-        Assert.Equal(5f, tweener.From);
-        Assert.Equal(15f, tweener.To);
-        Assert.Equal(5f, tweener.Value); // Value is set to From on Reset
-        Assert.False(tweener.IsComplete);
-        Assert.Equal(2f, tweener.Duration); // Duration remains unchanged
+        Assert.AreEqual(5f, tweener.From);
+        Assert.AreEqual(15f, tweener.To);
+        Assert.AreEqual(5f, tweener.Value); // Value is set to From on Reset
+        Assert.IsFalse(tweener.IsComplete);
+        Assert.AreEqual(2f, tweener.Duration); // Duration remains unchanged
     }
 
-    [Fact]
+    [TestMethod]
     public void CustomEasing_AppliedCorrectly()
     {
         // A simple custom easing that just squares the normalized time
@@ -144,6 +145,6 @@ public class TweenerTests
         tweener.Update(1f); // t = 0.5
 
         // Expected: 0 + (10 - 0) * (0.5 * 0.5) = 10 * 0.25 = 2.5
-        Assert.Equal(2.5f, tweener.Value);
+        Assert.AreEqual(2.5f, tweener.Value);
     }
 }

@@ -3,10 +3,11 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using GameUtils.Entity;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GameUtils.Tests.Entity;
 
+[TestClass]
 public class FixedSchedulerTests
 {
     private class TestScheduler : FixedScheduler
@@ -28,7 +29,7 @@ public class FixedSchedulerTests
         }
     }
 
-    [Fact]
+    [TestMethod]
     public async Task Start_CallsUpdateMultipleTimes()
     {
         // Arrange
@@ -44,10 +45,10 @@ public class FixedSchedulerTests
         await scheduler.Stop();
 
         // Assert
-        Assert.True(scheduler.UpdateCount >= 2, $"Expected at least 2 updates, but got {scheduler.UpdateCount}");
+        Assert.IsTrue(scheduler.UpdateCount >= 2, $"Expected at least 2 updates, but got {scheduler.UpdateCount}");
     }
 
-    [Fact]
+    [TestMethod]
     public async Task Stop_StopsSchedulerLoop()
     {
         // Arrange
@@ -64,10 +65,10 @@ public class FixedSchedulerTests
         await Task.Delay(100);
 
         // Assert
-        Assert.Equal(countAfterStop, scheduler.UpdateCount);
+        Assert.AreEqual(countAfterStop, scheduler.UpdateCount);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task Start_WhenAlreadyRunning_DoesNotCreateMultipleTasks()
     {
         // Arrange
@@ -89,10 +90,10 @@ public class FixedSchedulerTests
         // We're just making sure it doesn't throw or run twice as fast.
         // It's hard to test exact task creation without reflection, but we can verify
         // behavior remains normal.
-        Assert.True(scheduler.UpdateCount > count1);
+        Assert.IsTrue(scheduler.UpdateCount > count1);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task Update_WhenExceptionThrown_SwallowsExceptionAndContinues()
     {
         // Arrange
@@ -106,10 +107,10 @@ public class FixedSchedulerTests
         await scheduler.Stop();
 
         // Assert
-        Assert.True(scheduler.UpdateCount > 0, "Update should have been called despite exceptions");
+        Assert.IsTrue(scheduler.UpdateCount > 0, "Update should have been called despite exceptions");
     }
 
-    [Fact]
+    [TestMethod]
     public async Task Timing_ApproximatesTargetRate()
     {
         // Arrange
@@ -135,6 +136,7 @@ public class FixedSchedulerTests
         double lowerBound = expectedUpdates * 0.5;
         double upperBound = expectedUpdates * 1.5;
 
-        Assert.InRange(scheduler.UpdateCount, lowerBound, upperBound);
+        Assert.IsTrue(scheduler.UpdateCount >= lowerBound && scheduler.UpdateCount <= upperBound,
+            $"Expected update count between {lowerBound} and {upperBound}, but got {scheduler.UpdateCount}");
     }
 }

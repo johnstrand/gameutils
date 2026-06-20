@@ -2,17 +2,18 @@ using GameUtils.Procedural;
 
 namespace GameUtils.Tests.Procedural;
 
+[TestClass]
 public class DiamondTests
 {
-    [Theory]
-    [InlineData(0)]
-    [InlineData(4)]
-    [InlineData(10)]
-    [InlineData(16)]
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(4)]
+    [DataRow(10)]
+    [DataRow(16)]
     public void Create_ThrowsArgumentException_WhenSizeIsNotPowerOfTwoPlusOne(int size)
     {
         // Act & Assert
-        var ex = Assert.Throws<ArgumentException>(() =>
+        var ex = Assert.ThrowsExactly<ArgumentException>(() =>
             Diamond.Create(
                 size,
                 min: 0,
@@ -22,15 +23,15 @@ public class DiamondTests
                 valueFactory: (avg, range) => (int)avg)
         );
 
-        Assert.Equal("size", ex.ParamName);
+        Assert.AreEqual("size", ex.ParamName);
         Assert.Contains("Size must be a power-of-two plus one", ex.Message);
     }
 
-    [Theory]
-    [InlineData(3)]
-    [InlineData(9)]
-    [InlineData(17)]
-    [InlineData(33)]
+    [TestMethod]
+    [DataRow(3)]
+    [DataRow(9)]
+    [DataRow(17)]
+    [DataRow(33)]
     public void Create_ReturnsValidGrid_WhenSizeIsPowerOfTwoPlusOne(int size)
     {
         // Act
@@ -43,19 +44,19 @@ public class DiamondTests
             valueFactory: (avg, range) => (int)avg);
 
         // Assert
-        Assert.NotNull(grid);
-        Assert.Equal(size, grid.Width);
-        Assert.Equal(size, grid.Height);
+        Assert.IsNotNull(grid);
+        Assert.AreEqual(size, grid.Width);
+        Assert.AreEqual(size, grid.Height);
     }
 
-    [Fact]
+    [TestMethod]
     public void Create_ProducesIdenticalGrids_WithSameSeed()
     {
         // Arrange
         int size = 17;
         int seed = 42;
 
-        Func<float, float> nextRange = r => r * 0.5f;
+        static float nextRange(float r) => r * 0.5f;
 
         // Act
         var grid1 = Diamond.Create(size, 0, 100, 10f, nextRange, (avg, range) => (int)avg, seed);
@@ -66,12 +67,12 @@ public class DiamondTests
         {
             for (int x = 0; x < size; x++)
             {
-                Assert.Equal(grid1[x, y], grid2[x, y]);
+                Assert.AreEqual(grid1[x, y], grid2[x, y]);
             }
         }
     }
 
-    [Fact]
+    [TestMethod]
     public void Create_AppliesValueFactoryAndNextRangeCorrectly()
     {
         // Arrange
@@ -80,16 +81,16 @@ public class DiamondTests
         // Use a list to track ranges passed to the factory
         var rangesObserved = new List<float>();
 
-        Func<float, float> nextRange = r =>
+        float nextRange(float r)
         {
             return r * 0.5f;
-        };
+        }
 
-        Func<float, float, int> valueFactory = (avg, range) =>
+        int valueFactory(float avg, float range)
         {
             rangesObserved.Add(range);
             return (int)avg + (int)range;
-        };
+        }
 
         // Act
         var grid = Diamond.Create(size, 10, 10, 16f, nextRange, valueFactory);
@@ -103,8 +104,8 @@ public class DiamondTests
         //    Each cell step generates 5 points, so 4 * 5 = 20 points computed with range 8f
         // Let's just assert that ranges observed include 16f and 8f and the grid corner values
 
-        Assert.Contains(16f, rangesObserved);
-        Assert.Contains(8f, rangesObserved);
-        Assert.DoesNotContain(4f, rangesObserved); // Loop ends when step <= 1
+        CollectionAssert.Contains(rangesObserved, 16f);
+        CollectionAssert.Contains(rangesObserved, 8f);
+        CollectionAssert.DoesNotContain(rangesObserved, 4f); // Loop ends when step <= 1
     }
 }

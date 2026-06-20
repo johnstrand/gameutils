@@ -1,9 +1,10 @@
 using GameUtils.Entity;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace GameUtils.Tests.Entity;
 
+[TestClass]
 public class StateMachineTests
 {
     private enum TestState
@@ -14,24 +15,24 @@ public class StateMachineTests
         Falling
     }
 
-    [Fact]
+    [TestMethod]
     public void Constructor_SetsInitialState()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
-        Assert.Equal(TestState.Idle, fsm.CurrentState);
+        Assert.AreEqual(TestState.Idle, fsm.CurrentState);
     }
 
-    [Fact]
+    [TestMethod]
     public void ForceState_ChangesStateImmediately()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
 
         fsm.ForceState(TestState.Running);
 
-        Assert.Equal(TestState.Running, fsm.CurrentState);
+        Assert.AreEqual(TestState.Running, fsm.CurrentState);
     }
 
-    [Fact]
+    [TestMethod]
     public void ForceState_ToSameState_DoesNotInvokeCallbacks()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -43,11 +44,11 @@ public class StateMachineTests
 
         fsm.ForceState(TestState.Idle);
 
-        Assert.Equal(0, exitCount);
-        Assert.Equal(0, enterCount);
+        Assert.AreEqual(0, exitCount);
+        Assert.AreEqual(0, enterCount);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_WithValidTransition_ChangesState()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -56,14 +57,14 @@ public class StateMachineTests
         fsm.AddTransition(TestState.Idle, TestState.Running, () => shouldRun);
 
         fsm.Update();
-        Assert.Equal(TestState.Idle, fsm.CurrentState); // Condition is false
+        Assert.AreEqual(TestState.Idle, fsm.CurrentState); // Condition is false
 
         shouldRun = true;
         fsm.Update();
-        Assert.Equal(TestState.Running, fsm.CurrentState); // Condition is true
+        Assert.AreEqual(TestState.Running, fsm.CurrentState); // Condition is true
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_EvaluatesTransitionsInOrderAdded()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -75,10 +76,10 @@ public class StateMachineTests
         fsm.Update();
 
         // Should take the first transition added
-        Assert.Equal(TestState.Running, fsm.CurrentState);
+        Assert.AreEqual(TestState.Running, fsm.CurrentState);
     }
 
-    [Fact]
+    [TestMethod]
     public void Update_EvaluatesTransitionsOnlyFromCurrentState()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -88,10 +89,10 @@ public class StateMachineTests
         fsm.Update();
 
         // Should not transition because current state is Idle, not Running
-        Assert.Equal(TestState.Idle, fsm.CurrentState);
+        Assert.AreEqual(TestState.Idle, fsm.CurrentState);
     }
 
-    [Fact]
+    [TestMethod]
     public void ChangeState_InvokesExitAndEnterCallbacks()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -104,11 +105,11 @@ public class StateMachineTests
 
         fsm.ForceState(TestState.Running);
 
-        Assert.True(exitedIdle);
-        Assert.True(enteredRunning);
+        Assert.IsTrue(exitedIdle);
+        Assert.IsTrue(enteredRunning);
     }
 
-    [Fact]
+    [TestMethod]
     public void ChangeState_ViaUpdate_InvokesExitAndEnterCallbacks()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -123,12 +124,12 @@ public class StateMachineTests
 
         fsm.Update();
 
-        Assert.Equal(1, exitedIdleCount);
-        Assert.Equal(1, enteredRunningCount);
-        Assert.Equal(TestState.Running, fsm.CurrentState);
+        Assert.AreEqual(1, exitedIdleCount);
+        Assert.AreEqual(1, enteredRunningCount);
+        Assert.AreEqual(TestState.Running, fsm.CurrentState);
     }
 
-    [Fact]
+    [TestMethod]
     public void AddTransition_CanBeChained()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -136,10 +137,10 @@ public class StateMachineTests
         fsm.AddTransition(TestState.Idle, TestState.Running, () => false)
            .AddTransition(TestState.Running, TestState.Jumping, () => false);
 
-        Assert.NotNull(fsm);
+        Assert.IsNotNull(fsm);
     }
 
-    [Fact]
+    [TestMethod]
     public void OnEnterAndExit_CanBeChained()
     {
         var fsm = new StateMachine<TestState>(TestState.Idle);
@@ -147,6 +148,6 @@ public class StateMachineTests
         fsm.OnEnter(TestState.Idle, () => { })
            .OnExit(TestState.Idle, () => { });
 
-        Assert.NotNull(fsm);
+        Assert.IsNotNull(fsm);
     }
 }
