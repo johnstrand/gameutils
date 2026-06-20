@@ -1,5 +1,8 @@
 ﻿namespace GameUtils.Math;
 
+#pragma warning disable CA5394 // Do not use insecure randomness
+#pragma warning disable S2245 // Using pseudorandom number generators (PRNGs) is security-sensitive
+
 /// <summary>
 /// A collection of math-related extra methods.
 /// </summary>
