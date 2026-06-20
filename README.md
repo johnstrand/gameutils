@@ -15,6 +15,7 @@ dotnet add package JST.GameUtils
 
 ## Contents
 
+- [Contributing](#notes-for-contributing-to-this-project)
 - [Math](#math)
 - [Vector extensions](#vector-extensions)
 - [Geometry](#geometry)
@@ -26,6 +27,13 @@ dotnet add package JST.GameUtils
 - [Terminal](#terminal)
 
 ---
+
+## Notes for contributing to this project:
+
+- Performance is a key goal. Avoid unnecessary allocations, prefer structs for small types, and consider cache locality.
+- Add XML documentation comments to all public members for better IntelliSense support.
+- Add tests for all public APIs, covering edge cases and typical usage patterns.
+- Update the README with usage examples for any new features or types added.
 
 ## Math
 
@@ -87,7 +95,7 @@ Vector2 tangent = path.GetTangent(t);
 
 ### `CatmullRom` — Catmull-Rom splines
 
-Unlike Bézier curves, Catmull-Rom splines pass *through* every control point — ideal for camera paths, patrol routes, and cutscenes.
+Unlike Bézier curves, Catmull-Rom splines pass _through_ every control point — ideal for camera paths, patrol routes, and cutscenes.
 
 ```csharp
 // Single segment
