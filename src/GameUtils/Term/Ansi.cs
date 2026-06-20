@@ -340,14 +340,11 @@ public static class Ansi
             {
                 var rgb = sequence[4..].Split(',');
 
-                if (rgb.Length != 3)
+                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
 
-                var r = byte.Parse(rgb[0]);
-                var g = byte.Parse(rgb[1]);
-                var b = byte.Parse(rgb[2]);
                 result.Append(Foreground(r, g, b));
                 continue;
             }
@@ -356,14 +353,11 @@ public static class Ansi
             {
                 var rgb = sequence[4..].Split(',');
 
-                if (rgb.Length != 3)
+                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
 
-                var r = byte.Parse(rgb[0]);
-                var g = byte.Parse(rgb[1]);
-                var b = byte.Parse(rgb[2]);
                 result.Append(Background(r, g, b));
                 continue;
             }
@@ -372,14 +366,11 @@ public static class Ansi
             {
                 var rgb = sequence[1..].Split(',');
 
-                if (rgb.Length != 3)
+                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
 
-                var r = byte.Parse(rgb[0]);
-                var g = byte.Parse(rgb[1]);
-                var b = byte.Parse(rgb[2]);
                 result.Append(Foreground(r, g, b));
                 continue;
             }
