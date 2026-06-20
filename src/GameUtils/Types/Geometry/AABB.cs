@@ -148,6 +148,8 @@ public class AABB
 #pragma warning disable S3267 // LINQ would reintroduce allocations on a hot collision path
     public bool Intersects(Polygon2D polygon)
     {
+        if (!Intersects(polygon.BoundingBox)) return false;
+
         // 1. Fast bounds check: compute polygon bounds on the fly
         if (polygon.Vertices.Length > 0)
         {
