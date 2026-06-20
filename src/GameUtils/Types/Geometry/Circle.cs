@@ -63,6 +63,8 @@ public class Circle(Vector2 center, float radius)
 #pragma warning disable S3267 // LINQ would reintroduce allocations on a hot collision path
     public bool Intersects(Polygon2D polygon)
     {
+        if (!Intersects(polygon.BoundingBox)) return false;
+
         foreach (var v in polygon.Vertices)
         {
             if (Contains(v)) return true;

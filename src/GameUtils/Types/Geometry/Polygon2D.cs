@@ -24,7 +24,14 @@ public readonly struct Polygon2D
     /// Normals of each edge of the polygon
     /// </summary>
     public readonly Vector2[] Normals;
+
+    private readonly AABB[] _boundingBox;
 #pragma warning restore S3887
+
+    /// <summary>
+    /// The axis-aligned bounding box of the polygon
+    /// </summary>
+    public AABB BoundingBox => _boundingBox[0];
 
     /// <summary>
     /// Creates a new polygon from the specified vertices. If <paramref name="sort"/> is true, the vertices will be sorted clockwise before creating the polygon.
@@ -42,11 +49,18 @@ public readonly struct Polygon2D
         Edges = new Line[Vertices.Length];
         Normals = new Vector2[Vertices.Length];
 
+        var min = new Vector2(float.MaxValue);
+        var max = new Vector2(float.MinValue);
+
         for (var i = 0; i < Vertices.Length; i++)
         {
             Edges[i] = new Line(Vertices[i], Vertices[(i + 1) % Vertices.Length]);
             Normals[i] = Vector2.Normalize(new Vector2(Edges[i].End.Y - Edges[i].Start.Y, Edges[i].Start.X - Edges[i].End.X));
+            min = Vector2.Min(min, Vertices[i]);
+            max = Vector2.Max(max, Vertices[i]);
         }
+
+        _boundingBox = [new AABB(min, max)];
     }
 
     private static Vector2[] SortClockwise(Vector2[] vertices)
@@ -79,10 +93,23 @@ public readonly struct Polygon2D
     /// </summary>
     public void TranslateBy(Vector2 translation)
     {
+        var min = new Vector2(float.MaxValue);
+        var max = new Vector2(float.MinValue);
+
         for (var i = 0; i < Vertices.Length; i++)
         {
             Vertices[i] += translation;
+
+            min = Vector2.Min(min, Vertices[i]);
+            max = Vector2.Max(max, Vertices[i]);
         }
+
+        for (var i = 0; i < Vertices.Length; i++)
+        {
+            Edges[i] = new Line(Vertices[i], Vertices[(i + 1) % Vertices.Length]);
+        }
+
+        _boundingBox[0] = new AABB(min, max);
     }
 
     /// <summary>
