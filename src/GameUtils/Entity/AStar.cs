@@ -56,7 +56,7 @@ public class AStar<T> where T : notnull
 
         if (!edge.IsDirected)
         {
-            AddEdge(edge with { From = edge.To, To = edge.From });
+            AddEdge(edge with { From = edge.To, To = edge.From, IsDirected = true });
         }
     }
 
