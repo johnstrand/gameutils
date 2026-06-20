@@ -31,6 +31,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="GameUtils.Tests\**" />
+		<EmbeddedResource Remove="GameUtils.Tests\**" />
+		<None Remove="GameUtils.Tests\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include=".editorconfig" />
 		<None Include="README.md">
 			<Pack>True</Pack>
