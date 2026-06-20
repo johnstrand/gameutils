@@ -32,8 +32,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include=".editorconfig" />
-		<None Include="README.md">
+		<None Include="..\..\.editorconfig" />
+		<None Include="..\..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
@@ -46,4 +46,10 @@
 		</PackageReference>
 	</ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="GameUtils.Tests\**" />
+    <Content Remove="GameUtils.Tests\**" />
+    <EmbeddedResource Remove="GameUtils.Tests\**" />
+    <None Remove="GameUtils.Tests\**" />
+  </ItemGroup>
 </Project>
