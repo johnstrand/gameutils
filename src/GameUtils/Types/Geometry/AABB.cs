@@ -148,17 +148,43 @@ public class AABB
 #pragma warning disable S3267 // LINQ would reintroduce allocations on a hot collision path
     public bool Intersects(Polygon2D polygon)
     {
+        // 1. Fast bounds check: compute polygon bounds on the fly
+        if (polygon.Vertices.Length > 0)
+        {
+            var pMinX = polygon.Vertices[0].X;
+            var pMaxX = polygon.Vertices[0].X;
+            var pMinY = polygon.Vertices[0].Y;
+            var pMaxY = polygon.Vertices[0].Y;
+
+            for (int i = 1; i < polygon.Vertices.Length; i++)
+            {
+                var v = polygon.Vertices[i];
+                if (v.X < pMinX) pMinX = v.X;
+                if (v.X > pMaxX) pMaxX = v.X;
+                if (v.Y < pMinY) pMinY = v.Y;
+                if (v.Y > pMaxY) pMaxY = v.Y;
+            }
+
+            if (pMinX > Max.X || pMaxX < Min.X || pMinY > Max.Y || pMaxY < Min.Y)
+            {
+                return false;
+            }
+        }
+
+        // 2. Check if any polygon vertex is inside the AABB
         foreach (var v in polygon.Vertices)
         {
             if (Contains(v)) return true;
         }
 
+        // 3. Check if any polygon edge intersects the AABB
         foreach (var e in polygon.Edges)
         {
             if (Intersects(e)) return true;
         }
 
-        return false;
+        // 4. Check if the AABB is completely inside the polygon
+        return polygon.Contains(Center);
     }
 #pragma warning restore S3267
 
