@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
+		<DefaultItemExcludes>$(DefaultItemExcludes);GameUtils.Tests\**</DefaultItemExcludes>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>JST.$(AssemblyName)</PackageId>
@@ -31,27 +32,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="tests\**" />
-		<EmbeddedResource Remove="tests\**" />
-		<None Remove="tests\**" />
-		<Compile Remove="DummyTest\**" />
-		<EmbeddedResource Remove="DummyTest\**" />
-		<None Remove="DummyTest\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include=".editorconfig" />
-		<None Include="README.md">
+		<None Include="..\..\.editorconfig" />
+		<None Include="..\..\README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.26.0.140279">
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
-
 </Project>

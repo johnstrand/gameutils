@@ -1,22 +1,21 @@
-using System;
-using Xunit;
 using GameUtils.Procedural;
 
 namespace GameUtils.Tests.Procedural;
 
+[TestClass]
 public class PerlinNoiseTests
 {
-    [Fact]
+    [TestMethod]
     public void Default_ReturnsSameValueForSameCoordinates()
     {
         var noise = PerlinNoise.Default;
         var val1 = noise.Sample(1.5f, 2.5f);
         var val2 = noise.Sample(1.5f, 2.5f);
 
-        Assert.Equal(val1, val2);
+        Assert.AreEqual(val1, val2);
     }
 
-    [Fact]
+    [TestMethod]
     public void DefaultConstructor_ReturnsSameValueForSameCoordinates()
     {
         var noise1 = new PerlinNoise();
@@ -25,30 +24,30 @@ public class PerlinNoiseTests
         var val1 = noise1.Sample(1.5f, 2.5f, 3.5f);
         var val2 = noise2.Sample(1.5f, 2.5f, 3.5f);
 
-        Assert.Equal(val1, val2);
+        Assert.AreEqual(val1, val2);
     }
 
-    [Fact]
+    [TestMethod]
     public void SeededConstructor_SameSeedReturnsSameValues()
     {
         var noise1 = new PerlinNoise(42);
         var noise2 = new PerlinNoise(42);
 
-        Assert.Equal(noise1.Sample(1.5f, 2.5f), noise2.Sample(1.5f, 2.5f));
-        Assert.Equal(noise1.Sample(1.5f, 2.5f, 3.5f), noise2.Sample(1.5f, 2.5f, 3.5f));
+        Assert.AreEqual(noise1.Sample(1.5f, 2.5f), noise2.Sample(1.5f, 2.5f));
+        Assert.AreEqual(noise1.Sample(1.5f, 2.5f, 3.5f), noise2.Sample(1.5f, 2.5f, 3.5f));
     }
 
-    [Fact]
+    [TestMethod]
     public void SeededConstructor_DifferentSeedReturnsDifferentValues()
     {
         var noise1 = new PerlinNoise(42);
         var noise2 = new PerlinNoise(43);
 
         // While technically possible to have the same value, it's highly improbable for a specific point.
-        Assert.NotEqual(noise1.Sample(1.5f, 2.5f), noise2.Sample(1.5f, 2.5f));
+        Assert.AreNotEqual(noise1.Sample(1.5f, 2.5f), noise2.Sample(1.5f, 2.5f));
     }
 
-    [Fact]
+    [TestMethod]
     public void Sample2D_ReturnsValuesInExpectedRange()
     {
         var noise = PerlinNoise.Default;
@@ -61,12 +60,12 @@ public class PerlinNoiseTests
                 var val = noise.Sample(x, y);
                 // Note: The comment says "approximately [0, 1]". Perlin noise can sometimes slightly exceed typical bounds depending on implementation,
                 // but standard normalized Perlin should stay within these bounds.
-                Assert.True(val >= -0.1f && val <= 1.1f, $"Value {val} at ({x}, {y}) is outside expected approximate range [0, 1]");
+                Assert.IsTrue(val >= -0.1f && val <= 1.1f, $"Value {val} at ({x}, {y}) is outside expected approximate range [0, 1]");
             }
         }
     }
 
-    [Fact]
+    [TestMethod]
     public void Sample3D_ReturnsValuesInExpectedRange()
     {
         var noise = PerlinNoise.Default;
@@ -80,13 +79,13 @@ public class PerlinNoiseTests
                 {
                     var val = noise.Sample(x, y, z);
                     // Approximate range [-1, 1]
-                    Assert.True(val >= -1.1f && val <= 1.1f, $"Value {val} at ({x}, {y}, {z}) is outside expected approximate range [-1, 1]");
+                    Assert.IsTrue(val >= -1.1f && val <= 1.1f, $"Value {val} at ({x}, {y}, {z}) is outside expected approximate range [-1, 1]");
                 }
             }
         }
     }
 
-    [Fact]
+    [TestMethod]
     public void Fbm_ReturnsValuesInExpectedRangeAndDiffersFromBaseSample()
     {
         var noise = PerlinNoise.Default;
@@ -95,7 +94,7 @@ public class PerlinNoiseTests
         var fbmVal = noise.Fbm(1.5f, 2.5f, 4);
 
         // The value should be different due to multiple octaves being added
-        Assert.NotEqual(baseVal, fbmVal);
+        Assert.AreNotEqual(baseVal, fbmVal);
 
         // Check range over a few samples
         for (float x = 0; x < 10; x += 1.0f)
@@ -105,7 +104,7 @@ public class PerlinNoiseTests
                 var val = noise.Fbm(x, y, octaves: 4);
                 // The max possible value for FBM with amplitude 0.5 and gain 0.5 is ~1.0 if all samples are 1.
                 // It stays roughly in [0, 1] because base samples are in [0, 1] and 0.5 + 0.25 + 0.125... approaches 1.0
-                Assert.True(val >= -0.1f && val <= 1.1f, $"FBM Value {val} at ({x}, {y}) is outside expected approximate range [0, 1]");
+                Assert.IsTrue(val >= -0.1f && val <= 1.1f, $"FBM Value {val} at ({x}, {y}) is outside expected approximate range [0, 1]");
             }
         }
     }
