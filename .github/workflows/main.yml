@@ -12,7 +12,9 @@ jobs:
       uses: actions/checkout@v4.1.1
     - name: Build
       run: dotnet build --configuration Release
+    - name: Test
+      run: dotnet test --configuration Release --no-build
     - name: Publish
-      run: dotnet nuget push "/home/runner/work/gameutils/gameutils/bin/Release/*.nupkg" --api-key "${NUGET_TOKEN}" -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push "/home/runner/work/gameutils/gameutils/src/GameUtils/bin/Release/*.nupkg" --api-key "${NUGET_TOKEN}" -s https://api.nuget.org/v3/index.json
       env:
         NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
