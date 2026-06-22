@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/johnstrand/gameutils</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/johnstrand/gameutils</PackageProjectUrl>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<Version>1.0.8</Version>
+		<Version>1.0.9</Version>
 		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
 

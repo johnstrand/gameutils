@@ -21,6 +21,7 @@ dotnet add package JST.GameUtils
 - [Geometry](#geometry)
 - [Collections](#collections)
 - [Entity / Game systems](#entity--game-systems)
+- [Animation](#animation)
 - [Procedural generation](#procedural-generation)
 - [Types](#types)
 - [Extensions](#extensions)
@@ -383,6 +384,32 @@ loop.Start();
 // ... later ...
 loop.Stop();
 ```
+
+---
+
+## Animation
+
+### `Controller` — frame-based animation
+
+```csharp
+var anim = new Controller(frameCount: 10, isLooping: true, framesPerSecond: 12);
+anim.OnFrameChanged = frame => currentSprite = sprites[frame];
+anim.Play();
+anim.Update(deltaTime);
+```
+
+### `Tweener` — time-driven float interpolation
+
+```csharp
+var tween = new Tweener(from: 0f, to: 100f, duration: 1.5f, easingFunction: Ease.CubicOut);
+tween.OnComplete = () => Console.WriteLine("Done!");
+tween.Update(deltaTime);
+```
+
+### `Ease` / `Offset` — animation helpers
+
+`Ease` contains easing functions like `Ease.ElasticOut`, `Ease.BounceIn`, etc.
+`Offset` contains math functions for offsetting animations (`Jagged`, `Sine`, `Pulse`, `Triangle`, `Wobble`).
 
 ---
 
