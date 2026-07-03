@@ -114,7 +114,23 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     /// <inheritdoc/>
     public bool IsProperSupersetOf(IEnumerable<T> other)
     {
-        return _dictionary.Count > other.Count() && other.All(_dictionary.ContainsKey);
+        int dictCount = _dictionary.Count;
+        if (other.TryGetNonEnumeratedCount(out int count))
+        {
+            return dictCount > count && other.All(_dictionary.ContainsKey);
+        }
+
+        int matchCount = 0;
+        foreach (var item in other)
+        {
+            matchCount++;
+            if (!_dictionary.ContainsKey(item) || matchCount >= dictCount)
+            {
+                return false;
+            }
+        }
+
+        return dictCount > matchCount;
     }
 
     /// <inheritdoc/>
