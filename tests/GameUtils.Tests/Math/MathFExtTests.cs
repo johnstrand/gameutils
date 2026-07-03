@@ -6,9 +6,9 @@ namespace GameUtils.Tests.Math;
 
 [TestClass]
 public class MathFExtTests
-{
+{  
     private const float Tolerance = 0.0001f;
-
+  
     [TestMethod]
     public void Wrap_ValueWithinRange_ReturnsValue()
     {
