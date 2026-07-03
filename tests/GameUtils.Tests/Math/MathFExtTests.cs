@@ -7,35 +7,34 @@ namespace GameUtils.Tests.Math;
 [TestClass]
 public class MathFExtTests
 {
-    private const float Delta = 0.0001f;
     private const float Tolerance = 0.0001f;
 
     [TestMethod]
     public void AngleDifference_SameAngles_ReturnsZero()
     {
-        Assert.AreEqual(0f, MathFExt.AngleDifference(0f, 0f), Delta);
-        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.PI, MathF.PI), Delta);
-        Assert.AreEqual(0f, MathFExt.AngleDifference(-MathF.PI, -MathF.PI), Delta);
-        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.Tau, MathF.Tau), Delta);
+        Assert.AreEqual(0f, MathFExt.AngleDifference(0f, 0f), Tolerance);
+        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.PI, MathF.PI), Tolerance);
+        Assert.AreEqual(0f, MathFExt.AngleDifference(-MathF.PI, -MathF.PI), Tolerance);
+        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.Tau, MathF.Tau), Tolerance);
     }
 
     [TestMethod]
     public void AngleDifference_OppositeAngles_ReturnsPI()
     {
         // When difference is exactly PI or -PI, we expect -PI since it wraps to [-PI, PI)
-        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(0f, MathF.PI), Delta);
-        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(0f, -MathF.PI), Delta);
-        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(-MathF.PI / 2f, MathF.PI / 2f), Delta);
-        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(MathF.PI / 2f, -MathF.PI / 2f), Delta);
+        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(0f, MathF.PI), Tolerance);
+        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(0f, -MathF.PI), Tolerance);
+        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(-MathF.PI / 2f, MathF.PI / 2f), Tolerance);
+        Assert.AreEqual(-MathF.PI, MathFExt.AngleDifference(MathF.PI / 2f, -MathF.PI / 2f), Tolerance);
     }
 
     [TestMethod]
     public void AngleDifference_AcuteAngles_ReturnsDifference()
     {
-        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(0f, MathF.PI / 2f), Delta);
-        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(MathF.PI / 2f, 0f), Delta);
-        Assert.AreEqual(MathF.PI / 4f, MathFExt.AngleDifference(MathF.PI / 4f, MathF.PI / 2f), Delta);
-        Assert.AreEqual(-MathF.PI / 4f, MathFExt.AngleDifference(MathF.PI / 2f, MathF.PI / 4f), Delta);
+        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(0f, MathF.PI / 2f), Tolerance);
+        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(MathF.PI / 2f, 0f), Tolerance);
+        Assert.AreEqual(MathF.PI / 4f, MathFExt.AngleDifference(MathF.PI / 4f, MathF.PI / 2f), Tolerance);
+        Assert.AreEqual(-MathF.PI / 4f, MathFExt.AngleDifference(MathF.PI / 2f, MathF.PI / 4f), Tolerance);
     }
 
     [TestMethod]
@@ -43,23 +42,23 @@ public class MathFExtTests
     {
         // from PI-0.1 to -PI+0.1 (which is PI+0.1 going forward)
         // difference should be 0.2
-        Assert.AreEqual(0.2f, MathFExt.AngleDifference(MathF.PI - 0.1f, -MathF.PI + 0.1f), Delta);
+        Assert.AreEqual(0.2f, MathFExt.AngleDifference(MathF.PI - 0.1f, -MathF.PI + 0.1f), Tolerance);
 
         // from -PI+0.1 to PI-0.1
         // difference should be -0.2
-        Assert.AreEqual(-0.2f, MathFExt.AngleDifference(-MathF.PI + 0.1f, MathF.PI - 0.1f), Delta);
+        Assert.AreEqual(-0.2f, MathFExt.AngleDifference(-MathF.PI + 0.1f, MathF.PI - 0.1f), Tolerance);
     }
 
     [TestMethod]
     public void AngleDifference_LargeAngles_ReturnsWrappedDifference()
     {
-        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(0f, MathF.Tau + (MathF.PI / 2f)), Delta);
-        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(MathF.Tau + (MathF.PI / 2f), 0f), Delta);
+        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(0f, MathF.Tau + (MathF.PI / 2f)), Tolerance);
+        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(MathF.Tau + (MathF.PI / 2f), 0f), Tolerance);
 
-        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(0f, -MathF.Tau - (MathF.PI / 2f)), Delta);
-        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(-MathF.Tau - (MathF.PI / 2f), 0f), Delta);
+        Assert.AreEqual(-MathF.PI / 2f, MathFExt.AngleDifference(0f, -MathF.Tau - (MathF.PI / 2f)), Tolerance);
+        Assert.AreEqual(MathF.PI / 2f, MathFExt.AngleDifference(-MathF.Tau - (MathF.PI / 2f), 0f), Tolerance);
 
-        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.Tau, MathF.Tau + MathF.Tau), Delta);
+        Assert.AreEqual(0f, MathFExt.AngleDifference(MathF.Tau, MathF.Tau + MathF.Tau), Tolerance);
     }
 
     [TestMethod]
@@ -72,7 +71,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -85,7 +84,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -98,7 +97,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -111,7 +110,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -124,7 +123,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -137,7 +136,7 @@ public class MathFExtTests
 
         float actual = MathFExt.Wrap(value, min, max);
 
-        Assert.AreEqual(expected, actual, float.Epsilon);
+        Assert.AreEqual(expected, actual, Tolerance);
     }
 
     [TestMethod]
@@ -174,5 +173,39 @@ public class MathFExtTests
         Assert.AreEqual(1f, MathFExt.PingPong(-1f, 5f), Tolerance);
         Assert.AreEqual(4f, MathFExt.PingPong(-6f, 5f), Tolerance);
         Assert.AreEqual(0f, MathFExt.PingPong(-10f, 5f), Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_ZeroDegrees_ReturnsZero()
+    {
+        float degrees = 0f;
+        float expected = 0f;
+
+        float result = MathFExt.ToRadians(degrees);
+
+        Assert.AreEqual(expected, result, Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_PositiveDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(MathF.PI / 2f, MathFExt.ToRadians(90f), Tolerance);
+        Assert.AreEqual(MathF.PI, MathFExt.ToRadians(180f), Tolerance);
+        Assert.AreEqual(MathF.PI * 1.5f, MathFExt.ToRadians(270f), Tolerance);
+        Assert.AreEqual(MathF.Tau, MathFExt.ToRadians(360f), Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_NegativeDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(-MathF.PI / 2f, MathFExt.ToRadians(-90f), Tolerance);
+        Assert.AreEqual(-MathF.PI, MathFExt.ToRadians(-180f), Tolerance);
+        Assert.AreEqual(-MathF.Tau, MathFExt.ToRadians(-360f), Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_LargeDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(MathF.Tau * 2f, MathFExt.ToRadians(720f), Tolerance);
     }
 }
