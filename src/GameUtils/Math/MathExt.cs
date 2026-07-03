@@ -1,7 +1,7 @@
-﻿namespace GameUtils.Math;
+namespace GameUtils.Math;
 
-#pragma warning disable CA5394 // Do not use insecure randomness
-#pragma warning disable S2245 // Using pseudorandom number generators (PRNGs) is security-sensitive
+using System;
+using System.Security.Cryptography;
 
 /// <summary>
 /// A collection of math-related extra methods.
@@ -13,7 +13,7 @@ public static class MathExt
     /// </summary>
     public static float RandomFloat()
     {
-        return Random.Shared.NextSingle();
+        return (float)RandomNumberGenerator.GetInt32(0, 16777216) / 16777216f;
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public static class MathExt
     /// </summary>
     public static float RandomFloat(float min, float max)
     {
-        return MathFExt.Remap(Random.Shared.NextSingle(), 0, 1, min, max);
+        return MathFExt.Remap(RandomFloat(), 0, 1, min, max);
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public static class MathExt
     /// </summary>
     public static int RandomInt(int min, int max)
     {
-        return Random.Shared.Next(min, max);
+        return RandomNumberGenerator.GetInt32(min, max);
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public static class MathExt
     /// </summary>
     public static bool RandomBool(float probability = 0.5f)
     {
-        return Random.Shared.NextSingle() < probability;
+        return RandomFloat() < probability;
     }
 
     /// <summary>
@@ -45,8 +45,8 @@ public static class MathExt
     /// </summary>
     public static float RandomGaussian(float mean = 0f, float stdDev = 1f)
     {
-        var u1 = 1f - Random.Shared.NextSingle();
-        var u2 = 1f - Random.Shared.NextSingle();
+        var u1 = 1f - RandomFloat();
+        var u2 = 1f - RandomFloat();
         var normal = MathF.Sqrt(-2f * MathF.Log(u1)) * MathF.Sin(MathF.Tau * u2);
         return mean + (stdDev * normal);
     }
@@ -56,8 +56,8 @@ public static class MathExt
     /// </summary>
     public static System.Numerics.Vector2 RandomInCircle(float radius = 1f)
     {
-        var angle = Random.Shared.NextSingle() * MathF.Tau;
-        var r = radius * MathF.Sqrt(Random.Shared.NextSingle());
+        var angle = RandomFloat() * MathF.Tau;
+        var r = radius * MathF.Sqrt(RandomFloat());
         return new System.Numerics.Vector2(r * MathF.Cos(angle), r * MathF.Sin(angle));
     }
 
@@ -66,7 +66,7 @@ public static class MathExt
     /// </summary>
     public static System.Numerics.Vector2 RandomOnCircle(float radius = 1f)
     {
-        var angle = Random.Shared.NextSingle() * MathF.Tau;
+        var angle = RandomFloat() * MathF.Tau;
         return new System.Numerics.Vector2(radius * MathF.Cos(angle), radius * MathF.Sin(angle));
     }
 }
