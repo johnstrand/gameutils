@@ -169,10 +169,26 @@ public class Bitmap(int width, int height)
     }
 
     /// <summary>
+    /// Validates that the given path is within the application's current working directory.
+    /// Prevents path traversal vulnerabilities.
+    /// </summary>
+    private static void ValidatePath(string path)
+    {
+        var fullPath = Path.GetFullPath(path);
+        var relativePath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
+
+        if (relativePath.StartsWith("..") || Path.IsPathRooted(relativePath))
+        {
+            throw new UnauthorizedAccessException("Path traversal is not allowed.");
+        }
+    }
+
+    /// <summary>
     /// Writes the image to a file
     /// </summary>
     public void Write(string path)
     {
+        ValidatePath(path);
         using var stream = File.OpenWrite(path);
         Write(stream);
     }
