@@ -140,25 +140,100 @@ public static class CollectionExtensions
     /// <exception cref="InvalidOperationException">Thrown when the sequence is empty or all weights are zero.</exception>
     public static T WeightedRandom<T>(this IEnumerable<T> source, Func<T, float> weightSelector)
     {
+        if (source is IReadOnlyList<T> readOnlyList)
+        {
+            int count = readOnlyList.Count;
+            if (count == 0)
+            {
+                throw new InvalidOperationException("Sequence contains no elements.");
+            }
+
+            var totalWeight = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                totalWeight += weightSelector(readOnlyList[i]);
+            }
+
+            if (totalWeight <= 0)
+            {
+                throw new InvalidOperationException("Total weight must be greater than zero.");
+            }
+
+            var target = (float)(Random.Shared.NextDouble() * totalWeight);
+            var cumulative = 0f;
+
+            for (int i = 0; i < count; i++)
+            {
+                var item = readOnlyList[i];
+                cumulative += weightSelector(item);
+                if (target <= cumulative)
+                {
+                    return item;
+                }
+            }
+
+            return readOnlyList[count - 1];
+        }
+
+        if (source is IList<T> list)
+        {
+            int count = list.Count;
+            if (count == 0)
+            {
+                throw new InvalidOperationException("Sequence contains no elements.");
+            }
+
+            var totalWeight = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                totalWeight += weightSelector(list[i]);
+            }
+
+            if (totalWeight <= 0)
+            {
+                throw new InvalidOperationException("Total weight must be greater than zero.");
+            }
+
+            var target = (float)(Random.Shared.NextDouble() * totalWeight);
+            var cumulative = 0f;
+
+            for (int i = 0; i < count; i++)
+            {
+                var item = list[i];
+                cumulative += weightSelector(item);
+                if (target <= cumulative)
+                {
+                    return item;
+                }
+            }
+
+            return list[count - 1];
+        }
+
         var items = source.ToList();
         if (items.Count == 0)
         {
             throw new InvalidOperationException("Sequence contains no elements.");
         }
 
-        var totalWeight = items.Sum(weightSelector);
-        if (totalWeight <= 0)
+        var itemsTotalWeight = 0f;
+        foreach (var item in items)
+        {
+            itemsTotalWeight += weightSelector(item);
+        }
+
+        if (itemsTotalWeight <= 0)
         {
             throw new InvalidOperationException("Total weight must be greater than zero.");
         }
 
-        var target = (float)(Random.Shared.NextDouble() * totalWeight);
-        var cumulative = 0f;
+        var itemsTarget = (float)(Random.Shared.NextDouble() * itemsTotalWeight);
+        var itemsCumulative = 0f;
 
         foreach (var item in items)
         {
-            cumulative += weightSelector(item);
-            if (target <= cumulative)
+            itemsCumulative += weightSelector(item);
+            if (itemsTarget <= itemsCumulative)
             {
                 return item;
             }
