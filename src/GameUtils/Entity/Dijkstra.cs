@@ -153,7 +153,7 @@ public class Dijkstra<T> where T : notnull
             return;
         }
 
-        AddEdge(edge with { From = edge.To, To = edge.From });
+        AddEdge(edge with { From = edge.To, To = edge.From, IsDirected = true });
     }
 
     /// <summary>
@@ -175,7 +175,11 @@ public class Dijkstra<T> where T : notnull
     {
         if (_adjacency.TryGetValue(edge.From, out var fromNeighbors))
         {
-            RemoveFromList(fromNeighbors, edge.To);
+            var index = fromNeighbors.FindIndex(n => EqualityComparer<T>.Default.Equals(n.neighbor, edge.To));
+            if (index >= 0)
+            {
+                fromNeighbors.RemoveAt(index);
+            }
         }
 
         if (edge.IsDirected)
@@ -185,21 +189,14 @@ public class Dijkstra<T> where T : notnull
 
         if (_adjacency.TryGetValue(edge.To, out var toNeighbors))
         {
-            RemoveFromList(toNeighbors, edge.From);
-        }
-    }
-
-    private static void RemoveFromList(List<(T neighbor, float weight)> list, T target)
-    {
-        for (var i = 0; i < list.Count; i++)
-        {
-            if (EqualityComparer<T>.Default.Equals(list[i].neighbor, target))
+            var index = toNeighbors.FindIndex(n => EqualityComparer<T>.Default.Equals(n.neighbor, edge.From));
+            if (index >= 0)
             {
-                list.RemoveAt(i);
-                return;
+                toNeighbors.RemoveAt(index);
             }
         }
     }
+
 }
 
 /// <summary>
