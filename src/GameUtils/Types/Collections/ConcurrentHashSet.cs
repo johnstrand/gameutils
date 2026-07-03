@@ -162,7 +162,7 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
             }
         }
 
-        foreach (var item in _dictionary.Keys.ToList())
+        foreach (var item in _dictionary.Keys)
         {
             if (!otherSet.Contains(item))
             {
