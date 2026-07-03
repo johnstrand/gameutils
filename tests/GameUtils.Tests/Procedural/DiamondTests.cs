@@ -93,7 +93,7 @@ public class DiamondTests
         }
 
         // Act
-        _ = Diamond.Create(size, 10, 10, 16f, nextRange, valueFactory);
+        var grid = Diamond.Create(size, 10, 10, 16f, nextRange, valueFactory);
 
         // Assert
         // Given size = 5 (step initially 4)
