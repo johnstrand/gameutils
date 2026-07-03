@@ -122,4 +122,38 @@ public class MathFExtTests
         Assert.AreEqual(4f, MathFExt.PingPong(-6f, 5f), Tolerance);
         Assert.AreEqual(0f, MathFExt.PingPong(-10f, 5f), Tolerance);
     }
+
+    [TestMethod]
+    public void ToRadians_ZeroDegrees_ReturnsZero()
+    {
+        float degrees = 0f;
+        float expected = 0f;
+
+        float result = MathFExt.ToRadians(degrees);
+
+        Assert.AreEqual(expected, result, Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_PositiveDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(MathF.PI / 2f, MathFExt.ToRadians(90f), Tolerance);
+        Assert.AreEqual(MathF.PI, MathFExt.ToRadians(180f), Tolerance);
+        Assert.AreEqual(MathF.PI * 1.5f, MathFExt.ToRadians(270f), Tolerance);
+        Assert.AreEqual(MathF.Tau, MathFExt.ToRadians(360f), Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_NegativeDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(-MathF.PI / 2f, MathFExt.ToRadians(-90f), Tolerance);
+        Assert.AreEqual(-MathF.PI, MathFExt.ToRadians(-180f), Tolerance);
+        Assert.AreEqual(-MathF.Tau, MathFExt.ToRadians(-360f), Tolerance);
+    }
+
+    [TestMethod]
+    public void ToRadians_LargeDegrees_ReturnsCorrectRadians()
+    {
+        Assert.AreEqual(MathF.Tau * 2f, MathFExt.ToRadians(720f), Tolerance);
+    }
 }
