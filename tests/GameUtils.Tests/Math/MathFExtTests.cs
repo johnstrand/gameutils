@@ -95,7 +95,7 @@ public class MathFExtTests
         // 0.75 * 0.75 * (3 - 2 * 0.75) = 0.5625 * 1.5 = 0.84375
         Assert.AreEqual(0.84375f, result, Delta);
     }
-}
+
     [TestMethod]
     public void Remap_ValueInsideSourceRange_ReturnsMappedValue()
     {
