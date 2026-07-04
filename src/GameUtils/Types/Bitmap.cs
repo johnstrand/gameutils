@@ -173,6 +173,13 @@ public class Bitmap(int width, int height)
     /// </summary>
     public void Write(string path)
     {
+        var fullPath = Path.GetFullPath(path);
+        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
+        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
+        {
+            throw new UnauthorizedAccessException("Cannot write outside the current directory.");
+        }
+
         using var stream = File.OpenWrite(path);
         Write(stream);
     }
