@@ -97,6 +97,13 @@ public class ImageData
     /// </summary>
     public void Write(string path)
     {
+        var fullPath = Path.GetFullPath(path);
+        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
+        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
+        {
+            throw new UnauthorizedAccessException("Cannot write outside the current directory.");
+        }
+
         using var stream = File.OpenWrite(path);
         Write(stream);
     }
@@ -125,6 +132,13 @@ public class ImageData
     /// </summary>
     public static ImageData Read(string path)
     {
+        var fullPath = Path.GetFullPath(path);
+        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
+        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
+        {
+            throw new UnauthorizedAccessException("Cannot read outside the current directory.");
+        }
+
         using var stream = File.OpenRead(path);
         return Read(stream);
     }
