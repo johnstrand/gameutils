@@ -65,8 +65,19 @@ public readonly struct Polygon2D
 
     private static Vector2[] SortClockwise(Vector2[] vertices)
     {
-        var center = new Vector2(vertices.Sum(v => v.X) / vertices.Length, vertices.Sum(v => v.Y) / vertices.Length);
-        return [.. vertices.OrderBy(v => MathF.Atan2(v.Y - center.Y, v.X - center.X))];
+        var sum = Vector2.Zero;
+        for (var i = 0; i < vertices.Length; i++)
+        {
+            sum += vertices[i];
+        }
+
+        var center = sum / vertices.Length;
+
+        var sorted = new Vector2[vertices.Length];
+        Array.Copy(vertices, sorted, vertices.Length);
+        Array.Sort(sorted, (a, b) => MathF.Atan2(a.Y - center.Y, a.X - center.X).CompareTo(MathF.Atan2(b.Y - center.Y, b.X - center.X)));
+
+        return sorted;
     }
 
     /// <summary>
