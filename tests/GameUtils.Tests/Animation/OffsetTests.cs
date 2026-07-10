@@ -69,13 +69,16 @@ public class OffsetTests
     }
 
     [TestMethod]
-    public void Jagged_KnownValues()
+    [DataRow(0f, 0f)]
+    [DataRow(0.1f, -0.1f)]
+    [DataRow(0.25f, -0.25f)]
+    [DataRow(0.5f, 0f)]
+    [DataRow(0.75f, 0.25f)]
+    [DataRow(0.9f, 0.1f)]
+    [DataRow(1f, 0f)]
+    public void Jagged_ValidInput_ReturnsExpectedValues(float x, float expected)
     {
-        Assert.AreEqual(-0.1f, Offset.Jagged(0.1f), Epsilon);
-        Assert.AreEqual(-0.25f, Offset.Jagged(0.25f), Epsilon);
-        Assert.AreEqual(0f, Offset.Jagged(0.5f), Epsilon);
-        Assert.AreEqual(0.25f, Offset.Jagged(0.75f), Epsilon);
-        Assert.AreEqual(0.1f, Offset.Jagged(0.9f), Epsilon);
+        Assert.AreEqual(expected, Offset.Jagged(x), Epsilon);
     }
 
     [TestMethod]
