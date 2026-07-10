@@ -14,3 +14,5 @@ jobs:
       run: dotnet build --configuration Release
     - name: Test
       run: dotnet test --configuration Release --no-build
+    - name: Benchmark
+      run: dotnet run --project tests/GameUtils.Benchmarks/GameUtils.Benchmarks.csproj --configuration Release -- --filter '*'
