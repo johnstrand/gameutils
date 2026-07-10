@@ -79,11 +79,15 @@ public class OffsetTests
     }
 
     [TestMethod]
-    public void Sine_KnownValues()
+    public void Sine_ValidInput_ReturnsExpectedWaveValues()
     {
+        Assert.AreEqual(0.7071f, Offset.Sine(0.125f), Epsilon);
         Assert.AreEqual(1f, Offset.Sine(0.25f), Epsilon);
+        Assert.AreEqual(0.7071f, Offset.Sine(0.375f), Epsilon);
         Assert.AreEqual(0f, Offset.Sine(0.5f), Epsilon);
+        Assert.AreEqual(-0.7071f, Offset.Sine(0.625f), Epsilon);
         Assert.AreEqual(-1f, Offset.Sine(0.75f), Epsilon);
+        Assert.AreEqual(-0.7071f, Offset.Sine(0.875f), Epsilon);
     }
 
     [TestMethod]

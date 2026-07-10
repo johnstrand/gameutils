@@ -53,4 +53,22 @@ public class EaseTests
         // 2f clamps to 1f -> 1f * 2f + 5f = 7f
         Assert.AreEqual(7f, clampedEase(2f));
     }
+  
+    [TestMethod]
+    public void BounceIn_Zero_ReturnsZero()
+    {
+        Assert.AreEqual(0f, Ease.BounceIn(0f), 0.0001f);
+    }
+
+    [TestMethod]
+    public void BounceIn_Half_ReturnsExpectedValue()
+    {
+        Assert.AreEqual(0.234375f, Ease.BounceIn(0.5f), 0.0001f);
+    }
+
+    [TestMethod]
+    public void BounceIn_One_ReturnsOne()
+    {
+        Assert.AreEqual(1f, Ease.BounceIn(1f), 0.0001f);
+    }
 }
