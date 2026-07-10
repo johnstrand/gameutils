@@ -221,7 +221,14 @@ public class AABB
     /// </summary>
     public bool Intersects(Vector2[] vertices)
     {
-        return vertices.Any(Contains);
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            if (Contains(vertices[i]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
