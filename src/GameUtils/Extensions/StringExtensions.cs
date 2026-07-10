@@ -29,6 +29,19 @@ public static class StringExtensions
     {
         ArgumentNullException.ThrowIfNull(str);
         ArgumentOutOfRangeException.ThrowIfNegative(count);
-        return string.Concat(Enumerable.Repeat(str, count));
+
+        if (count == 0 || str.Length == 0) return string.Empty;
+        if (count == 1) return str;
+        if (str.Length == 1) return new string(str[0], count);
+
+        return string.Create(str.Length * count, (str, count), (span, state) =>
+        {
+            ReadOnlySpan<char> source = state.str.AsSpan();
+            int len = source.Length;
+            for (int i = 0; i < state.count; i++)
+            {
+                source.CopyTo(span.Slice(i * len, len));
+            }
+        });
     }
 }
