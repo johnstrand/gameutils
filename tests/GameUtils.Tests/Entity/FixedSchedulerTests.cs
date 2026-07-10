@@ -111,6 +111,27 @@ public class FixedSchedulerTests
     }
 
     [TestMethod]
+    public async Task Update_WhenExceptionThrown_RaisesErrorEvent()
+    {
+        // Arrange
+        var scheduler = new TestScheduler(20);
+        var expectedException = new InvalidOperationException("Test exception");
+        scheduler.ExceptionToThrow = expectedException;
+
+        Exception? caughtException = null;
+        scheduler.Error += (sender, ex) => caughtException = ex;
+
+        // Act
+        scheduler.Start();
+        await Task.Delay(150);
+        await scheduler.Stop();
+
+        // Assert
+        Assert.IsNotNull(caughtException, "Error event should have been raised.");
+        Assert.AreEqual(expectedException, caughtException);
+    }
+
+    [TestMethod]
     public async Task Timing_ApproximatesTargetRate()
     {
         // Arrange
