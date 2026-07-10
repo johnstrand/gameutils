@@ -63,7 +63,7 @@ public static class Ease
     /// </summary>
     public static float SineIn(float x)
     {
-        return 1 - MathF.Cos(x * MathF.PI / 2);
+        return GameUtils.Math.Easing.SineIn(x);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public static class Ease
     /// </summary>
     public static float SineOut(float x)
     {
-        return 1 - SineIn(1 - x);
+        return GameUtils.Math.Easing.SineOut(x);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public static class Ease
     /// </summary>
     public static float SineInOut(float x)
     {
-        return -(MathF.Cos(MathF.PI * x) - 1) / 2;
+        return GameUtils.Math.Easing.SineInOut(x);
     }
     #endregion
 
@@ -89,7 +89,7 @@ public static class Ease
     /// </summary>
     public static float CubicIn(float x)
     {
-        return x * x * x;
+        return GameUtils.Math.Easing.CubicIn(x);
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public static class Ease
     /// </summary>
     public static float CubicOut(float x)
     {
-        return 1 - CubicIn(1 - x);
+        return GameUtils.Math.Easing.CubicOut(x);
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ public static class Ease
     /// </summary>
     public static float CubicInOut(float x)
     {
-        return x < .5f ? 4 * x * x * x : 1 - (MathF.Pow((-2 * x) + 2, 3) / 2);
+        return GameUtils.Math.Easing.CubicInOut(x);
     }
     #endregion
 
@@ -115,7 +115,7 @@ public static class Ease
     /// </summary>
     public static float QuinticIn(float x)
     {
-        return x * x * x * x * x;
+        return GameUtils.Math.Easing.QuintIn(x);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public static class Ease
     /// </summary>
     public static float QuinticOut(float x)
     {
-        return 1 - QuinticIn(1 - x);
+        return GameUtils.Math.Easing.QuintOut(x);
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public static class Ease
     /// </summary>
     public static float QuinticInOut(float x)
     {
-        return x < 0.5f ? 16 * x * x * x * x * x : 1 - (MathF.Pow((-2 * x) + 2, 5) / 2);
+        return GameUtils.Math.Easing.QuintInOut(x);
     }
     #endregion
 
@@ -141,7 +141,7 @@ public static class Ease
     /// </summary>
     public static float CircularIn(float x)
     {
-        return 1 - MathF.Sqrt(1 - MathF.Pow(x, 2));
+        return GameUtils.Math.Easing.CircIn(x);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public static class Ease
     /// </summary>
     public static float CircularOut(float x)
     {
-        return 1 - CircularIn(1 - x);
+        return GameUtils.Math.Easing.CircOut(x);
     }
 
     /// <summary>
@@ -157,9 +157,7 @@ public static class Ease
     /// </summary>
     public static float CircularInOut(float x)
     {
-        return x < 0.5f
-      ? (1 - MathF.Sqrt(1 - MathF.Pow(2 * x, 2))) / 2
-      : (MathF.Sqrt(1 - MathF.Pow((-2 * x) + 2, 2)) + 1) / 2;
+        return GameUtils.Math.Easing.CircInOut(x);
     }
     #endregion
 
@@ -169,13 +167,7 @@ public static class Ease
     /// </summary>
     public static float ElasticIn(float x)
     {
-        const float C_4 = 2 * MathF.PI / 3;
-
-        return x <= 0
-          ? 0
-          : x >= 1
-          ? 1
-          : -MathF.Pow(2, (10 * x) - 10) * MathF.Sin(((x * 10) - 10.75f) * C_4);
+        return GameUtils.Math.Easing.ElasticIn(x);
     }
 
     /// <summary>
@@ -183,7 +175,7 @@ public static class Ease
     /// </summary>
     public static float ElasticOut(float x)
     {
-        return 1 - ElasticIn(1 - x);
+        return GameUtils.Math.Easing.ElasticOut(x);
     }
 
     /// <summary>
@@ -191,15 +183,7 @@ public static class Ease
     /// </summary>
     public static float ElasticInOut(float x)
     {
-        const float C_5 = MathF.PI * 4f / 9f;
-
-        return x <= 0
-          ? 0
-          : x >= 1
-          ? 1
-          : x < 0.5f
-          ? -(MathF.Pow(2, (20 * x) - 10) * MathF.Sin(((20f * x) - 11.125f) * C_5)) / 2
-          : (MathF.Pow(2, (-20 * x) + 10) * MathF.Sin(((20f * x) - 11.125f) * C_5) / 2) + 1;
+        return GameUtils.Math.Easing.ElasticInOut(x);
     }
     #endregion
 
@@ -209,7 +193,7 @@ public static class Ease
     /// </summary>
     public static float QuadraticIn(float x)
     {
-        return x * x;
+        return GameUtils.Math.Easing.QuadIn(x);
     }
 
     /// <summary>
@@ -217,7 +201,7 @@ public static class Ease
     /// </summary>
     public static float QuadraticOut(float x)
     {
-        return 1 - QuadraticIn(1 - x);
+        return GameUtils.Math.Easing.QuadOut(x);
     }
 
     /// <summary>
@@ -225,7 +209,7 @@ public static class Ease
     /// </summary>
     public static float InOutQuad(float x)
     {
-        return x < 0.5f ? 2 * x * x : 1 - (MathF.Pow((-2 * x) + 2, 2) / 2);
+        return GameUtils.Math.Easing.QuadInOut(x);
     }
     #endregion
 
@@ -235,7 +219,7 @@ public static class Ease
     /// </summary>
     public static float QuarticIn(float x)
     {
-        return x * x * x * x;
+        return GameUtils.Math.Easing.QuartIn(x);
     }
 
     /// <summary>
@@ -243,7 +227,7 @@ public static class Ease
     /// </summary>
     public static float QuarticOut(float x)
     {
-        return 1 - QuarticIn(1 - x);
+        return GameUtils.Math.Easing.QuartOut(x);
     }
 
     /// <summary>
@@ -251,7 +235,7 @@ public static class Ease
     /// </summary>
     public static float QuarticInOut(float x)
     {
-        return x < 0.5f ? 8 * x * x * x * x : 1 - (MathF.Pow((-2 * x) + 2, 4) / 2);
+        return GameUtils.Math.Easing.QuartInOut(x);
     }
     #endregion
 
@@ -261,7 +245,7 @@ public static class Ease
     /// </summary>
     public static float ExponentialIn(float x)
     {
-        return x <= 0 ? 0 : MathF.Pow(2, (10 * x) - 10);
+        return GameUtils.Math.Easing.ExpoIn(x);
     }
 
     /// <summary>
@@ -269,7 +253,7 @@ public static class Ease
     /// </summary>
     public static float ExponentialOut(float x)
     {
-        return 1 - ExponentialIn(1 - x);
+        return GameUtils.Math.Easing.ExpoOut(x);
     }
 
     /// <summary>
@@ -277,12 +261,7 @@ public static class Ease
     /// </summary>
     public static float ExponentialInOut(float x)
     {
-        return x <= 0
-      ? 0
-      : x >= 1
-      ? 1
-      : x < 0.5f ? MathF.Pow(2, (20 * x) - 10) / 2
-      : (2 - MathF.Pow(2, (-20 * x) + 10)) / 2;
+        return GameUtils.Math.Easing.ExpoInOut(x);
     }
     #endregion
 
@@ -292,10 +271,7 @@ public static class Ease
     /// </summary>
     public static float BackIn(float x)
     {
-        const float C_1 = 1.70158f;
-        const float C_3 = C_1 + 1;
-
-        return (C_3 * x * x * x) - (C_1 * x * x);
+        return GameUtils.Math.Easing.BackIn(x);
     }
 
     /// <summary>
@@ -303,7 +279,7 @@ public static class Ease
     /// </summary>
     public static float BackOut(float x)
     {
-        return 1 - BackIn(1 - x);
+        return GameUtils.Math.Easing.BackOut(x);
     }
 
     /// <summary>
@@ -311,12 +287,7 @@ public static class Ease
     /// </summary>
     public static float BackInOut(float x)
     {
-        const float C_1 = 1.70158f;
-        const float C_2 = C_1 * 1.525f;
-
-        return x < 0.5f
-          ? MathF.Pow(2 * x, 2) * (((C_2 + 1) * 2 * x) - C_2) / 2
-          : ((MathF.Pow((2 * x) - 2, 2) * (((C_2 + 1) * ((x * 2) - 2)) + C_2)) + 2) / 2;
+        return GameUtils.Math.Easing.BackInOut(x);
     }
     #endregion
 
@@ -326,7 +297,7 @@ public static class Ease
     /// </summary>
     public static float BounceIn(float x)
     {
-        return 1 - BounceOut(1 - x);
+        return GameUtils.Math.Easing.BounceIn(x);
     }
 
     /// <summary>
@@ -334,25 +305,7 @@ public static class Ease
     /// </summary>
     public static float BounceOut(float x)
     {
-        const float N_1 = 7.5625f;
-        const float D_1 = 2.75f;
-
-        if (x < 1 / D_1)
-        {
-            return N_1 * x * x;
-        }
-        else if (x < 2 / D_1)
-        {
-            return (N_1 * (x -= 1.5f / D_1) * x) + 0.75f;
-        }
-        else if (x < 2.5f / D_1)
-        {
-            return (N_1 * (x -= 2.25f / D_1) * x) + 0.9375f;
-        }
-        else
-        {
-            return (N_1 * (x -= 2.625f / D_1) * x) + 0.984375f;
-        }
+        return GameUtils.Math.Easing.BounceOut(x);
     }
 
     /// <summary>
@@ -360,9 +313,7 @@ public static class Ease
     /// </summary>
     public static float BounceInOut(float x)
     {
-        return x < 0.5f
-          ? (1 - BounceOut(1 - (2 * x))) / 2
-          : (1 + BounceOut((2 * x) - 1)) / 2;
+        return GameUtils.Math.Easing.BounceInOut(x);
     }
     #endregion
 }
