@@ -28,5 +28,11 @@ namespace GameUtils.Benchmarks
         {
             return _set.IsProperSupersetOf(_enumerable);
         }
+
+        [Benchmark]
+        public bool Overlaps()
+        {
+            return _set.Overlaps(_enumerable);
+        }
     }
 }

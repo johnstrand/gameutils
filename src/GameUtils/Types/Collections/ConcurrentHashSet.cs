@@ -147,10 +147,21 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     }
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public bool Overlaps(IEnumerable<T> other)
     {
-        return other.Any(_dictionary.ContainsKey);
+        ArgumentNullException.ThrowIfNull(other);
+
+        foreach (var item in other)
+        {
+            if (_dictionary.ContainsKey(item))
+            {
+                return true;
+            }
+        }
+        return false;
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
     public bool Remove(T item)
