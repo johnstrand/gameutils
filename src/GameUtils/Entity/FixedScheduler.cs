@@ -17,6 +17,11 @@ public abstract class FixedScheduler(int targetRatePerSecond)
     private Task? _runningTask;
 
     /// <summary>
+    /// Event raised when an exception is thrown during an update cycle.
+    /// </summary>
+    public event EventHandler<Exception>? Error;
+
+    /// <summary>
     /// Starts the scheduler. If the scheduler is already running, this method does nothing.
     /// </summary>
     public void Start()
@@ -38,9 +43,10 @@ public abstract class FixedScheduler(int targetRatePerSecond)
                 {
                     Update();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // Swallow exceptions to keep the loop alive; override Update to handle errors.
+                    Error?.Invoke(this, ex);
                 }
 
                 // Sleep for the bulk of the remaining time, leaving ~1ms for spin-wait precision
