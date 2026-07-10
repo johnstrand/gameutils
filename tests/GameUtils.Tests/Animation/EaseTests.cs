@@ -37,4 +37,12 @@ public class EaseTests
         Assert.AreEqual(0.5f, clampedEase(0.5f));
         Assert.AreEqual(1f, clampedEase(1f));
     }
+
+    [TestMethod]
+    public void QuinticBounceIn_ValidInput_ReturnsExpectedResult()
+    {
+        Assert.AreEqual(0f, Ease.QuinticBounceIn(0f), 0.0001f);
+        Assert.AreEqual(-0.2747936f, Ease.QuinticBounceIn(0.5f), 0.0001f);
+        Assert.AreEqual(1f, Ease.QuinticBounceIn(1f), 0.0001f);
+    }
 }
