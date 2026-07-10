@@ -8,6 +8,23 @@ namespace GameUtils.Tests.Math;
 public class Vector3ExtTests
 {
     private const float Tolerance = 0.0001f;
+  
+    [TestMethod]
+    public void IsZero_ZeroVector_ReturnsTrue()
+    {
+        Vector3 vector = Vector3.Zero;
+        Assert.IsTrue(vector.IsZero());
+    }
+
+    [TestMethod]
+    public void IsZero_NonZeroVector_ReturnsFalse()
+    {
+        Assert.IsFalse(new Vector3(1f, 0f, 0f).IsZero());
+        Assert.IsFalse(new Vector3(0f, 1f, 0f).IsZero());
+        Assert.IsFalse(new Vector3(0f, 0f, 1f).IsZero());
+        Assert.IsFalse(new Vector3(1f, 1f, 1f).IsZero());
+        Assert.IsFalse(new Vector3(-1f, 0f, 0f).IsZero());
+    }
 
     [TestMethod]
     public void Floor_PositiveValues_ReturnsRoundedDown()
