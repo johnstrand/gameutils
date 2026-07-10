@@ -176,7 +176,15 @@ public readonly struct Polygon2D
     /// </summary>
     public bool Intersects(Line line)
     {
-        return Edges.Any(edge => Intersects(edge.Start, edge.End, line.Start, line.End));
+        for (var i = 0; i < Edges.Length; i++)
+        {
+            if (Intersects(Edges[i].Start, Edges[i].End, line.Start, line.End))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
