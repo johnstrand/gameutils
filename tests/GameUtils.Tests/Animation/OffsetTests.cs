@@ -112,21 +112,26 @@ public class OffsetTests
     }
 
     [TestMethod]
-    public void Triangle_KnownValues()
+    public void Triangle_ValidInput_ReturnsExpectedWaveValues()
     {
-        // For x = 0.25:
-        // ((0.25 + 0.25) * 4 % 4) = 2 % 4 = 2
-        // Abs(2 - 2) - 1 = -1
+        Assert.AreEqual(-0.5f, Offset.Triangle(0.125f), Epsilon);
         Assert.AreEqual(-1f, Offset.Triangle(0.25f), Epsilon);
-
-        // For x = 0.5:
-        // ((0.5 + 0.25) * 4 % 4) = 3 % 4 = 3
-        // Abs(3 - 2) - 1 = 0
+        Assert.AreEqual(-0.5f, Offset.Triangle(0.375f), Epsilon);
         Assert.AreEqual(0f, Offset.Triangle(0.5f), Epsilon);
-
-        // For x = 0.75:
-        // ((0.75 + 0.25) * 4 % 4) = 4 % 4 = 0
-        // Abs(0 - 2) - 1 = 1
+        Assert.AreEqual(0.5f, Offset.Triangle(0.625f), Epsilon);
         Assert.AreEqual(1f, Offset.Triangle(0.75f), Epsilon);
+        Assert.AreEqual(0.5f, Offset.Triangle(0.875f), Epsilon);
+    }
+
+    [TestMethod]
+    public void Wobble_ValidInput_ReturnsExpectedWaveValues()
+    {
+        Assert.AreEqual(-0.12006933f, Offset.Wobble(0.125f), Epsilon);
+        Assert.AreEqual(0.12374661f, Offset.Wobble(0.25f), Epsilon);
+        Assert.AreEqual(0.2522871f, Offset.Wobble(0.375f), Epsilon);
+        Assert.AreEqual(-0.9014499f, Offset.Wobble(0.5f), Epsilon);
+        Assert.AreEqual(0.79250276f, Offset.Wobble(0.625f), Epsilon);
+        Assert.AreEqual(-0.41554952f, Offset.Wobble(0.75f), Epsilon);
+        Assert.AreEqual(0.022105332f, Offset.Wobble(0.875f), Epsilon);
     }
 }
