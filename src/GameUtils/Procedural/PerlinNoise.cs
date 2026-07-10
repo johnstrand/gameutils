@@ -161,6 +161,16 @@ public class PerlinNoise
             v = z;
         }
 
-        return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+        if ((h & 1) != 0)
+        {
+            u = -u;
+        }
+
+        if ((h & 2) != 0)
+        {
+            v = -v;
+        }
+
+        return u + v;
     }
 }
