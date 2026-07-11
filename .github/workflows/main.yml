@@ -1,3 +1,5 @@
+name: Publish new version
+
 on:
   push:
     branches:
