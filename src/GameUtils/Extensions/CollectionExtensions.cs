@@ -210,16 +210,17 @@ public static class CollectionExtensions
             return list[count - 1];
         }
 
-        var items = source.ToList();
-        if (items.Count == 0)
+        var itemsTotalWeight = 0f;
+        var hasElements = false;
+        foreach (var item in source)
         {
-            throw new InvalidOperationException("Sequence contains no elements.");
+            hasElements = true;
+            itemsTotalWeight += weightSelector(item);
         }
 
-        var itemsTotalWeight = 0f;
-        foreach (var item in items)
+        if (!hasElements)
         {
-            itemsTotalWeight += weightSelector(item);
+            throw new InvalidOperationException("Sequence contains no elements.");
         }
 
         if (itemsTotalWeight <= 0)
@@ -229,9 +230,11 @@ public static class CollectionExtensions
 
         var itemsTarget = (float)(Random.Shared.NextDouble() * itemsTotalWeight);
         var itemsCumulative = 0f;
+        T lastItem = default!;
 
-        foreach (var item in items)
+        foreach (var item in source)
         {
+            lastItem = item;
             itemsCumulative += weightSelector(item);
             if (itemsTarget <= itemsCumulative)
             {
@@ -239,6 +242,6 @@ public static class CollectionExtensions
             }
         }
 
-        return items[^1];
+        return lastItem;
     }
 }
