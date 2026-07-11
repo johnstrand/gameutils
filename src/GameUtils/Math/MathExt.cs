@@ -70,3 +70,6 @@ public static class MathExt
         return new System.Numerics.Vector2(radius * MathF.Cos(angle), radius * MathF.Sin(angle));
     }
 }
+
+#pragma warning restore CA5394 // Do not use insecure randomness
+#pragma warning restore S2245 // Using pseudorandom number generators (PRNGs) is security-sensitive
