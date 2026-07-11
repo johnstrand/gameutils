@@ -52,11 +52,37 @@ public static class CollectionExtensions
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
-        var buffer = source.ToArray();
-        for (var i = buffer.Length - 1; i > 0; i--)
+        T[] buffer;
+        if (source.TryGetNonEnumeratedCount(out int count))
+        {
+            if (count == 0)
+            {
+                return [];
+            }
+            buffer = new T[count];
+            if (source is ICollection<T> collection)
+            {
+                collection.CopyTo(buffer, 0);
+            }
+            else
+            {
+                int index = 0;
+                foreach (var item in source)
+                {
+                    buffer[index++] = item;
+                }
+            }
+        }
+        else
+        {
+            buffer = source.ToArray();
+        }
+
+        var span = buffer.AsSpan();
+        for (var i = span.Length - 1; i > 0; i--)
         {
             var j = Random.Shared.Next(i + 1);
-            (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
+            (span[i], span[j]) = (span[j], span[i]);
         }
         return buffer;
     }
