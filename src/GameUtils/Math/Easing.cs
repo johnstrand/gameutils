@@ -177,3 +177,5 @@ public static class Easing
     public static float BounceInOut(float t) =>
         t < 0.5f ? (1f - BounceOut(1f - 2f * t)) / 2f : (1f + BounceOut(2f * t - 1f)) / 2f;
 }
+
+#pragma warning restore S1244
