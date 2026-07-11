@@ -105,11 +105,25 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
 #pragma warning restore S3267
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public bool IsProperSubsetOf(IEnumerable<T> other)
     {
-        var otherSet = other.ToHashSet();
-        return otherSet.Count > _dictionary.Count && _dictionary.Keys.All(otherSet.Contains);
+        var otherSet = other as ISet<T> ?? other.ToHashSet();
+        if (_dictionary.Count >= otherSet.Count)
+        {
+            return false;
+        }
+
+        foreach (var item in _dictionary.Keys)
+        {
+            if (!otherSet.Contains(item))
+            {
+                return false;
+            }
+        }
+        return true;
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
     public bool IsProperSupersetOf(IEnumerable<T> other)
@@ -134,17 +148,40 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     }
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public bool IsSubsetOf(IEnumerable<T> other)
     {
-        var otherSet = other.ToHashSet();
-        return _dictionary.Keys.All(otherSet.Contains);
+        if (_dictionary.IsEmpty)
+        {
+            return true;
+        }
+
+        var otherSet = other as ISet<T> ?? other.ToHashSet();
+        foreach (var item in _dictionary.Keys)
+        {
+            if (!otherSet.Contains(item))
+            {
+                return false;
+            }
+        }
+        return true;
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public bool IsSupersetOf(IEnumerable<T> other)
     {
-        return other.All(_dictionary.ContainsKey);
+        foreach (var item in other)
+        {
+            if (!_dictionary.ContainsKey(item))
+            {
+                return false;
+            }
+        }
+        return true;
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
 #pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
@@ -170,11 +207,25 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
     }
 
     /// <inheritdoc/>
+#pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
     public bool SetEquals(IEnumerable<T> other)
     {
-        var otherSet = other.ToHashSet();
-        return _dictionary.Count == otherSet.Count && _dictionary.Keys.All(otherSet.Contains);
+        var otherSet = other as ISet<T> ?? other.ToHashSet();
+        if (_dictionary.Count != otherSet.Count)
+        {
+            return false;
+        }
+
+        foreach (var item in _dictionary.Keys)
+        {
+            if (!otherSet.Contains(item))
+            {
+                return false;
+            }
+        }
+        return true;
     }
+#pragma warning restore S3267
 
     /// <inheritdoc/>
 #pragma warning disable S3267 // intentional: foreach avoids LINQ allocations on this hot path
