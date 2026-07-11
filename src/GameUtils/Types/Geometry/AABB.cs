@@ -239,3 +239,5 @@ public class AABB
         return Intersects(new Polygon2D(vertices, sort));
     }
 }
+
+#pragma warning restore S101
