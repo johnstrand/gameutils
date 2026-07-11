@@ -131,3 +131,6 @@ public enum ConsoleMode : uint
     /// <summary>The APIs for writing character attributes including WriteConsoleOutput and ReadConsoleOutput will treat the character attributes as if they're encoding a LVB (Latin VT Bonus) attribute.</summary>
     ENABLE_LVB_GRID_WORLDWIDE = 0x0010,
 }
+
+#pragma warning restore CS0649
+#pragma warning restore S1104
