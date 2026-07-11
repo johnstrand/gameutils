@@ -1,0 +1,95 @@
+name: Manual Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version segment to bump
+        required: true
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      branch_prefix:
+        description: Prefix for the created branch
+        required: true
+        default: feature/version-bump
+        type: string
+      create_pr:
+        description: Create a PR to merge into master
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PROJECT_FILE: src/GameUtils/GameUtils.csproj
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4.2.2
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Bump version and create branch
+        id: bump
+        shell: pwsh
+        run: |
+          $projectFile = $env:PROJECT_FILE
+          [xml]$xml = Get-Content -LiteralPath $projectFile
+          $versionNode = $xml.Project.PropertyGroup.Version | Select-Object -First 1
+          if (-not $versionNode) {
+            throw "Could not find <Version> in $projectFile"
+          }
+
+          $currentVersion = $versionNode.InnerText.Trim()
+          if ($currentVersion -notmatch '^(\d+)\.(\d+)\.(\d+)$') {
+            throw "Version '$currentVersion' is not in major.minor.patch format."
+          }
+
+          $major = [int]$matches[1]
+          $minor = [int]$matches[2]
+          $patch = [int]$matches[3]
+
+          switch ('${{ inputs.bump }}') {
+            'major' { $major++; $minor = 0; $patch = 0 }
+            'minor' { $minor++; $patch = 0 }
+            'patch' { $patch++ }
+            default { throw "Unsupported bump input: ${{ inputs.bump }}" }
+          }
+
+          $newVersion = "$major.$minor.$patch"
+          $versionNode.InnerText = $newVersion
+          $xml.Save((Resolve-Path $projectFile))
+
+          $branchName = "${{ inputs.branch_prefix }}/v$newVersion"
+          git checkout -b $branchName
+
+          git add $projectFile
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Bump version to $newVersion" -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+          git push --set-upstream origin $branchName
+
+          "branch_name=$branchName" >> $env:GITHUB_OUTPUT
+          "new_version=$newVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Create PR
+        if: ${{ inputs.create_pr }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base master \
+            --head "${{ steps.bump.outputs.branch_name }}" \
+            --title "Bump version to ${{ steps.bump.outputs.new_version }}" \
+            --body "Automated version bump via workflow_dispatch."
