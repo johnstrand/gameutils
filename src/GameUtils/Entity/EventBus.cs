@@ -6,8 +6,8 @@ namespace GameUtils.Entity;
 /// </summary>
 public class EventBus
 {
-    private readonly Dictionary<Type, List<Delegate>> _handlers = [];
-    private readonly Dictionary<Type, Delegate[]> _snapshots = [];
+    private readonly Dictionary<Type, object> _handlers = [];
+    private readonly Dictionary<Type, object> _snapshots = [];
 
     /// <summary>
     /// Subscribes <paramref name="handler"/> to events of type <typeparamref name="TEvent"/>.
@@ -17,13 +17,16 @@ public class EventBus
         ArgumentNullException.ThrowIfNull(handler);
         var type = typeof(TEvent);
 
-        if (!_handlers.TryGetValue(type, out var list))
+        if (!_handlers.TryGetValue(type, out var listObj))
         {
-            list = _handlers[type] = [];
+            var newList = new List<Action<TEvent>>();
+            _handlers[type] = newList;
+            listObj = newList;
         }
 
+        var list = (List<Action<TEvent>>)listObj;
         list.Add(handler);
-        _snapshots[type] = [.. list];
+        _snapshots[type] = list.ToArray();
     }
 
     /// <summary>
@@ -35,10 +38,11 @@ public class EventBus
         ArgumentNullException.ThrowIfNull(handler);
         var type = typeof(TEvent);
 
-        if (_handlers.TryGetValue(type, out var list))
+        if (_handlers.TryGetValue(type, out var listObj))
         {
+            var list = (List<Action<TEvent>>)listObj;
             list.Remove(handler);
-            _snapshots[type] = [.. list];
+            _snapshots[type] = list.ToArray();
         }
     }
 
@@ -55,9 +59,10 @@ public class EventBus
             return;
         }
 
-        foreach (var handler in snapshot)
+        var typedSnapshot = (Action<TEvent>[])snapshot;
+        foreach (var handler in typedSnapshot)
         {
-            ((Action<TEvent>)handler)(eventData);
+            handler(eventData);
         }
     }
 
