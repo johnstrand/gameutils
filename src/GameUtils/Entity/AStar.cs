@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace GameUtils.Entity;
 
 /// <summary>
@@ -126,9 +128,10 @@ public class AStar<T> where T : notnull
 
                 var tentativeG = currentG + weight;
 
-                if (tentativeG < gScore.GetValueOrDefault(neighbor, float.MaxValue))
+                ref var neighborG = ref CollectionsMarshal.GetValueRefOrAddDefault(gScore, neighbor, out var exists);
+                if (!exists || tentativeG < neighborG)
                 {
-                    gScore[neighbor] = tentativeG;
+                    neighborG = tentativeG;
                     previousNodes[neighbor] = current;
                     open.Enqueue(neighbor, tentativeG + heuristic(neighbor, end));
                 }

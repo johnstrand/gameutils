@@ -158,7 +158,18 @@ public class ImageData
 
         var width = reader.ReadInt32();
         var height = reader.ReadInt32();
-        var data = new Vector4[width * height];
+        if (width <= 0 || height <= 0)
+        {
+            throw new InvalidDataException("Width and height must be positive");
+        }
+
+        long totalPixels = (long)width * height;
+        if (totalPixels > 67_108_864) // 1 GB max memory allocation (16 bytes per Vector4)
+        {
+            throw new InvalidDataException("Image size exceeds maximum allowed limit of 1GB");
+        }
+
+        var data = new Vector4[(int)totalPixels];
         for (var i = 0; i < data.Length; i++)
         {
             data[i] = new Vector4(

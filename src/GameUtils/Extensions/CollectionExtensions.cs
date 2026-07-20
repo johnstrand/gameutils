@@ -236,38 +236,37 @@ public static class CollectionExtensions
             return list[count - 1];
         }
 
-        var itemsTotalWeight = 0f;
-        var hasElements = false;
-        foreach (var item in source)
-        {
-            hasElements = true;
-            itemsTotalWeight += weightSelector(item);
-        }
-
-        if (!hasElements)
+        var array = source.ToArray();
+        int arrayCount = array.Length;
+        if (arrayCount == 0)
         {
             throw new InvalidOperationException("Sequence contains no elements.");
         }
 
-        if (itemsTotalWeight <= 0)
+        var arrayTotalWeight = 0f;
+        for (int i = 0; i < arrayCount; i++)
+        {
+            arrayTotalWeight += weightSelector(array[i]);
+        }
+
+        if (arrayTotalWeight <= 0)
         {
             throw new InvalidOperationException("Total weight must be greater than zero.");
         }
 
-        var itemsTarget = (float)(Random.Shared.NextDouble() * itemsTotalWeight);
-        var itemsCumulative = 0f;
-        T lastItem = default!;
+        var arrayTarget = (float)(Random.Shared.NextDouble() * arrayTotalWeight);
+        var arrayCumulative = 0f;
 
-        foreach (var item in source)
+        for (int i = 0; i < arrayCount; i++)
         {
-            lastItem = item;
-            itemsCumulative += weightSelector(item);
-            if (itemsTarget <= itemsCumulative)
+            var item = array[i];
+            arrayCumulative += weightSelector(item);
+            if (arrayTarget <= arrayCumulative)
             {
                 return item;
             }
         }
 
-        return lastItem;
+        return array[arrayCount - 1];
     }
 }
