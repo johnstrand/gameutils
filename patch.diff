@@ -1,0 +1,45 @@
+--- src/GameUtils/Procedural/Diamond.cs
++++ src/GameUtils/Procedural/Diamond.cs
+@@ -1,4 +1,5 @@
+-﻿using GameUtils.Types.Collections;
++﻿using System.Numerics;
++using GameUtils.Types.Collections;
+
+ namespace GameUtils.Procedural;
+
+@@ -45,11 +46,11 @@
+                     var mx = x + halfStep;
+                     var my = y + halfStep;
+
+-                    map[mx, my] = valueFactory(AverageInt(map, x, y, x + step, y, x, y + step, x + step, y + step), range);
+-                    map[mx, y] = valueFactory(AverageInt(map, x, y, x + step, y, mx, my, mx, y - step), range);
+-                    map[x, my] = valueFactory(AverageInt(map, x, y, x, y + step, mx, my, x - step, my), range);
+-                    map[x + step, my] = valueFactory(AverageInt(map, x + step, y, x + step, y + step, mx, my, x + step + step, my), range);
+-                    map[mx, y + step] = valueFactory(AverageInt(map, x, y + step, x + step, y + step, mx, my, mx, y + step + step), range);
++                    map[mx, my] = valueFactory(AverageInt(map, new(x, y), new(x + step, y), new(x, y + step), new(x + step, y + step)), range);
++                    map[mx, y] = valueFactory(AverageInt(map, new(x, y), new(x + step, y), new(mx, my), new(mx, y - step)), range);
++                    map[x, my] = valueFactory(AverageInt(map, new(x, y), new(x, y + step), new(mx, my), new(x - step, my)), range);
++                    map[x + step, my] = valueFactory(AverageInt(map, new(x + step, y), new(x + step, y + step), new(mx, my), new(x + step + step, my)), range);
++                    map[mx, y + step] = valueFactory(AverageInt(map, new(x, y + step), new(x + step, y + step), new(mx, my), new(mx, y + step + step)), range);
+                 }
+             }
+
+@@ -60,13 +61,13 @@
+         return map;
+     }
+
+-    private static float AverageInt(Grid<int> map, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy)
++    private static float AverageInt(Grid<int> map, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+     {
+         var sum = 0f;
+         var count = 0;
+-        if (ax >= 0 && ax < map.Width && ay >= 0 && ay < map.Height) { sum += map[ax, ay]; count++; }
+-        if (bx >= 0 && bx < map.Width && by >= 0 && by < map.Height) { sum += map[bx, by]; count++; }
+-        if (cx >= 0 && cx < map.Width && cy >= 0 && cy < map.Height) { sum += map[cx, cy]; count++; }
+-        if (dx >= 0 && dx < map.Width && dy >= 0 && dy < map.Height) { sum += map[dx, dy]; count++; }
++        if (map.IsInBounds(a)) { sum += map[a]; count++; }
++        if (map.IsInBounds(b)) { sum += map[b]; count++; }
++        if (map.IsInBounds(c)) { sum += map[c]; count++; }
++        if (map.IsInBounds(d)) { sum += map[d]; count++; }
+         return count == 0 ? 0f : sum / count;
+     }
