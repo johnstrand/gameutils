@@ -152,8 +152,15 @@ public static class Vector2Ext
     /// </summary>
     public static IEnumerable<Vector2> Sort(this IEnumerable<Vector2> source, Vector2 center, bool clockwise = true)
     {
+        var values = source.ToArray();
+        var keys = new float[values.Length];
         var sortMultiplier = clockwise ? 1 : -1;
-        return source.OrderBy(v => MathF.Atan2(v.Y - center.Y, v.X - center.X) * sortMultiplier);
+        for (int i = 0; i < values.Length; i++)
+        {
+            keys[i] = MathF.Atan2(values[i].Y - center.Y, values[i].X - center.X) * sortMultiplier;
+        }
+        Array.Sort(keys, values);
+        return values;
     }
 
     /// <summary>
