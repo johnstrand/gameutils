@@ -31,6 +31,8 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
 {
     private readonly ConcurrentQueue<Operation<T>> _pending = new();
     private readonly SemaphoreSlim _integrating = new(1, 1);
+    private IReadOnlyList<T>? _cachedSnapshot;
+    private bool _dirty = true;
 
     /// <summary>
     /// Schedules an entity to be added to the collection.
@@ -57,9 +59,16 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
         _integrating.Wait();
         try
         {
+            bool modified = false;
             while (_pending.TryDequeue(out var operation))
             {
                 HandleOperation(operation);
+                modified = true;
+            }
+
+            if (modified)
+            {
+                _dirty = true;
             }
         }
         finally
@@ -101,7 +110,13 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
         _integrating.Wait();
         try
         {
-            return GetInternal().ToList();
+            if (_dirty || _cachedSnapshot is null)
+            {
+                _cachedSnapshot = GetInternal().ToList();
+                _dirty = false;
+            }
+
+            return _cachedSnapshot;
         }
         finally
         {
