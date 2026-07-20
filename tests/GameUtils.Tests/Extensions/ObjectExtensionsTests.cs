@@ -16,6 +16,14 @@ public class ObjectExtensionsTests
     {
         public int Value { get; set; }
     }
+  
+    [TestMethod]
+    public void Mutate_Struct_ReturnsMutatedValue()
+    {
+        int value = 5;
+        int result = value.Mutate(x => x + 5);
+        Assert.AreEqual(10, result);
+    }
 
     [TestMethod]
     public void Mutate_Struct_ValidAction_ReturnsNewValue()
@@ -30,6 +38,9 @@ public class ObjectExtensionsTests
     [TestMethod]
     public void Mutate_Struct_NullAction_ThrowsArgumentNullException()
     {
+        int value = 5;
+        Func<int, int> action = null!;
+        Assert.ThrowsExactly<ArgumentNullException>(() => value.Mutate(action));
         var s = new DummyStruct();
         Assert.ThrowsExactly<ArgumentNullException>(() => s.Mutate((Func<DummyStruct, DummyStruct>)null!));
     }
