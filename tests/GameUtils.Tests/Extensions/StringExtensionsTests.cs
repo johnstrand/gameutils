@@ -53,4 +53,26 @@ public class StringExtensionsTests
         string str = "test";
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => str.Repeat(-1));
     }
+
+    [TestMethod]
+    public void Repeat_CountZero_ReturnsStringEmpty()
+    {
+        var result = "test".Repeat(0);
+        Assert.AreSame(string.Empty, result);
+    }
+
+    [TestMethod]
+    public void Repeat_EmptyString_ReturnsStringEmpty()
+    {
+        var result = string.Empty.Repeat(5);
+        Assert.AreSame(string.Empty, result);
+    }
+
+    [TestMethod]
+    public void Repeat_CountOne_ReturnsOriginalString()
+    {
+        string str = "test";
+        var result = str.Repeat(1);
+        Assert.AreSame(str, result);
+    }
 }
