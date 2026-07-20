@@ -12,6 +12,8 @@ public class StringExtensionsTests
     [DataRow("hello", 4, true, 'o')]
     [DataRow("hello", -1, false, '\0')]
     [DataRow("hello", 5, false, '\0')]
+    [DataRow("hello", int.MaxValue, false, '\0')]
+    [DataRow("hello", int.MinValue, false, '\0')]
     [DataRow("", 0, false, '\0')]
     public void TryGet_ReturnsExpectedResult(string str, int index, bool expectedReturn, char expectedChar)
     {
