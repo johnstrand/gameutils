@@ -39,8 +39,10 @@ public class EventBus
         if (_handlers.TryGetValue(type, out var listObj))
         {
             var list = (List<Action<TEvent>>)listObj;
-            list.Remove(handler);
-            _snapshots.Remove(type);
+            if (list.Remove(handler))
+            {
+                _snapshots.Remove(type);
+            }
         }
     }
 
