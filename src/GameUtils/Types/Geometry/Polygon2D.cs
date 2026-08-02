@@ -106,19 +106,26 @@ public readonly struct Polygon2D
     {
         var min = new Vector2(float.MaxValue);
         var max = new Vector2(float.MinValue);
+        var length = Vertices.Length;
 
-        for (var i = 0; i < Vertices.Length; i++)
+        var prevVert = Vertices[0] + translation;
+        Vertices[0] = prevVert;
+        min = Vector2.Min(min, prevVert);
+        max = Vector2.Max(max, prevVert);
+
+        for (var i = 1; i < length; i++)
         {
-            Vertices[i] += translation;
+            var vert = Vertices[i] + translation;
+            Vertices[i] = vert;
 
-            min = Vector2.Min(min, Vertices[i]);
-            max = Vector2.Max(max, Vertices[i]);
+            min = Vector2.Min(min, vert);
+            max = Vector2.Max(max, vert);
+
+            Edges[i - 1] = new Line(prevVert, vert);
+            prevVert = vert;
         }
 
-        for (var i = 0; i < Vertices.Length; i++)
-        {
-            Edges[i] = new Line(Vertices[i], Vertices[(i + 1) % Vertices.Length]);
-        }
+        Edges[length - 1] = new Line(prevVert, Vertices[0]);
 
         _boundingBox[0] = new AABB(min, max);
     }
