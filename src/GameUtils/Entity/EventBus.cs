@@ -41,8 +41,10 @@ public class EventBus
         if (_handlers.TryGetValue(type, out var listObj))
         {
             var list = (List<Action<TEvent>>)listObj;
-            list.Remove(handler);
-            _snapshots[type] = list.ToArray();
+            if (list.Remove(handler))
+            {
+                _snapshots[type] = list.ToArray();
+            }
         }
     }
 
