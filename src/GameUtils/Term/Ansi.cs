@@ -223,7 +223,7 @@ public static class Ansi
     /// </summary>
     public static string Write(string text, params object[] args)
     {
-        var formatted = Format(string.Format(text, args));
+        var formatted = Format(args != null && args.Length > 0 ? string.Format(text, args) : text);
         Console.Write(formatted);
         return formatted;
     }
@@ -233,7 +233,7 @@ public static class Ansi
     /// </summary>
     public static string WriteLine(string text, params object[] args)
     {
-        var formatted = Format(string.Format(text, args));
+        var formatted = Format(args != null && args.Length > 0 ? string.Format(text, args) : text);
         Console.WriteLine(formatted);
         return formatted;
     }
