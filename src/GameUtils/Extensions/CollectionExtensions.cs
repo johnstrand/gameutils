@@ -52,14 +52,13 @@ public static class CollectionExtensions
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
-        T[] buffer;
         if (source.TryGetNonEnumeratedCount(out int count))
         {
             if (count == 0)
             {
                 return [];
             }
-            buffer = new T[count];
+            var buffer = new T[count];
             if (source is ICollection<T> collection)
             {
                 collection.CopyTo(buffer, 0);
@@ -72,19 +71,29 @@ public static class CollectionExtensions
                     buffer[index++] = item;
                 }
             }
+            var span = buffer.AsSpan();
+            for (var i = span.Length - 1; i > 0; i--)
+            {
+                var j = Random.Shared.Next(i + 1);
+                (span[i], span[j]) = (span[j], span[i]);
+            }
+            return buffer;
         }
         else
         {
-            buffer = source.ToArray();
+            var list = new List<T>();
+            foreach (var item in source)
+            {
+                list.Add(item);
+            }
+            var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
+            for (var i = span.Length - 1; i > 0; i--)
+            {
+                var j = Random.Shared.Next(i + 1);
+                (span[i], span[j]) = (span[j], span[i]);
+            }
+            return list;
         }
-
-        var span = buffer.AsSpan();
-        for (var i = span.Length - 1; i > 0; i--)
-        {
-            var j = Random.Shared.Next(i + 1);
-            (span[i], span[j]) = (span[j], span[i]);
-        }
-        return buffer;
     }
 
     /// <summary>
