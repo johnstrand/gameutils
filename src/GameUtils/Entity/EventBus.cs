@@ -17,16 +17,14 @@ public class EventBus
         ArgumentNullException.ThrowIfNull(handler);
         var type = typeof(TEvent);
 
-        if (!_handlers.TryGetValue(type, out var listObj))
+        ref var listObj = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(_handlers, type, out bool exists);
+        if (!exists)
         {
-            var newList = new List<Action<TEvent>>();
-            _handlers[type] = newList;
-            listObj = newList;
+            listObj = new List<Action<TEvent>>();
         }
-
-        var list = (List<Action<TEvent>>)listObj;
+        var list = (List<Action<TEvent>>)listObj!;
         list.Add(handler);
-        _snapshots[type] = list.ToArray();
+        _snapshots.Remove(type);
     }
 
     /// <summary>
@@ -41,8 +39,10 @@ public class EventBus
         if (_handlers.TryGetValue(type, out var listObj))
         {
             var list = (List<Action<TEvent>>)listObj;
-            list.Remove(handler);
-            _snapshots[type] = list.ToArray();
+            if (list.Remove(handler))
+            {
+                _snapshots.Remove(type);
+            }
         }
     }
 
@@ -56,7 +56,12 @@ public class EventBus
         var type = typeof(TEvent);
         if (!_snapshots.TryGetValue(type, out var snapshot))
         {
-            return;
+            if (!_handlers.TryGetValue(type, out var listObj))
+            {
+                return;
+            }
+            snapshot = ((List<Action<TEvent>>)listObj).ToArray();
+            _snapshots[type] = snapshot;
         }
 
         var typedSnapshot = (Action<TEvent>[])snapshot;

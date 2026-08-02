@@ -32,4 +32,19 @@ public class AnsiTests
         var result = Ansi.Write(text, "World");
         Assert.AreEqual("Hello World", result);
     }
+  
+    public void Write_WithFormatStringButNoArgs_DoesNotThrow()
+    {
+        string untrustedInput = "Hello {0} World";
+        string result = Ansi.Write(untrustedInput);
+        Assert.AreEqual("Hello {0} World", result);
+    }
+
+    [TestMethod]
+    public void WriteLine_WithFormatStringButNoArgs_DoesNotThrow()
+    {
+        string untrustedInput = "Hello {0} World";
+        string result = Ansi.WriteLine(untrustedInput);
+        Assert.AreEqual("Hello {0} World", result);
+    }
 }
