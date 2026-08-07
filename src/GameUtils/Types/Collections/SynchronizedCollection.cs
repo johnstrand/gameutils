@@ -56,6 +56,11 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
     /// </summary>
     public void Integrate()
     {
+        if (_pending.IsEmpty)
+        {
+            return;
+        }
+
         _integrating.Wait();
         try
         {
