@@ -31,7 +31,7 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
 {
     private readonly ConcurrentQueue<Operation<T>> _pending = new();
     private readonly SemaphoreSlim _integrating = new(1, 1);
-    private IReadOnlyList<T>? _cachedSnapshot;
+    private List<T>? _cachedSnapshot;
     private volatile bool _dirty = true;
 
     /// <summary>
@@ -113,7 +113,11 @@ public abstract class SynchronizedCollection<T> : IEnumerable<T> where T : notnu
             {
                 if (_dirty || _cachedSnapshot is null)
                 {
-                    _cachedSnapshot = GetInternal().ToList();
+                    _cachedSnapshot ??= new List<T>();
+                    _cachedSnapshot.Clear();
+
+                    _cachedSnapshot.AddRange(GetInternal());
+
                     _dirty = false;
                 }
             }
