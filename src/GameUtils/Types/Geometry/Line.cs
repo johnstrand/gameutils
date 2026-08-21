@@ -127,7 +127,7 @@ public readonly record struct Line
         {
             if (Intersects(ray, out var intersectionPoint))
             {
-                var distance = Vector2.Distance(Start, intersectionPoint.Value);
+                var distance = Vector2.DistanceSquared(Start, intersectionPoint.Value);
                 if (distance < nearestDistance)
                 {
                     nearestDistance = distance;
