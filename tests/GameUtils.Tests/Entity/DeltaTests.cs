@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameUtils.Entity;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GameUtils.Tests.Entity;
 
