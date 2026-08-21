@@ -18,6 +18,17 @@ namespace GameUtils.Tests.Types
         }
 
         [TestMethod]
+        [DataRow(-1, 10)]
+        [DataRow(0, 10)]
+        [DataRow(10, -1)]
+        [DataRow(10, 0)]
+        [DataRow(100000, 100000)]
+        public void Constructor_InvalidDimensions_ThrowsArgumentOutOfRangeException(int width, int height)
+        {
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new Bitmap(width, height));
+        }
+
+        [TestMethod]
         public void Write_WithValidPath_DoesNotThrow()
         {
             var bitmap = new Bitmap(10, 10);
