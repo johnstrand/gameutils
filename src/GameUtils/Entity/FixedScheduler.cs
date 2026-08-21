@@ -32,7 +32,7 @@ public abstract class FixedScheduler(int targetRatePerSecond)
         }
 
         _isRunning = true;
-        _runningTask = Task.Run(() =>
+        _runningTask = Task.Factory.StartNew(() =>
         {
             var stopwatch = Stopwatch.StartNew();
             var nextTick = _interval;
@@ -68,7 +68,7 @@ public abstract class FixedScheduler(int targetRatePerSecond)
                 // If Update() ran long and we're already past nextTick, the next frame fires immediately.
                 nextTick += _interval;
             }
-        });
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
     }
 
     /// <summary>
