@@ -7,6 +7,10 @@ public class Dijkstra<T> where T : notnull
 {
     private readonly Dictionary<T, List<(T neighbor, float weight)>> _adjacency = [];
     private readonly HashSet<T> _nodes = [];
+    private readonly Dictionary<T, float> _distances = [];
+    private readonly Dictionary<T, T?> _previousNodes = [];
+    private readonly HashSet<T> _visited = [];
+    private readonly PriorityQueue<T, float> _queue = new();
 
     /// <summary>
     /// Base constructor
@@ -42,20 +46,19 @@ public class Dijkstra<T> where T : notnull
             return false;
         }
 
-        var distances = new Dictionary<T, float>();
-        var previousNodes = new Dictionary<T, T?>();
-        var visited = new HashSet<T>();
+        _distances.Clear();
+        _previousNodes.Clear();
+        _visited.Clear();
+        _queue.Clear();
 
-        distances[start] = 0;
+        _distances[start] = 0;
+        _queue.Enqueue(start, 0);
 
-        var queue = new PriorityQueue<T, float>();
-        queue.Enqueue(start, 0);
-
-        while (queue.Count > 0)
+        while (_queue.Count > 0)
         {
-            var next = queue.Dequeue();
+            var next = _queue.Dequeue();
 
-            if (!visited.Add(next))
+            if (!_visited.Add(next))
             {
                 continue; // stale priority-queue entry
             }
@@ -70,21 +73,21 @@ public class Dijkstra<T> where T : notnull
                 continue;
             }
 
-            var nextDist = distances.GetValueOrDefault(next, float.MaxValue);
+            var nextDist = _distances.GetValueOrDefault(next, float.MaxValue);
             foreach (var (n, weight) in neighbors)
             {
-                if (visited.Contains(n))
+                if (_visited.Contains(n))
                 {
                     continue;
                 }
 
                 var distance = nextDist + weight;
 
-                if (distance < distances.GetValueOrDefault(n, float.MaxValue))
+                if (distance < _distances.GetValueOrDefault(n, float.MaxValue))
                 {
-                    distances[n] = distance;
-                    previousNodes[n] = next;
-                    queue.Enqueue(n, distance);
+                    _distances[n] = distance;
+                    _previousNodes[n] = next;
+                    _queue.Enqueue(n, distance);
                 }
             }
         }
@@ -100,7 +103,7 @@ public class Dijkstra<T> where T : notnull
                 break;
             }
 
-            if (!previousNodes.TryGetValue(current, out var prev) || prev is null)
+            if (!_previousNodes.TryGetValue(current, out var prev) || prev is null)
             {
                 path = [];
                 return false;
