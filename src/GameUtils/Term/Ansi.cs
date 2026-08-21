@@ -221,10 +221,30 @@ public static class Ansi
     /// <summary>
     /// Writes text to the console, formatting it with ANSI escape sequences. Check documentation for <see cref="Format(string)"/> for more information.
     /// </summary>
+    public static string Write(string text)
+    {
+        var formatted = Format(text);
+        Console.Write(formatted);
+        return formatted;
+    }
+
+    /// <summary>
+    /// Writes text to the console, formatting it with ANSI escape sequences. Check documentation for <see cref="Format(string)"/> for more information.
+    /// </summary>
     public static string Write(string text, params object[] args)
     {
         var formatted = Format(args != null && args.Length > 0 ? string.Format(text, args) : text);
         Console.Write(formatted);
+        return formatted;
+    }
+
+    /// <summary>
+    /// Writes a line to the console, formatting it with ANSI escape sequences. Check documentation for <see cref="Format(string)"/> for more information.
+    /// </summary>
+    public static string WriteLine(string text)
+    {
+        var formatted = Format(text);
+        Console.WriteLine(formatted);
         return formatted;
     }
 
