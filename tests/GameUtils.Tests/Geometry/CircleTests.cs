@@ -73,4 +73,51 @@ public class CircleTests
         var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
         Assert.IsTrue(circle.Intersects(aabb));
     }
+
+    [TestMethod]
+    public void Intersects_LinePassingThrough_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var line = new Line(new Vector2(-10, 0), new Vector2(10, 0));
+        Assert.IsTrue(circle.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LineInsideCircle_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var line = new Line(new Vector2(-1, 0), new Vector2(1, 0));
+        Assert.IsTrue(circle.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LineTangentToCircle_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var line = new Line(new Vector2(-10, 5), new Vector2(10, 5));
+        Assert.IsTrue(circle.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LineOutsideCircle_ReturnsFalse()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var line = new Line(new Vector2(-10, 10), new Vector2(10, 10));
+        Assert.IsFalse(circle.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LinePointingAtCircleButShort_ReturnsFalse()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var line = new Line(new Vector2(10, 0), new Vector2(6, 0));
+        Assert.IsFalse(circle.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LineStartEndOverload_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        Assert.IsTrue(circle.Intersects(new Vector2(-10, 0), new Vector2(10, 0)));
+    }
 }
