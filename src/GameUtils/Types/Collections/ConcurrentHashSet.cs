@@ -93,10 +93,41 @@ public class ConcurrentHashSet<T> : ISet<T> where T : notnull
             return;
         }
 
-        var otherSet = other as ICollection<T> ?? other.ToHashSet();
+        if (other is ICollection<T> collection)
+        {
+            foreach (var item in _dictionary.Keys)
+            {
+                if (!collection.Contains(item))
+                {
+                    _dictionary.TryRemove(item, out _);
+                }
+            }
+
+            return;
+        }
+
+        var matches = new HashSet<T>();
+        foreach (var item in other)
+        {
+            if (_dictionary.ContainsKey(item))
+            {
+                matches.Add(item);
+                if (matches.Count == _dictionary.Count)
+                {
+                    return;
+                }
+            }
+        }
+
+        if (matches.Count == 0)
+        {
+            _dictionary.Clear();
+            return;
+        }
+
         foreach (var item in _dictionary.Keys)
         {
-            if (!otherSet.Contains(item))
+            if (!matches.Contains(item))
             {
                 _dictionary.TryRemove(item, out _);
             }
