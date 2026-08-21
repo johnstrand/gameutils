@@ -8,6 +8,33 @@ namespace GameUtils.Tests.Geometry;
 public class CircleTests
 {
     [TestMethod]
+    public void Contains_PointInsideCircle_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var point = new Vector2(2, 2);
+
+        Assert.IsTrue(circle.Contains(point));
+    }
+
+    [TestMethod]
+    public void Contains_PointOnEdge_ReturnsTrue()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var point = new Vector2(5, 0);
+
+        Assert.IsTrue(circle.Contains(point));
+    }
+
+    [TestMethod]
+    public void Contains_PointOutsideCircle_ReturnsFalse()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5);
+        var point = new Vector2(6, 6);
+
+        Assert.IsFalse(circle.Contains(point));
+    }
+
+    [TestMethod]
     public void Intersects_AABBInsideCircle_ReturnsTrue()
     {
         var circle = new Circle(new Vector2(15, 15), 10);

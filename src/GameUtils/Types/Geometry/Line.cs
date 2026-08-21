@@ -104,13 +104,16 @@ public readonly record struct Line
     {
         var direction = target - start;
         var length = direction.Length();
-        if (maxLength.HasValue && length > maxLength)
+        if (maxLength.HasValue && length > maxLength.Value)
         {
-            direction = Vector2.Normalize(direction);
-            length = maxLength.Value;
+            if (length > 0)
+            {
+                direction /= length; // normalize
+            }
+            return new Line(start, start + (direction * maxLength.Value));
         }
 
-        return new Line(start, start + (direction * length));
+        return new Line(start, target);
     }
 
     /// <summary>
