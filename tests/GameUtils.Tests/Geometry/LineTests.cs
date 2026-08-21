@@ -102,4 +102,55 @@ public class LineTests
         var line2 = new Line(new Vector2(6, 6), new Vector2(10, 0));
         Assert.IsFalse(line1.Intersects(line2));
     }
+
+    [TestMethod]
+    public void IntersectsAny_EmptyCollection_ReturnsFalse()
+    {
+        var line = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        var result = line.IntersectsAny(Array.Empty<Line>(), out var nearest);
+        Assert.IsFalse(result);
+        Assert.IsNull(nearest);
+    }
+
+    [TestMethod]
+    public void IntersectsAny_NoIntersections_ReturnsFalse()
+    {
+        var line = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        var rays = new[] { new Line(new Vector2(0, 5), new Vector2(10, 5)), new Line(new Vector2(0, -5), new Vector2(10, -5)) };
+        var result = line.IntersectsAny(rays, out var nearest);
+        Assert.IsFalse(result);
+        Assert.IsNull(nearest);
+    }
+
+    [TestMethod]
+    public void IntersectsAny_SingleIntersection_ReturnsTrueAndPoint()
+    {
+        var line = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        var rays = new[] { new Line(new Vector2(5, -5), new Vector2(5, 5)) };
+        var result = line.IntersectsAny(rays, out var nearest);
+        Assert.IsTrue(result);
+        Assert.AreEqual(new Vector2(5, 0), nearest);
+    }
+
+    [TestMethod]
+    public void IntersectsAny_MultipleIntersections_ReturnsNearestPoint()
+    {
+        var line = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        var rayFar = new Line(new Vector2(8, -5), new Vector2(8, 5));
+        var rayNear = new Line(new Vector2(2, -5), new Vector2(2, 5));
+        var rays = new[] { rayFar, rayNear };
+        var result = line.IntersectsAny(rays, out var nearest);
+        Assert.IsTrue(result);
+        Assert.AreEqual(new Vector2(2, 0), nearest);
+    }
+
+    [TestMethod]
+    public void IntersectsAny_IntersectionAtStart_ReturnsTrueWithZeroDistance()
+    {
+        var line = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        var rays = new[] { new Line(new Vector2(0, -5), new Vector2(0, 5)) };
+        var result = line.IntersectsAny(rays, out var nearest);
+        Assert.IsTrue(result);
+        Assert.AreEqual(new Vector2(0, 0), nearest);
+    }
 }
