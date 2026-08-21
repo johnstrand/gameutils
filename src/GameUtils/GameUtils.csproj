@@ -27,6 +27,12 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>GameUtils.Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
 		<Compile Remove="Program.cs" />
 	</ItemGroup>
