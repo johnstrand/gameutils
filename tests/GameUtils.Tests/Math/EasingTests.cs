@@ -10,6 +10,36 @@ public class EasingTests
     private const float Tolerance = 0.0001f;
 
     [TestMethod]
+    public void QuadIn_Zero_ReturnsZero()
+    {
+        Assert.AreEqual(0f, Easing.QuadIn(0f), Tolerance);
+    }
+
+    [TestMethod]
+    public void QuadIn_Half_ReturnsQuarter()
+    {
+        Assert.AreEqual(0.25f, Easing.QuadIn(0.5f), Tolerance);
+    }
+
+    [TestMethod]
+    public void QuadIn_One_ReturnsOne()
+    {
+        Assert.AreEqual(1f, Easing.QuadIn(1f), Tolerance);
+    }
+
+    [TestMethod]
+    public void QuadIn_Negative_ReturnsSquare()
+    {
+        Assert.AreEqual(1f, Easing.QuadIn(-1f), Tolerance);
+    }
+
+    [TestMethod]
+    public void QuadIn_Two_ReturnsFour()
+    {
+        Assert.AreEqual(4f, Easing.QuadIn(2f), Tolerance);
+    }
+
+    [TestMethod]
     [DataRow(0f, 0f)]
     [DataRow(0.5f, 0.7071f)]
     [DataRow(1f, 1f)]
