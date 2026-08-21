@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameUtils.Math;
 
@@ -36,6 +37,16 @@ public class EasingTests
     public void QuadIn_Two_ReturnsFour()
     {
         Assert.AreEqual(4f, Easing.QuadIn(2f), Tolerance);
+    }
+
+    [TestMethod]
+    [DataRow(0f, 0f)]
+    [DataRow(0.5f, 0.7071f)]
+    [DataRow(1f, 1f)]
+    public void SineOut_ReturnsExpectedValue(float t, float expected)
+    {
+        float result = Easing.SineOut(t);
+        Assert.AreEqual(expected, result, Tolerance);
     }
 
     [TestMethod]
