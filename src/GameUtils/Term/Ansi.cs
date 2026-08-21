@@ -258,11 +258,12 @@ public static class Ansi
     public static string Format(string text)
     {
         var result = new StringBuilder();
+        var span = text.AsSpan();
         var i = 0;
 
-        while (i < text.Length)
+        while (i < span.Length)
         {
-            var c = text[i];
+            var c = span[i];
 
             if (c != '[')
             {
@@ -271,76 +272,77 @@ public static class Ansi
                 continue;
             }
 
-            if (text.TryGet(i + 1, out var next) && next == '[')
+            if (i + 1 < span.Length && span[i + 1] == '[')
             {
                 result.Append('[');
                 i += 2;
                 continue;
             }
 
-            var endOfSequence = text.IndexOf(']', i);
+            var endOfSequence = span[i..].IndexOf(']');
 
             if (endOfSequence == -1)
             {
                 throw new ArgumentException($"Invalid ANSI sequence starting at position {i}");
             }
 
-            var sequence = text.Substring(i + 1, endOfSequence - i - 1);
+            endOfSequence += i;
+            var sequence = span.Slice(i + 1, endOfSequence - i - 1);
             i = endOfSequence + 1;
 
-            if (sequence is "/" or "")
+            if (sequence.Equals("/", StringComparison.Ordinal) || sequence.IsEmpty)
             {
                 result.Append(Reset);
                 continue;
             }
 
-            if (_foregroundColors.ContainsKey(sequence))
-            {
-                result.Append(Foreground(sequence));
-                continue;
-            }
-
-            if (sequence is "bold" or "b")
+            if (sequence.Equals("bold", StringComparison.Ordinal) || sequence.Equals("b", StringComparison.Ordinal))
             {
                 result.Append(Bold);
                 continue;
             }
 
-            if (sequence is "faint" or "f")
+            if (sequence.Equals("faint", StringComparison.Ordinal) || sequence.Equals("f", StringComparison.Ordinal))
             {
                 result.Append(Faint);
                 continue;
             }
 
-            if (sequence is "italic" or "i")
+            if (sequence.Equals("italic", StringComparison.Ordinal) || sequence.Equals("i", StringComparison.Ordinal))
             {
                 result.Append(Italic);
                 continue;
             }
 
-            if (sequence is "underline" or "u")
+            if (sequence.Equals("underline", StringComparison.Ordinal) || sequence.Equals("u", StringComparison.Ordinal))
             {
                 result.Append(Underline);
                 continue;
             }
 
-            if (sequence.StartsWith("fg:"))
+            if (sequence.StartsWith("fg:", StringComparison.Ordinal))
             {
-                result.Append(Foreground(sequence[3..]));
-                continue;
+                var colorSpan = sequence[3..];
+                if (TryGetNamedColor(_foregroundColors, colorSpan, out var colorCode))
+                {
+                    result.Append(CreateSequence("m", colorCode));
+                    continue;
+                }
             }
 
-            if (sequence.StartsWith("bg:"))
+            if (sequence.StartsWith("bg:", StringComparison.Ordinal))
             {
-                result.Append(Background(sequence[3..]));
-                continue;
+                var colorSpan = sequence[3..];
+                if (TryGetNamedColor(_backgroundColors, colorSpan, out var colorCode))
+                {
+                    result.Append(CreateSequence("m", colorCode));
+                    continue;
+                }
             }
 
-            if (sequence.StartsWith("#fg:"))
+            if (sequence.StartsWith("#fg:", StringComparison.Ordinal))
             {
-                var rgb = sequence[4..].Split(',');
-
-                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
+                if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
@@ -349,11 +351,9 @@ public static class Ansi
                 continue;
             }
 
-            if (sequence.StartsWith("#bg:"))
+            if (sequence.StartsWith("#bg:", StringComparison.Ordinal))
             {
-                var rgb = sequence[4..].Split(',');
-
-                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
+                if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
@@ -362,11 +362,9 @@ public static class Ansi
                 continue;
             }
 
-            if (sequence[0] == '#')
+            if (sequence.Length > 0 && sequence[0] == '#')
             {
-                var rgb = sequence[1..].Split(',');
-
-                if (rgb.Length != 3 || !byte.TryParse(rgb[0], out var r) || !byte.TryParse(rgb[1], out var g) || !byte.TryParse(rgb[2], out var b))
+                if (!TryParseRgbSpan(sequence[1..], out var r, out var g, out var b))
                 {
                     throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
                 }
@@ -375,9 +373,47 @@ public static class Ansi
                 continue;
             }
 
-            throw new ArgumentException($"Unknown ANSI sequence '{sequence}' starting at position {i}");
+            if (TryGetNamedColor(_foregroundColors, sequence, out var fgCode))
+            {
+                result.Append(CreateSequence("m", fgCode));
+                continue;
+            }
+
+            throw new ArgumentException($"Unknown ANSI sequence '{sequence.ToString()}' starting at position {i}");
         }
 
         return result.ToString();
+    }
+
+    private static bool TryGetNamedColor(Dictionary<string, int> colorDict, ReadOnlySpan<char> nameSpan, out int code)
+    {
+        foreach (var kvp in colorDict)
+        {
+            if (nameSpan.Equals(kvp.Key, StringComparison.Ordinal))
+            {
+                code = kvp.Value;
+                return true;
+            }
+        }
+        code = 0;
+        return false;
+    }
+
+    private static bool TryParseRgbSpan(ReadOnlySpan<char> span, out byte r, out byte g, out byte b)
+    {
+        r = g = b = 0;
+        var comma1 = span.IndexOf(',');
+        if (comma1 == -1) return false;
+
+        var part1 = span[..comma1];
+        var remaining = span[(comma1 + 1)..];
+
+        var comma2 = remaining.IndexOf(',');
+        if (comma2 == -1) return false;
+
+        var part2 = remaining[..comma2];
+        var part3 = remaining[(comma2 + 1)..];
+
+        return byte.TryParse(part1, out r) && byte.TryParse(part2, out g) && byte.TryParse(part3, out b);
     }
 }
