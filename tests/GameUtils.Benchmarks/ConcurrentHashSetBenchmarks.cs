@@ -19,7 +19,6 @@ namespace GameUtils.Benchmarks
             {
                 ((ISet<int>)_set).Add(i);
             }
-            // Create an IEnumerable that is NOT an ICollection
             _enumerable = Enumerable.Range(0, 500).Select(x => x);
         }
 
@@ -33,6 +32,17 @@ namespace GameUtils.Benchmarks
         public bool Overlaps()
         {
             return _set.Overlaps(_enumerable);
+        }
+
+        [Benchmark]
+        public void IntersectWith()
+        {
+            var testSet = new ConcurrentHashSet<int>();
+            for (int i = 0; i < 1000; i++)
+            {
+                ((ISet<int>)testSet).Add(i);
+            }
+            testSet.IntersectWith(_enumerable);
         }
     }
 }
