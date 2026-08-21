@@ -150,42 +150,19 @@ public class AABB
     {
         if (!Intersects(polygon.BoundingBox)) return false;
 
-        // 1. Fast bounds check: compute polygon bounds on the fly
-        if (polygon.Vertices.Length > 0)
-        {
-            var pMinX = polygon.Vertices[0].X;
-            var pMaxX = polygon.Vertices[0].X;
-            var pMinY = polygon.Vertices[0].Y;
-            var pMaxY = polygon.Vertices[0].Y;
-
-            for (int i = 1; i < polygon.Vertices.Length; i++)
-            {
-                var v = polygon.Vertices[i];
-                if (v.X < pMinX) pMinX = v.X;
-                if (v.X > pMaxX) pMaxX = v.X;
-                if (v.Y < pMinY) pMinY = v.Y;
-                if (v.Y > pMaxY) pMaxY = v.Y;
-            }
-
-            if (pMinX > Max.X || pMaxX < Min.X || pMinY > Max.Y || pMaxY < Min.Y)
-            {
-                return false;
-            }
-        }
-
-        // 2. Check if any polygon vertex is inside the AABB
+        // 1. Check if any polygon vertex is inside the AABB
         foreach (var v in polygon.Vertices)
         {
             if (Contains(v)) return true;
         }
 
-        // 3. Check if any polygon edge intersects the AABB
+        // 2. Check if any polygon edge intersects the AABB
         foreach (var e in polygon.Edges)
         {
             if (Intersects(e)) return true;
         }
 
-        // 4. Check if the AABB is completely inside the polygon
+        // 3. Check if the AABB is completely inside the polygon
         return polygon.Contains(Center);
     }
 #pragma warning restore S3267
@@ -197,7 +174,7 @@ public class AABB
     {
         var closest = Vector2.Clamp(circle.Center, Min, Max);
         var distance = Vector2.DistanceSquared(circle.Center, closest);
-        return distance <= circle.Radius * circle.Radius;
+        return distance <= circle.RadiusSquared;
     }
 
     /// <summary>
@@ -205,7 +182,14 @@ public class AABB
     /// </summary>
     public bool Intersects(Vector2 start, Vector2 end)
     {
-        return Intersects(new Line(start, end));
+        var dir = end - start;
+        var tmin = (Min - start) / dir;
+        var tmax = (Max - start) / dir;
+        var t1 = Vector2.Min(tmin, tmax);
+        var t2 = Vector2.Max(tmin, tmax);
+        var tNear = MathF.Max(t1.X, t1.Y);
+        var tFar = MathF.Min(t2.X, t2.Y);
+        return tNear <= tFar && tFar >= 0f && tNear <= 1f;
     }
 
     /// <summary>
@@ -213,7 +197,10 @@ public class AABB
     /// </summary>
     public bool Intersects(Vector2 center, float radius)
     {
-        return Intersects(new Circle(center, radius));
+        if (radius < 0f) throw new ArgumentOutOfRangeException(nameof(radius), "Radius must be non-negative.");
+        var closest = Vector2.Clamp(center, Min, Max);
+        var distance = Vector2.DistanceSquared(center, closest);
+        return distance <= radius * radius;
     }
 
     /// <summary>
