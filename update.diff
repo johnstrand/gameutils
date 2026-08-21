@@ -1,0 +1,48 @@
+--- src/GameUtils/Types/Collections/SynchronizedCollection.cs
++++ src/GameUtils/Types/Collections/SynchronizedCollection.cs
+@@ -31,8 +31,7 @@
+ {
+     private readonly ConcurrentQueue<Operation<T>> _pending = new();
+     private readonly SemaphoreSlim _integrating = new(1, 1);
+-    private T[]? _cachedSnapshot;
+-    private int _cachedSnapshotCount;
++    private List<T>? _cachedSnapshot;
+     private volatile bool _dirty = true;
+
+     /// <summary>
+@@ -114,21 +113,11 @@
+             {
+                 if (_dirty || _cachedSnapshot is null)
+                 {
+-                    var internalCollection = GetInternal();
+-                    var count = internalCollection.TryGetNonEnumeratedCount(out var c) ? c : internalCollection.Count();
+-                    if (_cachedSnapshot is null || _cachedSnapshot.Length < count)
+-                    {
+-                        _cachedSnapshot = new T[System.Math.Max(count, System.Math.Max((_cachedSnapshot?.Length ?? 0) * 2, 4))];
+-                    }
+-
+-                    _cachedSnapshotCount = count;
+-
+-                    int idx = 0;
+-                    foreach (var item in internalCollection)
+-                    {
+-                        _cachedSnapshot[idx++] = item;
+-                    }
+-
++                    _cachedSnapshot ??= new List<T>();
++                    _cachedSnapshot.Clear();
++
++                    _cachedSnapshot.AddRange(GetInternal());
++
+                     _dirty = false;
+                 }
+             }
+@@ -138,7 +127,7 @@
+             }
+         }
+
+-        return new ArraySegment<T>(_cachedSnapshot!, 0, _cachedSnapshotCount);
++        return _cachedSnapshot!;
+     }
+
+     /// <summary>

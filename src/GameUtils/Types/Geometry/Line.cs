@@ -104,13 +104,16 @@ public readonly record struct Line
     {
         var direction = target - start;
         var length = direction.Length();
-        if (maxLength.HasValue && length > maxLength)
+        if (maxLength.HasValue && length > maxLength.Value)
         {
-            direction = Vector2.Normalize(direction);
-            length = maxLength.Value;
+            if (length > 0)
+            {
+                direction /= length; // normalize
+            }
+            return new Line(start, start + (direction * maxLength.Value));
         }
 
-        return new Line(start, start + (direction * length));
+        return new Line(start, target);
     }
 
     /// <summary>
@@ -145,9 +148,9 @@ public readonly record struct Line
         var b = other.End - other.Start;
         var c = other.Start - Start;
 
-        var alphaNumerator = (b.Y * c.X) - (b.X * c.Y);
-        var betaNumerator = (a.X * c.Y) - (a.Y * c.X);
-        var denominator = (a.Y * b.X) - (a.X * b.Y);
+        var alphaNumerator = (c.X * b.Y) - (c.Y * b.X);
+        var betaNumerator = (c.X * a.Y) - (c.Y * a.X);
+        var denominator = (a.X * b.Y) - (a.Y * b.X);
 
         if (MathF.Abs(denominator) < float.Epsilon)
         {
@@ -178,9 +181,9 @@ public readonly record struct Line
         var otherDelta = other.End - other.Start;
         var startDelta = other.Start - Start;
 
-        var alphaNumerator = (otherDelta.Y * startDelta.X) - (otherDelta.X * startDelta.Y);
-        var betaNumerator = (thisDelta.X * startDelta.Y) - (thisDelta.Y * startDelta.X);
-        var denominator = (thisDelta.Y * otherDelta.X) - (thisDelta.X * otherDelta.Y);
+        var alphaNumerator = (startDelta.X * otherDelta.Y) - (startDelta.Y * otherDelta.X);
+        var betaNumerator = (startDelta.X * thisDelta.Y) - (startDelta.Y * thisDelta.X);
+        var denominator = (thisDelta.X * otherDelta.Y) - (thisDelta.Y * otherDelta.X);
 
         if (MathF.Abs(denominator) < float.Epsilon)
         {
