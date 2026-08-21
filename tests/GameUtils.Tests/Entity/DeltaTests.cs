@@ -7,11 +7,12 @@ namespace GameUtils.Tests.Entity;
 public class DeltaTests
 {
     [TestMethod]
-    public void Instance_IsSingleton()
+    public void Instance_IsNotNullAndSingleton()
     {
         var instance1 = Delta.Instance;
         var instance2 = Delta.Instance;
 
+        Assert.IsNotNull(instance1);
         Assert.AreSame(instance1, instance2);
     }
 }
