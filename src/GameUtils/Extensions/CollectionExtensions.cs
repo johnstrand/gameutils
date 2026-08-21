@@ -245,37 +245,34 @@ public static class CollectionExtensions
             return list[count - 1];
         }
 
-        var array = source.ToArray();
-        int arrayCount = array.Length;
-        if (arrayCount == 0)
+        T selected = default!;
+        float fallbackTotalWeight = 0f;
+        bool hasElements = false;
+
+        foreach (var item in source)
+        {
+            hasElements = true;
+            float weight = weightSelector(item);
+            if (weight <= 0f) continue;
+
+            fallbackTotalWeight += weight;
+
+            if (Random.Shared.NextDouble() * fallbackTotalWeight < weight)
+            {
+                selected = item;
+            }
+        }
+
+        if (!hasElements)
         {
             throw new InvalidOperationException("Sequence contains no elements.");
         }
 
-        var arrayTotalWeight = 0f;
-        for (int i = 0; i < arrayCount; i++)
-        {
-            arrayTotalWeight += weightSelector(array[i]);
-        }
-
-        if (arrayTotalWeight <= 0)
+        if (fallbackTotalWeight <= 0f)
         {
             throw new InvalidOperationException("Total weight must be greater than zero.");
         }
 
-        var arrayTarget = (float)(Random.Shared.NextDouble() * arrayTotalWeight);
-        var arrayCumulative = 0f;
-
-        for (int i = 0; i < arrayCount; i++)
-        {
-            var item = array[i];
-            arrayCumulative += weightSelector(item);
-            if (arrayTarget <= arrayCumulative)
-            {
-                return item;
-            }
-        }
-
-        return array[arrayCount - 1];
+        return selected;
     }
 }
