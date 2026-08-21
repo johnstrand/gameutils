@@ -52,6 +52,8 @@ public static class CollectionExtensions
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
+        ArgumentNullException.ThrowIfNull(source);
+
         if (source.TryGetNonEnumeratedCount(out int count))
         {
             if (count == 0)
@@ -81,18 +83,45 @@ public static class CollectionExtensions
         }
         else
         {
-            var list = new List<T>();
-            foreach (var item in source)
+            int initialCapacity = 16;
+            T[] rentedArray = System.Buffers.ArrayPool<T>.Shared.Rent(initialCapacity);
+            int itemCapacity = rentedArray.Length;
+            int numItems = 0;
+            try
             {
-                list.Add(item);
+                foreach (var item in source)
+                {
+                    if (numItems == itemCapacity)
+                    {
+                        T[] newArray = System.Buffers.ArrayPool<T>.Shared.Rent(itemCapacity * 2);
+                        rentedArray.AsSpan(0, numItems).CopyTo(newArray);
+                        System.Buffers.ArrayPool<T>.Shared.Return(rentedArray, clearArray: System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<T>());
+                        rentedArray = newArray;
+                        itemCapacity = newArray.Length;
+                    }
+                    rentedArray[numItems++] = item;
+                }
+
+                if (numItems == 0)
+                {
+                    return [];
+                }
+
+                var span = rentedArray.AsSpan(0, numItems);
+                for (var i = span.Length - 1; i > 0; i--)
+                {
+                    var j = Random.Shared.Next(i + 1);
+                    (span[i], span[j]) = (span[j], span[i]);
+                }
+
+                var result = new T[numItems];
+                span.CopyTo(result);
+                return result;
             }
-            var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
-            for (var i = span.Length - 1; i > 0; i--)
+            finally
             {
-                var j = Random.Shared.Next(i + 1);
-                (span[i], span[j]) = (span[j], span[i]);
+                System.Buffers.ArrayPool<T>.Shared.Return(rentedArray, clearArray: System.Runtime.CompilerServices.RuntimeHelpers.IsReferenceOrContainsReferences<T>());
             }
-            return list;
         }
     }
 
