@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace GameUtils.Types;
@@ -5,22 +6,39 @@ namespace GameUtils.Types;
 /// <summary>
 /// Bitmap image class
 /// </summary>
-public class Bitmap(int width, int height)
+public class Bitmap
 {
     /// <summary>
     /// Width of the image in pixels
     /// </summary>
-    public int Width { get; } = width;
+    public int Width { get; }
 
     /// <summary>
     /// Height of the image in pixels
     /// </summary>
-    public int Height { get; } = height;
+    public int Height { get; }
 
     /// <summary>
     /// Pixel data
     /// </summary>
-    public Vector3[] Data { get; } = new Vector3[width * height];
+    public Vector3[] Data { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Bitmap"/> class with the specified width and height.
+    /// </summary>
+    public Bitmap(int width, int height)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+        if ((long)width * height > int.MaxValue)
+        {
+            throw new ArgumentOutOfRangeException(nameof(height), "Width and height product exceeds maximum array size.");
+        }
+
+        Width = width;
+        Height = height;
+        Data = new Vector3[width * height];
+    }
 
     /// <summary>
     /// Gets or sets a pixel at the specified coordinates. If the coordinates are out of bounds, no operation is performed and Vector3.Zero is returned.
