@@ -10,6 +10,10 @@ public class AStar<T> where T : notnull
 {
     private readonly Dictionary<T, List<(T neighbor, float weight)>> _adjacency = [];
     private readonly HashSet<T> _nodes = [];
+    private readonly Dictionary<T, float> _gScore = [];
+    private readonly Dictionary<T, T?> _previousNodes = [];
+    private readonly HashSet<T> _visited = [];
+    private readonly PriorityQueue<T, float> _open = new();
 
     /// <summary>Creates an empty A* solver.</summary>
     public AStar() { }
@@ -92,18 +96,19 @@ public class AStar<T> where T : notnull
             return false;
         }
 
-        var gScore = new Dictionary<T, float> { [start] = 0f };
-        var previousNodes = new Dictionary<T, T?>();
-        var visited = new HashSet<T>();
+        _gScore.Clear();
+        _previousNodes.Clear();
+        _visited.Clear();
+        _open.Clear();
 
-        var open = new PriorityQueue<T, float>();
-        open.Enqueue(start, heuristic(start, end));
+        _gScore[start] = 0f;
+        _open.Enqueue(start, heuristic(start, end));
 
-        while (open.Count > 0)
+        while (_open.Count > 0)
         {
-            var current = open.Dequeue();
+            var current = _open.Dequeue();
 
-            if (!visited.Add(current))
+            if (!_visited.Add(current))
             {
                 continue;
             }
@@ -118,22 +123,22 @@ public class AStar<T> where T : notnull
                 continue;
             }
 
-            var currentG = gScore.GetValueOrDefault(current, float.MaxValue);
+            var currentG = _gScore.GetValueOrDefault(current, float.MaxValue);
             foreach (var (neighbor, weight) in neighbors)
             {
-                if (visited.Contains(neighbor))
+                if (_visited.Contains(neighbor))
                 {
                     continue;
                 }
 
                 var tentativeG = currentG + weight;
 
-                ref var neighborG = ref CollectionsMarshal.GetValueRefOrAddDefault(gScore, neighbor, out var exists);
+                ref var neighborG = ref CollectionsMarshal.GetValueRefOrAddDefault(_gScore, neighbor, out var exists);
                 if (!exists || tentativeG < neighborG)
                 {
                     neighborG = tentativeG;
-                    previousNodes[neighbor] = current;
-                    open.Enqueue(neighbor, tentativeG + heuristic(neighbor, end));
+                    _previousNodes[neighbor] = current;
+                    _open.Enqueue(neighbor, tentativeG + heuristic(neighbor, end));
                 }
             }
         }
@@ -149,7 +154,7 @@ public class AStar<T> where T : notnull
                 break;
             }
 
-            if (!previousNodes.TryGetValue(node, out var prev) || prev is null)
+            if (!_previousNodes.TryGetValue(node, out var prev) || prev is null)
             {
                 path = [];
                 return false;
