@@ -18,11 +18,16 @@ public class EventBus
         var type = typeof(TEvent);
 
         ref var listObj = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(_handlers, type, out bool exists);
+        List<Action<TEvent>> list;
         if (!exists)
         {
-            listObj = new List<Action<TEvent>>();
+            list = new List<Action<TEvent>>();
+            listObj = list;
         }
-        var list = (List<Action<TEvent>>)listObj!;
+        else
+        {
+            list = (List<Action<TEvent>>)listObj!;
+        }
         list.Add(handler);
         _snapshots.Remove(type);
     }

@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameUtils.Types.Geometry;
 using System.Numerics;
+using System;
 
 namespace GameUtils.Tests.Geometry;
 
@@ -49,5 +50,35 @@ public class AABBTests
         });
 
         Assert.IsFalse(aabb.Intersects(polyOutsideAABB));
+    }
+
+    [TestMethod]
+    public void Intersects_Circle_ReturnsExpectedResult()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var intersectingCircle = new Circle(new Vector2(25, 15), 6f);
+        var nonIntersectingCircle = new Circle(new Vector2(30, 30), 5f);
+
+        Assert.IsTrue(aabb.Intersects(intersectingCircle));
+        Assert.IsFalse(aabb.Intersects(nonIntersectingCircle));
+    }
+
+    [TestMethod]
+    public void Intersects_Vector2CenterAndRadius_ReturnsExpectedResult()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+
+        Assert.IsTrue(aabb.Intersects(new Vector2(25, 15), 6f));
+        Assert.IsFalse(aabb.Intersects(new Vector2(30, 30), 5f));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => aabb.Intersects(new Vector2(15, 15), -1f));
+    }
+
+    [TestMethod]
+    public void Intersects_Vector2StartAndEnd_ReturnsExpectedResult()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+
+        Assert.IsTrue(aabb.Intersects(new Vector2(5, 15), new Vector2(25, 15)));
+        Assert.IsFalse(aabb.Intersects(new Vector2(0, 0), new Vector2(5, 5)));
     }
 }
