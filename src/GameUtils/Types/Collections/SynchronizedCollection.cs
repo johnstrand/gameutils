@@ -22,7 +22,7 @@ public enum OperationKind
 /// <summary>
 /// Represents an operation to perform on a collection with an entity.
 /// </summary>
-public record Operation<T>(OperationKind Kind, T Entity);
+public readonly record struct Operation<T>(OperationKind Kind, T Entity);
 
 /// <summary>
 /// Abstract class for a thread-safe collection that can be modified from multiple threads.
