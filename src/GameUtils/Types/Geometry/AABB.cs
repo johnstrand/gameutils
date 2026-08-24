@@ -174,7 +174,7 @@ public class AABB
     {
         var closest = Vector2.Clamp(circle.Center, Min, Max);
         var distance = Vector2.DistanceSquared(circle.Center, closest);
-        return distance <= circle.Radius * circle.Radius;
+        return distance <= circle.RadiusSquared;
     }
 
     /// <summary>
@@ -182,7 +182,14 @@ public class AABB
     /// </summary>
     public bool Intersects(Vector2 start, Vector2 end)
     {
-        return Intersects(new Line(start, end));
+        var dir = end - start;
+        var tmin = (Min - start) / dir;
+        var tmax = (Max - start) / dir;
+        var t1 = Vector2.Min(tmin, tmax);
+        var t2 = Vector2.Max(tmin, tmax);
+        var tNear = MathF.Max(t1.X, t1.Y);
+        var tFar = MathF.Min(t2.X, t2.Y);
+        return tNear <= tFar && tFar >= 0f && tNear <= 1f;
     }
 
     /// <summary>
@@ -190,6 +197,7 @@ public class AABB
     /// </summary>
     public bool Intersects(Vector2 center, float radius)
     {
+        if (radius < 0f) throw new ArgumentOutOfRangeException(nameof(radius), "Radius must be non-negative.");
         var closest = Vector2.Clamp(center, Min, Max);
         var distance = Vector2.DistanceSquared(center, closest);
         return distance <= radius * radius;
