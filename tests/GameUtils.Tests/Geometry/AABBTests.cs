@@ -81,4 +81,47 @@ public class AABBTests
         Assert.IsTrue(aabb.Intersects(new Vector2(5, 15), new Vector2(25, 15)));
         Assert.IsFalse(aabb.Intersects(new Vector2(0, 0), new Vector2(5, 5)));
     }
+
+    [TestMethod]
+    public void Intersects_AABB_Overlapping_ReturnsTrue()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+        Assert.IsTrue(box1.Intersects(box2));
+        Assert.IsTrue(box2.Intersects(box1));
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_Contained_ReturnsTrue()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(20, 20));
+        var box2 = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+        Assert.IsTrue(box1.Intersects(box2));
+        Assert.IsTrue(box2.Intersects(box1));
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_Identical_ReturnsTrue()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        Assert.IsTrue(box1.Intersects(box2));
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_TouchingEdges_ReturnsTrue()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(10, 0), new Vector2(20, 10));
+        Assert.IsTrue(box1.Intersects(box2));
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_Disjoint_ReturnsFalse()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(20, 20), new Vector2(30, 30));
+        Assert.IsFalse(box1.Intersects(box2));
+        Assert.IsFalse(box2.Intersects(box1));
+    }
 }
