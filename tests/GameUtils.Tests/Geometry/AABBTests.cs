@@ -81,4 +81,33 @@ public class AABBTests
         Assert.IsTrue(aabb.Intersects(new Vector2(5, 15), new Vector2(25, 15)));
         Assert.IsFalse(aabb.Intersects(new Vector2(0, 0), new Vector2(5, 5)));
     }
+
+    [TestMethod]
+    public void Contains_PointInsideBox_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        Assert.IsTrue(aabb.Contains(new Vector2(15, 15)));
+    }
+
+    [TestMethod]
+    public void Contains_PointOnBoundary_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        Assert.IsTrue(aabb.Contains(new Vector2(10, 10)));
+        Assert.IsTrue(aabb.Contains(new Vector2(20, 20)));
+        Assert.IsTrue(aabb.Contains(new Vector2(10, 15)));
+        Assert.IsTrue(aabb.Contains(new Vector2(20, 15)));
+        Assert.IsTrue(aabb.Contains(new Vector2(15, 10)));
+        Assert.IsTrue(aabb.Contains(new Vector2(15, 20)));
+    }
+
+    [TestMethod]
+    public void Contains_PointOutsideBox_ReturnsFalse()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        Assert.IsFalse(aabb.Contains(new Vector2(9, 15)));
+        Assert.IsFalse(aabb.Contains(new Vector2(21, 15)));
+        Assert.IsFalse(aabb.Contains(new Vector2(15, 9)));
+        Assert.IsFalse(aabb.Contains(new Vector2(15, 21)));
+    }
 }
