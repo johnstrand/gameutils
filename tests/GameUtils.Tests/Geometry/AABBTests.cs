@@ -81,4 +81,46 @@ public class AABBTests
         Assert.IsTrue(aabb.Intersects(new Vector2(5, 15), new Vector2(25, 15)));
         Assert.IsFalse(aabb.Intersects(new Vector2(0, 0), new Vector2(5, 5)));
     }
+
+    [TestMethod]
+    public void Intersects_AABBOutPoints_NoIntersection_ReturnsFalseAndEmptyArray()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(20, 20), new Vector2(30, 30));
+
+        bool result = box1.Intersects(box2, out Vector2[] points);
+
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, points.Length);
+    }
+
+    [TestMethod]
+    public void Intersects_AABBOutPoints_Overlapping_ReturnsTrueAndIntersectionPoints()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+
+        bool result = box1.Intersects(box2, out Vector2[] points);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(2, points.Length);
+        CollectionAssert.Contains(points, new Vector2(5, 0));
+        CollectionAssert.Contains(points, new Vector2(0, 5));
+    }
+
+    [TestMethod]
+    public void Intersects_AABBOutPoints_Box1ContainsBox2_ReturnsTrueAndFourPoints()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(20, 20));
+        var box2 = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+
+        bool result = box1.Intersects(box2, out Vector2[] points);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(4, points.Length);
+        CollectionAssert.Contains(points, new Vector2(5, 0));
+        CollectionAssert.Contains(points, new Vector2(15, 0));
+        CollectionAssert.Contains(points, new Vector2(0, 5));
+        CollectionAssert.Contains(points, new Vector2(0, 15));
+    }
 }
