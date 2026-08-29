@@ -206,72 +206,12 @@ public static class CollectionExtensions
     {
         if (source is IReadOnlyList<T> readOnlyList)
         {
-            int count = readOnlyList.Count;
-            if (count == 0)
-            {
-                throw new InvalidOperationException("Sequence contains no elements.");
-            }
-
-            var totalWeight = 0f;
-            for (int i = 0; i < count; i++)
-            {
-                totalWeight += weightSelector(readOnlyList[i]);
-            }
-
-            if (totalWeight <= 0)
-            {
-                throw new InvalidOperationException("Total weight must be greater than zero.");
-            }
-
-            var target = (float)(Random.Shared.NextDouble() * totalWeight);
-            var cumulative = 0f;
-
-            for (int i = 0; i < count; i++)
-            {
-                var item = readOnlyList[i];
-                cumulative += weightSelector(item);
-                if (target <= cumulative)
-                {
-                    return item;
-                }
-            }
-
-            return readOnlyList[count - 1];
+            return WeightedRandomIndexed(new ReadOnlyListWrapper<T>(readOnlyList), weightSelector);
         }
 
         if (source is IList<T> list)
         {
-            int count = list.Count;
-            if (count == 0)
-            {
-                throw new InvalidOperationException("Sequence contains no elements.");
-            }
-
-            var totalWeight = 0f;
-            for (int i = 0; i < count; i++)
-            {
-                totalWeight += weightSelector(list[i]);
-            }
-
-            if (totalWeight <= 0)
-            {
-                throw new InvalidOperationException("Total weight must be greater than zero.");
-            }
-
-            var target = (float)(Random.Shared.NextDouble() * totalWeight);
-            var cumulative = 0f;
-
-            for (int i = 0; i < count; i++)
-            {
-                var item = list[i];
-                cumulative += weightSelector(item);
-                if (target <= cumulative)
-                {
-                    return item;
-                }
-            }
-
-            return list[count - 1];
+            return WeightedRandomIndexed(new ListWrapper<T>(list), weightSelector);
         }
 
         T selected = default!;
@@ -303,5 +243,59 @@ public static class CollectionExtensions
         }
 
         return selected;
+    }
+
+    private interface IIndexedList<out T>
+    {
+        int Count { get; }
+        T this[int index] { get; }
+    }
+
+    private readonly struct ReadOnlyListWrapper<T>(IReadOnlyList<T> list) : IIndexedList<T>
+    {
+        public int Count => list.Count;
+        public T this[int index] => list[index];
+    }
+
+    private readonly struct ListWrapper<T>(IList<T> list) : IIndexedList<T>
+    {
+        public int Count => list.Count;
+        public T this[int index] => list[index];
+    }
+
+    private static T WeightedRandomIndexed<TList, T>(TList list, Func<T, float> weightSelector)
+        where TList : struct, IIndexedList<T>
+    {
+        int count = list.Count;
+        if (count == 0)
+        {
+            throw new InvalidOperationException("Sequence contains no elements.");
+        }
+
+        var totalWeight = 0f;
+        for (int i = 0; i < count; i++)
+        {
+            totalWeight += weightSelector(list[i]);
+        }
+
+        if (totalWeight <= 0)
+        {
+            throw new InvalidOperationException("Total weight must be greater than zero.");
+        }
+
+        var target = (float)(Random.Shared.NextDouble() * totalWeight);
+        var cumulative = 0f;
+
+        for (int i = 0; i < count; i++)
+        {
+            var item = list[i];
+            cumulative += weightSelector(item);
+            if (target <= cumulative)
+            {
+                return item;
+            }
+        }
+
+        return list[count - 1];
     }
 }
