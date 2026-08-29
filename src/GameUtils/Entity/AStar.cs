@@ -124,8 +124,10 @@ public class AStar<T> where T : notnull
             }
 
             var currentG = _gScore.GetValueOrDefault(current, float.MaxValue);
-            foreach (var (neighbor, weight) in neighbors)
+            ReadOnlySpan<(T neighbor, float weight)> neighborSpan = CollectionsMarshal.AsSpan(neighbors);
+            for (int i = 0; i < neighborSpan.Length; i++)
             {
+                var (neighbor, weight) = neighborSpan[i];
                 if (_visited.Contains(neighbor))
                 {
                     continue;
@@ -144,11 +146,10 @@ public class AStar<T> where T : notnull
         }
 
         // Reconstruct path
-        var stack = new Stack<T>();
         var node = end;
         while (true)
         {
-            stack.Push(node);
+            path.Add(node);
             if (node.Equals(start))
             {
                 break;
@@ -163,7 +164,7 @@ public class AStar<T> where T : notnull
             node = prev;
         }
 
-        path = new List<T>(stack);
+        path.Reverse();
 
         return path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end);
     }

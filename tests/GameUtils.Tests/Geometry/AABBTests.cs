@@ -124,4 +124,43 @@ public class AABBTests
         Assert.IsFalse(box1.Intersects(box2));
         Assert.IsFalse(box2.Intersects(box1));
     }
+
+    [TestMethod]
+    public void Constructor_NormalMinMax_SetsPropertiesCorrectly()
+    {
+        var min = new Vector2(10, 15);
+        var max = new Vector2(20, 25);
+        var aabb = new AABB(min, max);
+
+        Assert.AreEqual(min, aabb.Min);
+        Assert.AreEqual(max, aabb.Max);
+        Assert.AreEqual(new Vector2(15, 20), aabb.Center);
+        Assert.AreEqual(new Vector2(10, 10), aabb.Size);
+    }
+
+    [TestMethod]
+    public void Constructor_ReversedMinMax_SwapsMinAndMaxCorrectly()
+    {
+        var min = new Vector2(20, 25);
+        var max = new Vector2(10, 15);
+        var aabb = new AABB(min, max);
+
+        Assert.AreEqual(new Vector2(10, 15), aabb.Min);
+        Assert.AreEqual(new Vector2(20, 25), aabb.Max);
+        Assert.AreEqual(new Vector2(15, 20), aabb.Center);
+        Assert.AreEqual(new Vector2(10, 10), aabb.Size);
+    }
+
+    [TestMethod]
+    public void Constructor_MixedMinMax_SwapsAxesIndividuallyCorrectly()
+    {
+        var point1 = new Vector2(20, 15);
+        var point2 = new Vector2(10, 25);
+        var aabb = new AABB(point1, point2);
+
+        Assert.AreEqual(new Vector2(10, 15), aabb.Min);
+        Assert.AreEqual(new Vector2(20, 25), aabb.Max);
+        Assert.AreEqual(new Vector2(15, 20), aabb.Center);
+        Assert.AreEqual(new Vector2(10, 10), aabb.Size);
+    }
 }
