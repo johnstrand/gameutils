@@ -69,5 +69,34 @@ namespace GameUtils.Tests.Types
                 }
             }
         }
+
+        [TestMethod]
+        public void WriteAndRead_StreamRoundtrip_PreservesData()
+        {
+            int width = 4;
+            int height = 3;
+            var data = new System.Numerics.Vector4[width * height];
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = new System.Numerics.Vector4(i * 1.0f, i * 2.0f, i * 3.0f, i * 4.0f);
+            }
+
+            var original = new ImageData(width, height, data);
+
+            using var ms = new MemoryStream();
+            original.Write(ms);
+
+            ms.Position = 0;
+            var loaded = ImageData.Read(ms);
+
+            Assert.AreEqual(original.Width, loaded.Width);
+            Assert.AreEqual(original.Height, loaded.Height);
+            Assert.AreEqual(original.Data.Length, loaded.Data.Length);
+
+            for (int i = 0; i < original.Data.Length; i++)
+            {
+                Assert.AreEqual(original.Data[i], loaded.Data[i]);
+            }
+        }
     }
 }
