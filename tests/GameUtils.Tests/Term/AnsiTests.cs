@@ -47,4 +47,72 @@ public class AnsiTests
         string result = Ansi.WriteLine(untrustedInput);
         Assert.AreEqual("Hello {0} World", result);
     }
+
+    [TestMethod]
+    public void Format_EscapedBrackets_RendersBracket()
+    {
+        var result = Ansi.Format("[[Hello]");
+        Assert.AreEqual("[Hello]", result);
+    }
+
+    [TestMethod]
+    public void Format_ResetSequences_RendersResetSequence()
+    {
+        var res1 = Ansi.Format("Text[]End");
+        var res2 = Ansi.Format("Text[/]End");
+        var expected = $"Text{Ansi.Reset}End";
+
+        Assert.AreEqual(expected, res1);
+        Assert.AreEqual(expected, res2);
+    }
+
+    [TestMethod]
+    public void Format_TextStyles_RendersStyleSequences()
+    {
+        Assert.AreEqual($"Bold: {Ansi.Bold}", Ansi.Format("Bold: [bold]"));
+        Assert.AreEqual($"Bold: {Ansi.Bold}", Ansi.Format("Bold: [b]"));
+        Assert.AreEqual($"Faint: {Ansi.Faint}", Ansi.Format("Faint: [faint]"));
+        Assert.AreEqual($"Faint: {Ansi.Faint}", Ansi.Format("Faint: [f]"));
+        Assert.AreEqual($"Italic: {Ansi.Italic}", Ansi.Format("Italic: [italic]"));
+        Assert.AreEqual($"Italic: {Ansi.Italic}", Ansi.Format("Italic: [i]"));
+        Assert.AreEqual($"Underline: {Ansi.Underline}", Ansi.Format("Underline: [underline]"));
+        Assert.AreEqual($"Underline: {Ansi.Underline}", Ansi.Format("Underline: [u]"));
+    }
+
+    [TestMethod]
+    public void Format_NamedColors_RendersColorSequences()
+    {
+        Assert.AreEqual($"Red: {Ansi.Foreground("red")}", Ansi.Format("Red: [red]"));
+        Assert.AreEqual($"Red: {Ansi.Foreground("red")}", Ansi.Format("Red: [fg:red]"));
+        Assert.AreEqual($"BgRed: {Ansi.Background("red")}", Ansi.Format("BgRed: [bg:red]"));
+    }
+
+    [TestMethod]
+    public void Format_RgbColors_RendersRgbColorSequences()
+    {
+        Assert.AreEqual($"RGB Fg: {Ansi.Foreground(255, 100, 50)}", Ansi.Format("RGB Fg: [#255,100,50]"));
+        Assert.AreEqual($"RGB Fg: {Ansi.Foreground(255, 100, 50)}", Ansi.Format("RGB Fg: [#fg:255,100,50]"));
+        Assert.AreEqual($"RGB Bg: {Ansi.Background(10, 20, 30)}", Ansi.Format("RGB Bg: [#bg:10,20,30]"));
+    }
+
+    [TestMethod]
+    public void Format_UnterminatedSequence_ThrowsArgumentException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Ansi.Format("Hello [red"));
+        Assert.IsTrue(ex.Message.Contains("Invalid ANSI sequence starting at position 6"));
+    }
+
+    [TestMethod]
+    public void Format_InvalidRgbSequence_ThrowsArgumentException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Ansi.Format("Hello [#fg:255,abc,0]"));
+        Assert.IsTrue(ex.Message.Contains("Invalid RGB color sequence starting at position 21"));
+    }
+
+    [TestMethod]
+    public void Format_UnknownSequence_ThrowsArgumentException()
+    {
+        var ex = Assert.ThrowsExactly<ArgumentException>(() => Ansi.Format("Hello [invalid_tag]"));
+        Assert.IsTrue(ex.Message.Contains("Unknown ANSI sequence 'invalid_tag' starting at position 19"));
+    }
 }
