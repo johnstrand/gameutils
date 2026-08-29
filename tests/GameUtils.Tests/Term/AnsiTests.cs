@@ -11,7 +11,6 @@ public class AnsiTests
     public void Write_WithNoArgsAndFormatTokens_DoesNotThrow()
     {
         var text = "Test string with {0} and {1}";
-        // Should not throw System.FormatException
         var result = Ansi.Write(text);
         Assert.AreEqual(text, result);
     }
@@ -20,7 +19,6 @@ public class AnsiTests
     public void WriteLine_WithNoArgsAndFormatTokens_DoesNotThrow()
     {
         var text = "Another {test} string {0}";
-        // Should not throw System.FormatException
         var result = Ansi.WriteLine(text);
         Assert.AreEqual(text, result);
     }
@@ -32,7 +30,8 @@ public class AnsiTests
         var result = Ansi.Write(text, "World");
         Assert.AreEqual("Hello World", result);
     }
-  
+
+    [TestMethod]
     public void Write_WithFormatStringButNoArgs_DoesNotThrow()
     {
         string untrustedInput = "Hello {0} World";
@@ -46,5 +45,36 @@ public class AnsiTests
         string untrustedInput = "Hello {0} World";
         string result = Ansi.WriteLine(untrustedInput);
         Assert.AreEqual("Hello {0} World", result);
+    }
+
+    [TestMethod]
+    [DataRow("Hello [world")]
+    [DataRow("Text [fg:notacolor]")]
+    [DataRow("Text [bg:notacolor]")]
+    [DataRow("Text [#fg:255,0]")]
+    [DataRow("Text [#bg:invalid]")]
+    [DataRow("Text [#255,255,abc]")]
+    [DataRow("Text [unknown_tag]")]
+    public void Format_InvalidAnsiSequence_ThrowsArgumentException(string invalidInput)
+    {
+        Assert.ThrowsExactly<ArgumentException>(() => Ansi.Format(invalidInput));
+    }
+
+    [TestMethod]
+    [DataRow("Hello [world")]
+    [DataRow("Text [fg:notacolor]")]
+    [DataRow("Text [#fg:255,0]")]
+    public void Write_InvalidAnsiSequence_ThrowsArgumentException(string invalidInput)
+    {
+        Assert.ThrowsExactly<ArgumentException>(() => Ansi.Write(invalidInput));
+    }
+
+    [TestMethod]
+    [DataRow("Hello [world")]
+    [DataRow("Text [bg:notacolor]")]
+    [DataRow("Text [#bg:invalid]")]
+    public void WriteLine_InvalidAnsiSequence_ThrowsArgumentException(string invalidInput)
+    {
+        Assert.ThrowsExactly<ArgumentException>(() => Ansi.WriteLine(invalidInput));
     }
 }
