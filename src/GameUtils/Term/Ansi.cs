@@ -310,99 +310,126 @@ public static class Ansi
             var sequence = span.Slice(i + 1, endOfSequence - i - 1);
             i = endOfSequence + 1;
 
-            if (sequence.Equals("/", StringComparison.Ordinal) || sequence.IsEmpty)
-            {
-                result.Append(Reset);
-                continue;
-            }
-
-            if (sequence.Equals("bold", StringComparison.Ordinal) || sequence.Equals("b", StringComparison.Ordinal))
-            {
-                result.Append(Bold);
-                continue;
-            }
-
-            if (sequence.Equals("faint", StringComparison.Ordinal) || sequence.Equals("f", StringComparison.Ordinal))
-            {
-                result.Append(Faint);
-                continue;
-            }
-
-            if (sequence.Equals("italic", StringComparison.Ordinal) || sequence.Equals("i", StringComparison.Ordinal))
-            {
-                result.Append(Italic);
-                continue;
-            }
-
-            if (sequence.Equals("underline", StringComparison.Ordinal) || sequence.Equals("u", StringComparison.Ordinal))
-            {
-                result.Append(Underline);
-                continue;
-            }
-
-            if (sequence.StartsWith("fg:", StringComparison.Ordinal))
-            {
-                var colorSpan = sequence[3..];
-                if (TryGetNamedColor(_foregroundColors, colorSpan, out var colorCode))
-                {
-                    result.Append(CreateSequence("m", colorCode));
-                    continue;
-                }
-            }
-
-            if (sequence.StartsWith("bg:", StringComparison.Ordinal))
-            {
-                var colorSpan = sequence[3..];
-                if (TryGetNamedColor(_backgroundColors, colorSpan, out var colorCode))
-                {
-                    result.Append(CreateSequence("m", colorCode));
-                    continue;
-                }
-            }
-
-            if (sequence.StartsWith("#fg:", StringComparison.Ordinal))
-            {
-                if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
-                {
-                    throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
-                }
-
-                result.Append(Foreground(r, g, b));
-                continue;
-            }
-
-            if (sequence.StartsWith("#bg:", StringComparison.Ordinal))
-            {
-                if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
-                {
-                    throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
-                }
-
-                result.Append(Background(r, g, b));
-                continue;
-            }
-
-            if (sequence.Length > 0 && sequence[0] == '#')
-            {
-                if (!TryParseRgbSpan(sequence[1..], out var r, out var g, out var b))
-                {
-                    throw new ArgumentException($"Invalid RGB color sequence starting at position {i}");
-                }
-
-                result.Append(Foreground(r, g, b));
-                continue;
-            }
-
-            if (TryGetNamedColor(_foregroundColors, sequence, out var fgCode))
-            {
-                result.Append(CreateSequence("m", fgCode));
-                continue;
-            }
-
-            throw new ArgumentException($"Unknown ANSI sequence '{sequence.ToString()}' starting at position {i}");
+            ProcessSequence(sequence, result, i);
         }
 
         return result.ToString();
+    }
+
+    private static void ProcessSequence(ReadOnlySpan<char> sequence, StringBuilder result, int positionAfterSequence)
+    {
+        if (TryProcessResetOrStyle(sequence, result))
+        {
+            return;
+        }
+
+        if (TryProcessColorSequence(sequence, result, positionAfterSequence))
+        {
+            return;
+        }
+
+        throw new ArgumentException($"Unknown ANSI sequence '{sequence.ToString()}' starting at position {positionAfterSequence}");
+    }
+
+    private static bool TryProcessResetOrStyle(ReadOnlySpan<char> sequence, StringBuilder result)
+    {
+        if (sequence.Equals("/", StringComparison.Ordinal) || sequence.IsEmpty)
+        {
+            result.Append(Reset);
+            return true;
+        }
+
+        if (sequence.Equals("bold", StringComparison.Ordinal) || sequence.Equals("b", StringComparison.Ordinal))
+        {
+            result.Append(Bold);
+            return true;
+        }
+
+        if (sequence.Equals("faint", StringComparison.Ordinal) || sequence.Equals("f", StringComparison.Ordinal))
+        {
+            result.Append(Faint);
+            return true;
+        }
+
+        if (sequence.Equals("italic", StringComparison.Ordinal) || sequence.Equals("i", StringComparison.Ordinal))
+        {
+            result.Append(Italic);
+            return true;
+        }
+
+        if (sequence.Equals("underline", StringComparison.Ordinal) || sequence.Equals("u", StringComparison.Ordinal))
+        {
+            result.Append(Underline);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryProcessColorSequence(ReadOnlySpan<char> sequence, StringBuilder result, int positionAfterSequence)
+    {
+        if (sequence.StartsWith("fg:", StringComparison.Ordinal))
+        {
+            var colorSpan = sequence[3..];
+            if (TryGetNamedColor(_foregroundColors, colorSpan, out var colorCode))
+            {
+                result.Append(CreateSequence("m", colorCode));
+                return true;
+            }
+            return false;
+        }
+
+        if (sequence.StartsWith("bg:", StringComparison.Ordinal))
+        {
+            var colorSpan = sequence[3..];
+            if (TryGetNamedColor(_backgroundColors, colorSpan, out var colorCode))
+            {
+                result.Append(CreateSequence("m", colorCode));
+                return true;
+            }
+            return false;
+        }
+
+        if (sequence.StartsWith("#fg:", StringComparison.Ordinal))
+        {
+            if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
+            {
+                throw new ArgumentException($"Invalid RGB color sequence starting at position {positionAfterSequence}");
+            }
+
+            result.Append(Foreground(r, g, b));
+            return true;
+        }
+
+        if (sequence.StartsWith("#bg:", StringComparison.Ordinal))
+        {
+            if (!TryParseRgbSpan(sequence[4..], out var r, out var g, out var b))
+            {
+                throw new ArgumentException($"Invalid RGB color sequence starting at position {positionAfterSequence}");
+            }
+
+            result.Append(Background(r, g, b));
+            return true;
+        }
+
+        if (sequence.Length > 0 && sequence[0] == '#')
+        {
+            if (!TryParseRgbSpan(sequence[1..], out var r, out var g, out var b))
+            {
+                throw new ArgumentException($"Invalid RGB color sequence starting at position {positionAfterSequence}");
+            }
+
+            result.Append(Foreground(r, g, b));
+            return true;
+        }
+
+        if (TryGetNamedColor(_foregroundColors, sequence, out var fgCode))
+        {
+            result.Append(CreateSequence("m", fgCode));
+            return true;
+        }
+
+        return false;
     }
 
     private static bool TryGetNamedColor(Dictionary<string, int> colorDict, ReadOnlySpan<char> nameSpan, out int code)
