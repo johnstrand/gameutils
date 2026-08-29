@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace GameUtils.Types;
 
@@ -113,18 +114,14 @@ public class ImageData
     /// </summary>
     public void Write(Stream target)
     {
-        using var compressor = new GZipStream(target, CompressionLevel.Optimal);
-        using var writer = new BinaryWriter(compressor);
+        using var compressor = new GZipStream(target, CompressionLevel.Optimal, leaveOpen: true);
+        using var writer = new BinaryWriter(compressor, System.Text.Encoding.UTF8, leaveOpen: true);
         writer.Write("IMGD"u8);
         writer.Write(Width);
         writer.Write(Height);
-        foreach (var pixel in Data)
-        {
-            writer.Write(pixel.X);
-            writer.Write(pixel.Y);
-            writer.Write(pixel.Z);
-            writer.Write(pixel.W);
-        }
+        writer.Flush();
+        ReadOnlySpan<byte> bytes = MemoryMarshal.AsBytes(Data.AsSpan());
+        compressor.Write(bytes);
     }
 
     /// <summary>
@@ -148,8 +145,8 @@ public class ImageData
     /// </summary>
     public static ImageData Read(Stream source)
     {
-        using var decompressor = new GZipStream(source, CompressionMode.Decompress);
-        using var reader = new BinaryReader(decompressor);
+        using var decompressor = new GZipStream(source, CompressionMode.Decompress, leaveOpen: true);
+        using var reader = new BinaryReader(decompressor, System.Text.Encoding.UTF8, leaveOpen: true);
         var magic = reader.ReadUInt32();
         if (magic != 0x44474D49) // IMGD as a little-endian uint32
         {
@@ -170,14 +167,8 @@ public class ImageData
         }
 
         var data = new Vector4[(int)totalPixels];
-        for (var i = 0; i < data.Length; i++)
-        {
-            data[i] = new Vector4(
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle(),
-                reader.ReadSingle());
-        }
+        Span<byte> bytes = MemoryMarshal.AsBytes(data.AsSpan());
+        decompressor.ReadExactly(bytes);
 
         return new ImageData(width, height, data);
     }
