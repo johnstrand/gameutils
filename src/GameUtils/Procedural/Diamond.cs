@@ -46,10 +46,10 @@ public static class Diamond
                     var my = y + halfStep;
 
                     map[mx, my] = valueFactory((map[x, y] + map[x + step, y] + map[x, y + step] + map[x + step, y + step]) * 0.25f, range);
-                    map[mx, y] = valueFactory(AverageInt(map, x, y, x + step, y, mx, my, mx, y - step, size), range);
-                    map[x, my] = valueFactory(AverageInt(map, x, y, x, y + step, mx, my, x - step, my, size), range);
-                    map[x + step, my] = valueFactory(AverageInt(map, x + step, y, x + step, y + step, mx, my, x + step + step, my, size), range);
-                    map[mx, y + step] = valueFactory(AverageInt(map, x, y + step, x + step, y + step, mx, my, mx, y + step + step, size), range);
+                    map[mx, y] = valueFactory(AverageInt(map, x, y, x + step, y, mx, my, mx, y - step), range);
+                    map[x, my] = valueFactory(AverageInt(map, x, y, x, y + step, mx, my, x - step, my), range);
+                    map[x + step, my] = valueFactory(AverageInt(map, x + step, y, x + step, y + step, mx, my, x + step + step, my), range);
+                    map[mx, y + step] = valueFactory(AverageInt(map, x, y + step, x + step, y + step, mx, my, mx, y + step + step), range);
                 }
             }
 
@@ -60,14 +60,14 @@ public static class Diamond
         return map;
     }
 
-    private static float AverageInt(Grid<int> map, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy, int size)
+    private static float AverageInt(Grid<int> map, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy)
     {
         var sum = 0f;
         var count = 0;
-        if (ax >= 0 && ax < size && ay >= 0 && ay < size) { sum += map[ax, ay]; count++; }
-        if (bx >= 0 && bx < size && by >= 0 && by < size) { sum += map[bx, by]; count++; }
-        if (cx >= 0 && cx < size && cy >= 0 && cy < size) { sum += map[cx, cy]; count++; }
-        if (dx >= 0 && dx < size && dy >= 0 && dy < size) { sum += map[dx, dy]; count++; }
+        if (map.IsInBounds(ax, ay)) { sum += map[ax, ay]; count++; }
+        if (map.IsInBounds(bx, by)) { sum += map[bx, by]; count++; }
+        if (map.IsInBounds(cx, cy)) { sum += map[cx, cy]; count++; }
+        if (map.IsInBounds(dx, dy)) { sum += map[dx, dy]; count++; }
         return count == 0 ? 0f : sum / count;
     }
 }
