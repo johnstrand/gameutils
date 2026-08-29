@@ -1,4 +1,6 @@
-﻿namespace GameUtils.Entity;
+using System.Runtime.InteropServices;
+
+namespace GameUtils.Entity;
 
 /// <summary>
 /// Helper class for solving the shortest path between two points. This implementation uses Dijkstra's algorithm, but might be wonky for weights that are not 1.
@@ -83,9 +85,10 @@ public class Dijkstra<T> where T : notnull
 
                 var distance = nextDist + weight;
 
-                if (distance < _distances.GetValueOrDefault(n, float.MaxValue))
+                ref var nDist = ref CollectionsMarshal.GetValueRefOrAddDefault(_distances, n, out var exists);
+                if (!exists || distance < nDist)
                 {
-                    _distances[n] = distance;
+                    nDist = distance;
                     _previousNodes[n] = next;
                     _queue.Enqueue(n, distance);
                 }
