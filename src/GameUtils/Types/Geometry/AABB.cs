@@ -49,6 +49,14 @@ public class AABB
     }
 
     /// <summary>
+    /// Returns true if the specified box is completely inside this box
+    /// </summary>
+    public bool Contains(AABB other)
+    {
+        return other.Min.X >= Min.X && other.Max.X <= Max.X && other.Min.Y >= Min.Y && other.Max.Y <= Max.Y;
+    }
+
+    /// <summary>
     /// Returns true if the specified box intersects with, or is inside the box
     /// </summary>
     public bool Intersects(AABB other)
