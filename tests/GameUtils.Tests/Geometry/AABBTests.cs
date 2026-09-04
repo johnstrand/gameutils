@@ -109,6 +109,69 @@ public class AABBTests
         Assert.IsFalse(aabb.Contains(new Vector2(21, 15)));
         Assert.IsFalse(aabb.Contains(new Vector2(15, 9)));
         Assert.IsFalse(aabb.Contains(new Vector2(15, 21)));
+        Assert.IsFalse(aabb.Contains(new Vector2(9, 9)));
+        Assert.IsFalse(aabb.Contains(new Vector2(21, 21)));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_FullyContained_ReturnsTrue()
+    {
+        var outer = new AABB(new Vector2(0, 0), new Vector2(20, 20));
+        var inner = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+        Assert.IsTrue(outer.Contains(inner));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_Identical_ReturnsTrue()
+    {
+        var box1 = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var box2 = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        Assert.IsTrue(box1.Contains(box2));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_TouchingInternalBoundary_ReturnsTrue()
+    {
+        var outer = new AABB(new Vector2(0, 0), new Vector2(20, 20));
+        var inner = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        Assert.IsTrue(outer.Contains(inner));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_PartiallyOverlapping_ReturnsFalse()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+        Assert.IsFalse(box1.Contains(box2));
+        Assert.IsFalse(box2.Contains(box1));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_Disjoint_ReturnsFalse()
+    {
+        var box1 = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+        var box2 = new AABB(new Vector2(20, 20), new Vector2(30, 30));
+        Assert.IsFalse(box1.Contains(box2));
+        Assert.IsFalse(box2.Contains(box1));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_EnclosingBox_ReturnsFalse()
+    {
+        var inner = new AABB(new Vector2(5, 5), new Vector2(15, 15));
+        var outer = new AABB(new Vector2(0, 0), new Vector2(20, 20));
+        Assert.IsFalse(inner.Contains(outer));
+    }
+
+    [TestMethod]
+    public void Contains_AABB_ExceedsInSingleDimension_ReturnsFalse()
+    {
+        var baseBox = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+
+        Assert.IsFalse(baseBox.Contains(new AABB(new Vector2(9, 11), new Vector2(19, 19))));
+        Assert.IsFalse(baseBox.Contains(new AABB(new Vector2(11, 11), new Vector2(21, 19))));
+        Assert.IsFalse(baseBox.Contains(new AABB(new Vector2(11, 9), new Vector2(19, 19))));
+        Assert.IsFalse(baseBox.Contains(new AABB(new Vector2(11, 11), new Vector2(19, 21))));
     }
 
     [TestMethod]
