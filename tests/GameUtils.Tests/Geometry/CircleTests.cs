@@ -8,6 +8,22 @@ namespace GameUtils.Tests.Geometry;
 public class CircleTests
 {
     [TestMethod]
+    public void Constructor_NegativeRadius_ThrowsArgumentOutOfRangeException()
+    {
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new Circle(new Vector2(0, 0), -1f));
+    }
+
+    [TestMethod]
+    public void Constructor_ValidParameters_PropertiesSetCorrectly()
+    {
+        var center = new Vector2(3, 4);
+        var circle = new Circle(center, 5f);
+        Assert.AreEqual(center, circle.Center);
+        Assert.AreEqual(5f, circle.Radius);
+        Assert.AreEqual(25f, circle.RadiusSquared);
+    }
+
+    [TestMethod]
     public void Contains_PointInsideCircle_ReturnsTrue()
     {
         var circle = new Circle(new Vector2(0, 0), 5);
@@ -119,5 +135,45 @@ public class CircleTests
     {
         var circle = new Circle(new Vector2(0, 0), 5);
         Assert.IsTrue(circle.Intersects(new Vector2(-10, 0), new Vector2(10, 0)));
+    }
+
+    [TestMethod]
+    public void Contains_NonOriginCenter_ReturnsCorrectResult()
+    {
+        var circle = new Circle(new Vector2(10, 10), 5f);
+        Assert.IsTrue(circle.Contains(new Vector2(12, 12)));
+        Assert.IsFalse(circle.Contains(new Vector2(20, 20)));
+    }
+
+    [TestMethod]
+    public void Contains_ZeroRadiusCircle_OnlyContainsCenter()
+    {
+        var circle = new Circle(new Vector2(5, 5), 0f);
+        Assert.IsTrue(circle.Contains(new Vector2(5, 5)));
+        Assert.IsFalse(circle.Contains(new Vector2(5.1f, 5)));
+    }
+
+    [TestMethod]
+    public void Intersects_Circle_OverlappingTouchingDisjoint_ReturnsExpectedResult()
+    {
+        var c1 = new Circle(new Vector2(0, 0), 5f);
+        var c2 = new Circle(new Vector2(6, 0), 5f);
+        var c3 = new Circle(new Vector2(10, 0), 5f);
+        var c4 = new Circle(new Vector2(12, 0), 5f);
+        Assert.IsTrue(c1.Intersects(c2));
+        Assert.IsTrue(c1.Intersects(c3));
+        Assert.IsFalse(c1.Intersects(c4));
+    }
+
+    [TestMethod]
+    public void Intersects_Polygon2D_ReturnsExpectedResult()
+    {
+        var circle = new Circle(new Vector2(0, 0), 5f);
+        var polyInside = new Polygon2D(new[] { new Vector2(-1, -1), new Vector2(1, -1), new Vector2(0, 1) });
+        var polyIntersecting = new Polygon2D(new[] { new Vector2(4, 0), new Vector2(8, 0), new Vector2(6, 4) });
+        var polyOutside = new Polygon2D(new[] { new Vector2(10, 10), new Vector2(12, 10), new Vector2(11, 12) });
+        Assert.IsTrue(circle.Intersects(polyInside));
+        Assert.IsTrue(circle.Intersects(polyIntersecting));
+        Assert.IsFalse(circle.Intersects(polyOutside));
     }
 }
