@@ -485,4 +485,64 @@ public class QuadTreeTests
         Assert.AreEqual(1, results.Count);
         Assert.AreEqual("Near", results[0]);
     }
+
+    [TestMethod]
+    public void Insert_ManyItemsAtExactSamePosition_SubdividesToMaxDepthWithoutInfiniteLoop()
+    {
+        var bounds = new AABB(new Vector2(0, 0), new Vector2(100, 100));
+        var quadTree = new QuadTree<string>(bounds, capacity: 2);
+        var samePos = new Vector2(50, 50);
+
+        for (int i = 0; i < 50; i++)
+        {
+            bool inserted = quadTree.Insert($"item_{i}", samePos);
+            Assert.IsTrue(inserted);
+        }
+
+        var queried = quadTree.Query(bounds).ToList();
+        Assert.AreEqual(50, queried.Count);
+    }
+
+    [TestMethod]
+    public void Insert_DuplicatesAtSamePosition_CanQueryAndRemoveEach()
+    {
+        var bounds = new AABB(new Vector2(0, 0), new Vector2(100, 100));
+        var quadTree = new QuadTree<string>(bounds, capacity: 2);
+        var pos = new Vector2(25, 25);
+
+        for (int i = 0; i < 10; i++)
+        {
+            quadTree.Insert($"dup_{i}", pos);
+        }
+
+        var queried = quadTree.Query(new AABB(new Vector2(20, 20), new Vector2(30, 30))).ToList();
+        Assert.AreEqual(10, queried.Count);
+
+        for (int i = 0; i < 10; i++)
+        {
+            bool removed = quadTree.Remove($"dup_{i}", pos);
+            Assert.IsTrue(removed);
+        }
+
+        Assert.AreEqual(0, quadTree.Query(bounds).Count());
+    }
+
+    [TestMethod]
+    public void Insert_ItemsAtSamePositionExceedingCapacityAndMaxDepth_AllItemsPreservedAndQueried()
+    {
+        var bounds = new AABB(new Vector2(0, 0), new Vector2(100, 100));
+        var quadTree = new QuadTree<int>(bounds, capacity: 4);
+        var pos = new Vector2(10, 10);
+
+        for (int i = 0; i < 100; i++)
+        {
+            Assert.IsTrue(quadTree.Insert(i, pos));
+        }
+
+        var result = quadTree.Query(bounds).ToList();
+        Assert.AreEqual(100, result.Count);
+
+        var radiusResult = quadTree.Query(pos, 1.0f).ToList();
+        Assert.AreEqual(100, radiusResult.Count);
+    }
 }
