@@ -111,15 +111,16 @@ public class CatmullRomPath
         var segmentCount = _loop ? _points.Count : _points.Count - 1;
         var scaled = t * segmentCount;
         segmentIndex = (int)MathF.Floor(scaled);
-        localT = scaled - segmentIndex;
 
         if (_loop)
         {
-            segmentIndex = segmentIndex % segmentCount;
+            segmentIndex = ((segmentIndex % segmentCount) + segmentCount) % segmentCount;
+            localT = scaled - MathF.Floor(scaled);
         }
         else
         {
             segmentIndex = System.Math.Clamp(segmentIndex, 0, segmentCount - 1);
+            localT = scaled - segmentIndex;
         }
     }
 
