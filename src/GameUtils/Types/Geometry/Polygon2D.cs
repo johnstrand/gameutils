@@ -85,6 +85,11 @@ public readonly struct Polygon2D
     /// </summary>
     public bool Contains(Vector2 point)
     {
+        if (!BoundingBox.Contains(point))
+        {
+            return false;
+        }
+
         var inside = false;
         var j = Vertices.Length - 1;
         for (var i = 0; i < Vertices.Length; j = i++)

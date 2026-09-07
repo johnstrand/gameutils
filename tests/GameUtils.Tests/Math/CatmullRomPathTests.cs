@@ -134,4 +134,42 @@ public class CatmullRomPathTests
         var tangentStart = path.GetTangent(0f);
         Assert.AreNotEqual(Vector2.Zero, tangentStart);
     }
+
+    [TestMethod]
+    public void SetLooping_True_AlignsPositionAndTangentAtEndpoints()
+    {
+        var path = new CatmullRomPath()
+            .SetLooping(true)
+            .AddPoint(new Vector2(0, 0))
+            .AddPoint(new Vector2(10, 0))
+            .AddPoint(new Vector2(10, 10))
+            .AddPoint(new Vector2(0, 10));
+
+        var pStart = path.GetPoint(0f);
+        var pEnd = path.GetPoint(1f);
+        Assert.AreEqual(pStart, pEnd);
+
+        var tangentStart = path.GetTangent(0f);
+        var tangentEnd = path.GetTangent(1f);
+        Assert.AreEqual(tangentStart.X, tangentEnd.X, 1e-4f);
+        Assert.AreEqual(tangentStart.Y, tangentEnd.Y, 1e-4f);
+    }
+
+    [TestMethod]
+    public void SetLooping_CanToggleLoopingState()
+    {
+        var path = new CatmullRomPath()
+            .AddPoint(new Vector2(0, 0))
+            .AddPoint(new Vector2(10, 0))
+            .AddPoint(new Vector2(10, 10))
+            .AddPoint(new Vector2(0, 10));
+
+        path.SetLooping(true);
+        var pEndLoop = path.GetPoint(1f);
+        Assert.AreEqual(new Vector2(0, 0), pEndLoop);
+
+        path.SetLooping(false);
+        var pEndNonLoop = path.GetPoint(1f);
+        Assert.AreEqual(new Vector2(0, 10), pEndNonLoop);
+    }
 }
