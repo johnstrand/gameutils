@@ -7,7 +7,6 @@ namespace GameUtils.Entity;
 public class EventBus
 {
     private readonly Dictionary<Type, object> _handlers = [];
-    private readonly Dictionary<Type, object> _snapshots = [];
 
     /// <summary>
     /// Subscribes <paramref name="handler"/> to events of type <typeparamref name="TEvent"/>.
@@ -17,19 +16,18 @@ public class EventBus
         ArgumentNullException.ThrowIfNull(handler);
         var type = typeof(TEvent);
 
-        ref var listObj = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(_handlers, type, out bool exists);
-        List<Action<TEvent>> list;
-        if (!exists)
+        ref var obj = ref System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(_handlers, type, out bool exists);
+        if (!exists || obj is not Action<TEvent>[] oldArray)
         {
-            list = new List<Action<TEvent>>();
-            listObj = list;
+            obj = new Action<TEvent>[] { handler };
         }
         else
         {
-            list = (List<Action<TEvent>>)listObj!;
+            var newArray = new Action<TEvent>[oldArray.Length + 1];
+            Array.Copy(oldArray, newArray, oldArray.Length);
+            newArray[oldArray.Length] = handler;
+            obj = newArray;
         }
-        list.Add(handler);
-        _snapshots.Remove(type);
     }
 
     /// <summary>
@@ -41,12 +39,24 @@ public class EventBus
         ArgumentNullException.ThrowIfNull(handler);
         var type = typeof(TEvent);
 
-        if (_handlers.TryGetValue(type, out var listObj))
+        if (_handlers.TryGetValue(type, out var obj) && obj is Action<TEvent>[] oldArray)
         {
-            var list = (List<Action<TEvent>>)listObj;
-            if (list.Remove(handler))
+            int index = Array.IndexOf(oldArray, handler);
+            if (index < 0)
             {
-                _snapshots.Remove(type);
+                return;
+            }
+
+            if (oldArray.Length == 1)
+            {
+                _handlers.Remove(type);
+            }
+            else
+            {
+                var newArray = new Action<TEvent>[oldArray.Length - 1];
+                Array.Copy(oldArray, 0, newArray, 0, index);
+                Array.Copy(oldArray, index + 1, newArray, index, oldArray.Length - index - 1);
+                _handlers[type] = newArray;
             }
         }
     }
@@ -59,18 +69,13 @@ public class EventBus
     public void Publish<TEvent>(TEvent eventData)
     {
         var type = typeof(TEvent);
-        if (!_snapshots.TryGetValue(type, out var snapshot))
+        if (!_handlers.TryGetValue(type, out var obj))
         {
-            if (!_handlers.TryGetValue(type, out var listObj))
-            {
-                return;
-            }
-            snapshot = ((List<Action<TEvent>>)listObj).ToArray();
-            _snapshots[type] = snapshot;
+            return;
         }
 
-        var typedSnapshot = (Action<TEvent>[])snapshot;
-        foreach (var handler in typedSnapshot)
+        var handlers = (Action<TEvent>[])obj;
+        foreach (var handler in handlers)
         {
             handler(eventData);
         }
@@ -82,7 +87,6 @@ public class EventBus
     public void Clear()
     {
         _handlers.Clear();
-        _snapshots.Clear();
     }
 
     /// <summary>
@@ -92,6 +96,5 @@ public class EventBus
     {
         var type = typeof(TEvent);
         _handlers.Remove(type);
-        _snapshots.Remove(type);
     }
 }
