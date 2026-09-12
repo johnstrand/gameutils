@@ -96,11 +96,10 @@ public class Dijkstra<T> where T : notnull
         }
 
         // Reconstruct path
-        var stack = new Stack<T>();
         var current = end;
         while (true)
         {
-            stack.Push(current);
+            path.Add(current);
             if (current.Equals(start))
             {
                 break;
@@ -115,7 +114,7 @@ public class Dijkstra<T> where T : notnull
             current = prev;
         }
 
-        path = new List<T>(stack);
+        path.Reverse();
 
         return path.Count > 0 && path[0].Equals(start) && path[^1].Equals(end);
     }
