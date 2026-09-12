@@ -135,6 +135,57 @@ public class TweenerTests
     }
 
     [TestMethod]
+    public void Restart_OngoingTween_ResetsProgressAndInterpolatesWithNewBounds()
+    {
+        var tweener = new Tweener(0f, 10f, 2f);
+        tweener.Update(1f);
+
+        tweener.Restart(20f, 40f);
+
+        Assert.AreEqual(20f, tweener.From);
+        Assert.AreEqual(40f, tweener.To);
+        Assert.AreEqual(20f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+
+        tweener.Update(1f);
+        Assert.AreEqual(30f, tweener.Value);
+    }
+
+    [TestMethod]
+    public void Restart_CompletedTween_ResetsIsCompleteAndRunsToCompletion()
+    {
+        var tweener = new Tweener(0f, 10f, 2f);
+        var completeCount = 0;
+        tweener.OnComplete = () => completeCount++;
+        tweener.Update(2f);
+
+        tweener.Restart(100f, 200f);
+
+        Assert.AreEqual(100f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+
+        tweener.Update(2f);
+        Assert.AreEqual(200f, tweener.Value);
+        Assert.IsTrue(tweener.IsComplete);
+        Assert.AreEqual(2, completeCount);
+    }
+
+    [TestMethod]
+    public void Restart_LoopingTween_ResetsAndContinuesLoopingWithNewBounds()
+    {
+        var tweener = new Tweener(0f, 10f, 2f) { IsLooping = true };
+        tweener.Update(1.5f);
+
+        tweener.Restart(0f, 100f);
+
+        Assert.AreEqual(0f, tweener.Value);
+        Assert.IsFalse(tweener.IsComplete);
+
+        tweener.Update(1f);
+        Assert.AreEqual(50f, tweener.Value);
+    }
+
+    [TestMethod]
     public void CustomEasing_AppliedCorrectly()
     {
         // A simple custom easing that just squares the normalized time
