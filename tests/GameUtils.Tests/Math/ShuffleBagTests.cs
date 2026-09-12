@@ -106,4 +106,29 @@ public class ShuffleBagTests
         var secondNext = bag.Next();
         Assert.AreEqual("Item A", secondNext);
     }
+
+    [TestMethod]
+    public void Peek_WhenBagExhaustedWithMultipleItems_RefillsAndResetsRemaining()
+    {
+        // Arrange
+        var items = new[] { ("Item A", 1), ("Item B", 1), ("Item C", 1) };
+        var bag = new ShuffleBag<string>(items);
+        var initialCapacity = bag.Capacity;
+
+        // Exhaust the bag by drawing all items
+        for (var i = 0; i < initialCapacity; i++)
+        {
+            bag.Next();
+        }
+        Assert.AreEqual(0, bag.Remaining);
+
+        // Act
+        var peekedItem = bag.Peek();
+
+        // Assert
+        Assert.AreEqual(initialCapacity, bag.Remaining);
+        var nextItem = bag.Next();
+        Assert.AreEqual(peekedItem, nextItem);
+        Assert.AreEqual(initialCapacity - 1, bag.Remaining);
+    }
 }
