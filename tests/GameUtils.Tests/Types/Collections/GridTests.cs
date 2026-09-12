@@ -144,6 +144,20 @@ public class GridTests
     }
 
     [TestMethod]
+    [DataRow(-1, 0)]
+    [DataRow(3, 0)]
+    [DataRow(0, -1)]
+    [DataRow(0, 3)]
+    public void TrySet_IntCoordinates_OutOfBounds_ReturnsFalseAndDoesNotModify(int x, int y)
+    {
+        var grid = new Grid<int>(3, 3);
+
+        bool result = grid.TrySet(x, y, 77);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
     public void TrySet_Vector2_ReturnsExpected()
     {
         var grid = new Grid<int>(2, 2);
