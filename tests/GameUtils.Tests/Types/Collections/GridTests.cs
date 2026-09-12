@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using GameUtils.Types.Collections;
@@ -10,11 +11,13 @@ namespace GameUtils.Tests.Types.Collections;
 public class GridTests
 {
     [TestMethod]
-    public void Constructor_ValidDimensions_SetsWidthAndHeight()
+    public void Constructor_ValidDimensions_InitializesGrid()
     {
         var grid = new Grid<int>(3, 4);
         Assert.AreEqual(3, grid.Width);
         Assert.AreEqual(4, grid.Height);
+        Assert.AreEqual(0, grid[0, 0]);
+        Assert.AreEqual(0, grid[2, 3]);
     }
 
     [TestMethod]
@@ -28,122 +31,158 @@ public class GridTests
     }
 
     [TestMethod]
-    public void Constructor_WithData_ValidData_InitializesData()
+    public void Constructor_WithArrayData_InitializesGrid()
     {
-        int[] data = [1, 2, 3, 4, 5, 6];
+        int[] data = { 1, 2, 3, 4, 5, 6 };
         var grid = new Grid<int>(3, 2, data);
         Assert.AreEqual(3, grid.Width);
         Assert.AreEqual(2, grid.Height);
         Assert.AreEqual(1, grid[0, 0]);
+        Assert.AreEqual(3, grid[2, 0]);
+        Assert.AreEqual(4, grid[0, 1]);
         Assert.AreEqual(6, grid[2, 1]);
     }
 
     [TestMethod]
-    public void Constructor_WithData_MismatchedLength_ThrowsArgumentException()
+    public void Constructor_WithArrayData_InvalidLength_ThrowsArgumentException()
     {
-        int[] data = [1, 2, 3];
+        int[] data = { 1, 2, 3 };
         Assert.ThrowsExactly<ArgumentException>(() => new Grid<int>(3, 2, data));
     }
 
     [TestMethod]
-    [DataRow(-1, 2)]
-    [DataRow(2, -1)]
-    public void Constructor_WithData_InvalidDimensions_ThrowsArgumentOutOfRangeException(int width, int height)
+    [DataRow(0, 5)]
+    [DataRow(-1, 5)]
+    [DataRow(5, 0)]
+    [DataRow(5, -1)]
+    public void Constructor_WithArrayData_InvalidDimensions_ThrowsArgumentOutOfRangeException(int width, int height)
     {
-        int[] data = [];
+        int[] data = new int[System.Math.Max(0, width * height)];
         Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new Grid<int>(width, height, data));
     }
 
     [TestMethod]
-    public void Indexer_IntCoordinates_GetAndSet()
+    public void Indexer_Ints_GetAndSet()
     {
         var grid = new Grid<int>(2, 2);
         grid[1, 0] = 42;
+        grid[0, 1] = 99;
         Assert.AreEqual(42, grid[1, 0]);
+        Assert.AreEqual(99, grid[0, 1]);
     }
 
     [TestMethod]
-    public void Indexer_Vector2Coordinates_GetAndSet()
-    {
-        var grid = new Grid<string>(2, 2);
-        var pos = new Vector2(1, 1);
-        grid[pos] = "test";
-        Assert.AreEqual("test", grid[pos]);
-    }
-
-    [TestMethod]
-    public void Indexer_OutOfBounds_ThrowsIndexOutOfRangeException()
+    public void Indexer_Ints_OutOfBounds_ThrowsIndexOutOfRangeException()
     {
         var grid = new Grid<int>(2, 2);
         Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[-1, 0]);
-        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[5, 5] = 10);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[0, -1]);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[0, 2]);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[2, 2]);
+
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[-1, 0] = 1);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[0, -1] = 1);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[0, 2] = 1);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[2, 2] = 1);
+    }
+
+    [TestMethod]
+    public void Indexer_Vector2_GetAndSet()
+    {
+        var grid = new Grid<string>(2, 2);
+        grid[new Vector2(1, 0)] = "hello";
+        Assert.AreEqual("hello", grid[new Vector2(1, 0)]);
+    }
+
+    [TestMethod]
+    public void Indexer_Vector2_OutOfBounds_ThrowsIndexOutOfRangeException()
+    {
+        var grid = new Grid<int>(2, 2);
         Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[new Vector2(-1, 0)]);
-        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[new Vector2(5, 5)] = 10);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[new Vector2(0, 2)]);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => _ = grid[new Vector2(2, 2)]);
+
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[new Vector2(-1, 0)] = 1);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[new Vector2(0, 2)] = 1);
+        Assert.ThrowsExactly<IndexOutOfRangeException>(() => grid[new Vector2(2, 2)] = 1);
     }
 
     [TestMethod]
-    public void TryGet_IntCoordinates_InBoundsAndOutOfBounds()
+    public void TryGet_Ints_ReturnsExpected()
     {
         var grid = new Grid<int>(2, 2);
-        grid[0, 1] = 99;
-
-        Assert.IsTrue(grid.TryGet(0, 1, out var valIn));
-        Assert.AreEqual(99, valIn);
-
-        Assert.IsFalse(grid.TryGet(-1, 0, out var valOut));
-        Assert.AreEqual(0, valOut);
+        grid[1, 1] = 77;
+        Assert.IsTrue(grid.TryGet(1, 1, out int value));
+        Assert.AreEqual(77, value);
+        Assert.IsFalse(grid.TryGet(2, 1, out int outVal));
+        Assert.AreEqual(0, outVal);
+        Assert.IsFalse(grid.TryGet(-1, 0, out outVal));
+        Assert.AreEqual(0, outVal);
     }
 
     [TestMethod]
-    public void TryGet_Vector2Coordinates_InBoundsAndOutOfBounds()
+    public void TryGet_Vector2_ReturnsExpected()
     {
         var grid = new Grid<int>(2, 2);
-        grid[1, 1] = 88;
-
-        Assert.IsTrue(grid.TryGet(new Vector2(1, 1), out var valIn));
-        Assert.AreEqual(88, valIn);
-
-        Assert.IsFalse(grid.TryGet(new Vector2(2, 0), out var valOut));
-        Assert.AreEqual(0, valOut);
+        grid[0, 1] = 88;
+        Assert.IsTrue(grid.TryGet(new Vector2(0, 1), out int value));
+        Assert.AreEqual(88, value);
+        Assert.IsFalse(grid.TryGet(new Vector2(2, 1), out int outVal));
+        Assert.AreEqual(0, outVal);
+        Assert.IsFalse(grid.TryGet(new Vector2(-1, 0), out outVal));
+        Assert.AreEqual(0, outVal);
     }
 
     [TestMethod]
-    public void TrySet_IntCoordinates_InBoundsAndOutOfBounds()
+    public void TrySet_Ints_ReturnsExpected()
     {
         var grid = new Grid<int>(2, 2);
-
-        Assert.IsTrue(grid.TrySet(0, 0, 15));
-        Assert.AreEqual(15, grid[0, 0]);
-
-        Assert.IsFalse(grid.TrySet(2, 2, 99));
+        Assert.IsTrue(grid.TrySet(1, 0, 50));
+        Assert.AreEqual(50, grid[1, 0]);
+        Assert.IsFalse(grid.TrySet(2, 0, 100));
+        Assert.IsFalse(grid.TrySet(-1, 0, 100));
     }
 
     [TestMethod]
-    public void TrySet_Vector2Coordinates_InBoundsAndOutOfBounds()
-    {
-        var grid = new Grid<int>(2, 2);
-
-        Assert.IsTrue(grid.TrySet(new Vector2(0, 1), 25));
-        Assert.AreEqual(25, grid[0, 1]);
-
-        Assert.IsFalse(grid.TrySet(new Vector2(-1, 0), 99));
-    }
-
-    [TestMethod]
-    public void IsInBounds_IntAndVector2_ReturnsExpectedResult()
+    [DataRow(-1, 0)]
+    [DataRow(3, 0)]
+    [DataRow(0, -1)]
+    [DataRow(0, 3)]
+    public void TrySet_IntCoordinates_OutOfBounds_ReturnsFalseAndDoesNotModify(int x, int y)
     {
         var grid = new Grid<int>(3, 3);
 
+        bool result = grid.TrySet(x, y, 77);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void TrySet_Vector2_ReturnsExpected()
+    {
+        var grid = new Grid<int>(2, 2);
+        Assert.IsTrue(grid.TrySet(new Vector2(1, 0), 50));
+        Assert.AreEqual(50, grid[1, 0]);
+        Assert.IsFalse(grid.TrySet(new Vector2(2, 0), 100));
+        Assert.IsFalse(grid.TrySet(new Vector2(-1, 0), 100));
+    }
+
+    [TestMethod]
+    public void IsInBounds_IntsAndVector2_ReturnsExpected()
+    {
+        var grid = new Grid<int>(3, 3);
         Assert.IsTrue(grid.IsInBounds(0, 0));
         Assert.IsTrue(grid.IsInBounds(2, 2));
         Assert.IsFalse(grid.IsInBounds(-1, 0));
-        Assert.IsFalse(grid.IsInBounds(0, -1));
         Assert.IsFalse(grid.IsInBounds(3, 0));
+        Assert.IsFalse(grid.IsInBounds(0, -1));
         Assert.IsFalse(grid.IsInBounds(0, 3));
-
-        Assert.IsTrue(grid.IsInBounds(new Vector2(1, 1)));
-        Assert.IsFalse(grid.IsInBounds(new Vector2(-1, 1)));
-        Assert.IsFalse(grid.IsInBounds(new Vector2(1, 3)));
+        Assert.IsTrue(grid.IsInBounds(new Vector2(0, 0)));
+        Assert.IsTrue(grid.IsInBounds(new Vector2(2, 2)));
+        Assert.IsFalse(grid.IsInBounds(new Vector2(-1, 0)));
+        Assert.IsFalse(grid.IsInBounds(new Vector2(3, 0)));
+        Assert.IsFalse(grid.IsInBounds(new Vector2(0, -1)));
+        Assert.IsFalse(grid.IsInBounds(new Vector2(0, 3)));
     }
 
     [TestMethod]
@@ -152,33 +191,30 @@ public class GridTests
         var grid = new Grid<int>(2, 2);
         grid.Fill(10);
         grid.Clear();
-
-        foreach (var val in grid)
-        {
-            Assert.AreEqual(0, val);
-        }
+        Assert.AreEqual(0, grid[0, 0]);
+        Assert.AreEqual(0, grid[1, 0]);
+        Assert.AreEqual(0, grid[0, 1]);
+        Assert.AreEqual(0, grid[1, 1]);
     }
 
     [TestMethod]
-    public void Fill_WithValue_FillsAllElementsAndReturnsGrid()
+    public void Fill_WithValue_SetsAllElements()
     {
         var grid = new Grid<int>(2, 2);
-        var returned = grid.Fill(7);
-
-        Assert.AreSame(grid, returned);
-        foreach (var val in grid)
-        {
-            Assert.AreEqual(7, val);
-        }
+        var result = grid.Fill(5);
+        Assert.AreSame(grid, result);
+        Assert.AreEqual(5, grid[0, 0]);
+        Assert.AreEqual(5, grid[1, 0]);
+        Assert.AreEqual(5, grid[0, 1]);
+        Assert.AreEqual(5, grid[1, 1]);
     }
 
     [TestMethod]
-    public void Fill_WithXYFactory_FillsGridAndReturnsGrid()
+    public void Fill_WithXYFactory_SetsAllElements()
     {
         var grid = new Grid<int>(2, 2);
-        var returned = grid.Fill((x, y) => x + y * 10);
-
-        Assert.AreSame(grid, returned);
+        var result = grid.Fill((x, y) => x + y * 10);
+        Assert.AreSame(grid, result);
         Assert.AreEqual(0, grid[0, 0]);
         Assert.AreEqual(1, grid[1, 0]);
         Assert.AreEqual(10, grid[0, 1]);
@@ -186,12 +222,11 @@ public class GridTests
     }
 
     [TestMethod]
-    public void Fill_WithVector2Factory_FillsGridAndReturnsGrid()
+    public void Fill_WithVector2Factory_SetsAllElements()
     {
         var grid = new Grid<int>(2, 2);
-        var returned = grid.Fill(pos => (int)pos.X + (int)pos.Y * 10);
-
-        Assert.AreSame(grid, returned);
+        var result = grid.Fill(pos => (int)pos.X + (int)pos.Y * 10);
+        Assert.AreSame(grid, result);
         Assert.AreEqual(0, grid[0, 0]);
         Assert.AreEqual(1, grid[1, 0]);
         Assert.AreEqual(10, grid[0, 1]);
@@ -199,25 +234,22 @@ public class GridTests
     }
 
     [TestMethod]
-    public void GetEnumerator_EnumeratesAllElements()
+    public void GetEnumerator_GenericAndNonGeneric_EnumeratesAllElements()
     {
-        var grid = new Grid<int>(2, 2, [10, 20, 30, 40]);
-        var list = new System.Collections.Generic.List<int>();
-
-        foreach (var val in grid)
+        var grid = new Grid<int>(2, 2);
+        grid.Fill((x, y) => x + y * 2);
+        List<int> genericList = new List<int>();
+        foreach (var item in grid)
         {
-            list.Add(val);
+            genericList.Add(item);
         }
-
-        CollectionAssert.AreEqual(new[] { 10, 20, 30, 40 }, list);
-
-        IEnumerable nonGenericGrid = grid;
-        var nonGenericList = new System.Collections.Generic.List<object>();
-        foreach (var val in nonGenericGrid)
+        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3 }, genericList);
+        IEnumerable nonGenericEnumerable = grid;
+        List<int> nonGenericList = new List<int>();
+        foreach (var item in nonGenericEnumerable)
         {
-            nonGenericList.Add(val);
+            nonGenericList.Add((int)item);
         }
-
-        CollectionAssert.AreEqual(new object[] { 10, 20, 30, 40 }, nonGenericList);
+        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3 }, nonGenericList);
     }
 }
