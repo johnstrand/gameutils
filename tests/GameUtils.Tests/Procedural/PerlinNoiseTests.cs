@@ -16,6 +16,16 @@ public class PerlinNoiseTests
     }
 
     [TestMethod]
+    public void DefaultConstructor_MatchesDefaultInstance()
+    {
+        var noise1 = new PerlinNoise();
+        var noise2 = PerlinNoise.Default;
+
+        Assert.AreEqual(noise2.Sample(1.5f, 2.5f), noise1.Sample(1.5f, 2.5f));
+        Assert.AreEqual(noise2.Sample(1.5f, 2.5f, 3.5f), noise1.Sample(1.5f, 2.5f, 3.5f));
+    }
+
+    [TestMethod]
     public void DefaultConstructor_ReturnsSameValueForSameCoordinates()
     {
         var noise1 = new PerlinNoise();

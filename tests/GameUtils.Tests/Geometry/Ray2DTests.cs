@@ -190,4 +190,16 @@ public class Ray2DTests
         Assert.IsNotNull(point);
         Assert.AreEqual(new Vector2(5, 0), point.Value);
     }
+
+    [TestMethod]
+    public void Intersects_AABB_PointingAwayFromAABB_ReturnsFalse()
+    {
+        var ray = new Ray2D(new Vector2(0, 5), new Vector2(-1, 0));
+        var aabb = new AABB(new Vector2(5, 0), new Vector2(10, 10));
+
+        bool hit = ray.Intersects(aabb, out _, out Vector2? point);
+
+        Assert.IsFalse(hit);
+        Assert.IsNull(point);
+    }
 }
