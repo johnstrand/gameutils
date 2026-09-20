@@ -191,14 +191,21 @@ public class Bitmap
     /// </summary>
     public void Write(string path)
     {
+        var baseDir = Path.GetFullPath(Environment.CurrentDirectory);
+        if (!baseDir.EndsWith(Path.DirectorySeparatorChar) && !baseDir.EndsWith(Path.AltDirectorySeparatorChar))
+        {
+            baseDir += Path.DirectorySeparatorChar;
+        }
+
         var fullPath = Path.GetFullPath(path);
-        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
-        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
+
+        if (!fullPath.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(fullPath + Path.DirectorySeparatorChar, baseDir, StringComparison.OrdinalIgnoreCase))
         {
             throw new UnauthorizedAccessException("Cannot write outside the current directory.");
         }
 
-        using var stream = File.OpenWrite(path);
+        using var stream = File.OpenWrite(fullPath);
         Write(stream);
     }
 
