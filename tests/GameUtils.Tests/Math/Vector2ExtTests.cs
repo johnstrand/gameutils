@@ -171,17 +171,17 @@ public class Vector2ExtTests
         };
 
         // Midpoint is (0,0)
-        var result = vectors.Sort(clockwise: true).ToList();
+        vectors.Sort(clockwise: true);
 
         // Atan2 relative to (0,0):
         // (0, -1) -> -PI/2
         // (1, 0) -> 0
         // (0, 1) -> PI/2
         // (-1, 0) -> PI
-        Assert.AreEqual(new Vector2(0, -1), result[0]);
-        Assert.AreEqual(new Vector2(1, 0), result[1]);
-        Assert.AreEqual(new Vector2(0, 1), result[2]);
-        Assert.AreEqual(new Vector2(-1, 0), result[3]);
+        Assert.AreEqual(new Vector2(0, -1), vectors[0]);
+        Assert.AreEqual(new Vector2(1, 0), vectors[1]);
+        Assert.AreEqual(new Vector2(0, 1), vectors[2]);
+        Assert.AreEqual(new Vector2(-1, 0), vectors[3]);
     }
 
     [TestMethod]
@@ -196,17 +196,17 @@ public class Vector2ExtTests
         };
 
         // Midpoint is (0,0)
-        var result = vectors.Sort(clockwise: false).ToList();
+        vectors.Sort(clockwise: false);
 
         // Atan2 * -1:
         // (-1, 0) -> PI * -1 = -PI
         // (0, 1) -> PI/2 * -1 = -PI/2
         // (1, 0) -> 0 * -1 = 0
         // (0, -1) -> -PI/2 * -1 = PI/2
-        Assert.AreEqual(new Vector2(-1, 0), result[0]);
-        Assert.AreEqual(new Vector2(0, 1), result[1]);
-        Assert.AreEqual(new Vector2(1, 0), result[2]);
-        Assert.AreEqual(new Vector2(0, -1), result[3]);
+        Assert.AreEqual(new Vector2(-1, 0), vectors[0]);
+        Assert.AreEqual(new Vector2(0, 1), vectors[1]);
+        Assert.AreEqual(new Vector2(1, 0), vectors[2]);
+        Assert.AreEqual(new Vector2(0, -1), vectors[3]);
     }
 
     [TestMethod]
@@ -221,12 +221,12 @@ public class Vector2ExtTests
             new Vector2(11, 10)  // relative: (1, 0)
         };
 
-        var result = vectors.Sort(center, clockwise: true).ToList();
+        vectors.Sort(center, clockwise: true);
 
-        Assert.AreEqual(new Vector2(10, 9), result[0]);
-        Assert.AreEqual(new Vector2(11, 10), result[1]);
-        Assert.AreEqual(new Vector2(10, 11), result[2]);
-        Assert.AreEqual(new Vector2(9, 10), result[3]);
+        Assert.AreEqual(new Vector2(10, 9), vectors[0]);
+        Assert.AreEqual(new Vector2(11, 10), vectors[1]);
+        Assert.AreEqual(new Vector2(10, 11), vectors[2]);
+        Assert.AreEqual(new Vector2(9, 10), vectors[3]);
     }
 
     [TestMethod]
@@ -241,12 +241,109 @@ public class Vector2ExtTests
             new Vector2(11, 10)
         };
 
-        var result = vectors.Sort(center, clockwise: false).ToList();
+        vectors.Sort(center, clockwise: false);
 
-        Assert.AreEqual(new Vector2(9, 10), result[0]);
-        Assert.AreEqual(new Vector2(10, 11), result[1]);
-        Assert.AreEqual(new Vector2(11, 10), result[2]);
-        Assert.AreEqual(new Vector2(10, 9), result[3]);
+        Assert.AreEqual(new Vector2(9, 10), vectors[0]);
+        Assert.AreEqual(new Vector2(10, 11), vectors[1]);
+        Assert.AreEqual(new Vector2(11, 10), vectors[2]);
+        Assert.AreEqual(new Vector2(10, 9), vectors[3]);
+    }
+
+    [TestMethod]
+    public void Sort_IEnumerable_ReturnsSortedList()
+    {
+        IEnumerable<Vector2> vectors = new Vector2[]
+        {
+            new Vector2(0, 1),
+            new Vector2(-1, 0),
+            new Vector2(0, -1),
+            new Vector2(1, 0)
+        };
+
+        var result = vectors.Sort(clockwise: true);
+
+        Assert.AreEqual(new Vector2(0, -1), result[0]);
+        Assert.AreEqual(new Vector2(1, 0), result[1]);
+        Assert.AreEqual(new Vector2(0, 1), result[2]);
+        Assert.AreEqual(new Vector2(-1, 0), result[3]);
+    }
+
+    [TestMethod]
+    public void Sort_Span_InPlace_Clockwise_SortsCorrectly()
+    {
+        Span<Vector2> vectors = stackalloc Vector2[]
+        {
+            new Vector2(0, 1),
+            new Vector2(-1, 0),
+            new Vector2(0, -1),
+            new Vector2(1, 0)
+        };
+
+        vectors.Sort(clockwise: true);
+
+        Assert.AreEqual(new Vector2(0, -1), vectors[0]);
+        Assert.AreEqual(new Vector2(1, 0), vectors[1]);
+        Assert.AreEqual(new Vector2(0, 1), vectors[2]);
+        Assert.AreEqual(new Vector2(-1, 0), vectors[3]);
+    }
+
+    [TestMethod]
+    public void Sort_Span_LargeBuffer_UsesArrayPool_SortsCorrectly()
+    {
+        var count = 300;
+        var vectorsArray = new Vector2[count];
+        for (int i = 0; i < count; i++)
+        {
+            float angle = i * MathF.PI * 2f / count;
+            vectorsArray[i] = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+        }
+
+        Span<Vector2> span = vectorsArray;
+        span.Sort(Vector2.Zero, clockwise: true);
+
+        Assert.AreEqual(count, vectorsArray.Length);
+    }
+
+    [TestMethod]
+    public void Sort_List_InPlace_Clockwise_SortsCorrectly()
+    {
+        var vectors = new List<Vector2>
+        {
+            new Vector2(0, 1),
+            new Vector2(-1, 0),
+            new Vector2(0, -1),
+            new Vector2(1, 0)
+        };
+
+        vectors.Sort(clockwise: true);
+
+        Assert.AreEqual(new Vector2(0, -1), vectors[0]);
+        Assert.AreEqual(new Vector2(1, 0), vectors[1]);
+        Assert.AreEqual(new Vector2(0, 1), vectors[2]);
+        Assert.AreEqual(new Vector2(-1, 0), vectors[3]);
+    }
+
+    [TestMethod]
+    public void Midpoint_ReadOnlySpan_CalculatesMidpointCorrectly()
+    {
+        ReadOnlySpan<Vector2> vectors = new Vector2[]
+        {
+            new Vector2(0, 0),
+            new Vector2(10, 0),
+            new Vector2(10, 10),
+            new Vector2(0, 10)
+        };
+
+        var midpoint = vectors.Midpoint();
+
+        Assert.AreEqual(5f, midpoint.X, Tolerance);
+        Assert.AreEqual(5f, midpoint.Y, Tolerance);
+    }
+
+    [TestMethod]
+    public void Midpoint_ReadOnlySpan_Empty_ThrowsArgumentException()
+    {
+        Assert.ThrowsExactly<ArgumentException>(() => ReadOnlySpan<Vector2>.Empty.Midpoint());
     }
 
     [TestMethod]
