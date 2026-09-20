@@ -1,4 +1,6 @@
+using System.Buffers;
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace GameUtils.Math;
 
@@ -89,6 +91,26 @@ public static class Vector2Ext
     }
 
     /// <summary>
+    /// Calculates the midpoint (average) of a span of vectors.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the span is empty.</exception>
+    public static Vector2 Midpoint(this ReadOnlySpan<Vector2> source)
+    {
+        if (source.IsEmpty)
+        {
+            throw new ArgumentException("Sequence contains no elements.", nameof(source));
+        }
+
+        var sum = Vector2.Zero;
+        for (int i = 0; i < source.Length; i++)
+        {
+            sum += source[i];
+        }
+
+        return sum / source.Length;
+    }
+
+    /// <summary>
     /// Returns the normalized result of <paramref name="target"/> - <paramref name="source"/>
     /// </summary>
     public static Vector2 GetDirection(this Vector2 source, Vector2 target)
@@ -139,28 +161,90 @@ public static class Vector2Ext
     }
 
     /// <summary>
-    /// Sorts a list of vectors clockwise (or counter clockwise, if so desired) around the average center of the vectors.
+    /// Sorts a span of vectors clockwise (or counter clockwise) around the average center of the vectors in place.
     /// </summary>
-    public static IEnumerable<Vector2> Sort(this IEnumerable<Vector2> source, bool clockwise = true)
+    public static void Sort(this Span<Vector2> source, bool clockwise = true)
     {
         var center = source.Midpoint();
-        return Sort(source, center, clockwise);
+        Sort(source, center, clockwise);
     }
 
     /// <summary>
-    /// Sorts a list of vectors clockwise (or counter clockwise, if so desired) around the specified center.
+    /// Sorts a span of vectors clockwise (or counter clockwise) around the specified center in place.
     /// </summary>
-    public static IEnumerable<Vector2> Sort(this IEnumerable<Vector2> source, Vector2 center, bool clockwise = true)
+    public static void Sort(this Span<Vector2> source, Vector2 center, bool clockwise = true)
     {
-        var values = source.ToArray();
-        var keys = new float[values.Length];
-        var sortMultiplier = clockwise ? 1 : -1;
-        for (int i = 0; i < values.Length; i++)
+        if (source.Length <= 1)
         {
-            keys[i] = MathF.Atan2(values[i].Y - center.Y, values[i].X - center.X) * sortMultiplier;
+            return;
         }
-        Array.Sort(keys, values);
-        return values;
+
+        float[]? rented = null;
+        Span<float> keys = source.Length <= 256
+            ? stackalloc float[source.Length]
+            : null;
+
+        if (keys.IsEmpty)
+        {
+            rented = ArrayPool<float>.Shared.Rent(source.Length);
+            keys = rented.AsSpan(0, source.Length);
+        }
+
+        try
+        {
+            var sortMultiplier = clockwise ? 1f : -1f;
+            for (int i = 0; i < source.Length; i++)
+            {
+                keys[i] = MathF.Atan2(source[i].Y - center.Y, source[i].X - center.X) * sortMultiplier;
+            }
+
+            keys.Sort(source);
+        }
+        finally
+        {
+            if (rented != null)
+            {
+                ArrayPool<float>.Shared.Return(rented);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sorts a list of vectors clockwise (or counter clockwise) around the average center of the vectors in place.
+    /// </summary>
+    public static void Sort(this List<Vector2> source, bool clockwise = true)
+    {
+        var center = CollectionsMarshal.AsSpan(source).Midpoint();
+        Sort(source, center, clockwise);
+    }
+
+    /// <summary>
+    /// Sorts a list of vectors clockwise (or counter clockwise) around the specified center in place.
+    /// </summary>
+    public static void Sort(this List<Vector2> source, Vector2 center, bool clockwise = true)
+    {
+        Sort(CollectionsMarshal.AsSpan(source), center, clockwise);
+    }
+
+    /// <summary>
+    /// Sorts a sequence of vectors clockwise (or counter clockwise) around the average center of the vectors and returns a list.
+    /// </summary>
+    public static List<Vector2> Sort(this IEnumerable<Vector2> source, bool clockwise = true)
+    {
+        var list = source.ToList();
+        var center = CollectionsMarshal.AsSpan(list).Midpoint();
+        Sort(CollectionsMarshal.AsSpan(list), center, clockwise);
+        return list;
+    }
+
+    /// <summary>
+    /// Sorts a sequence of vectors clockwise (or counter clockwise) around the specified center and returns a list.
+    /// </summary>
+    public static List<Vector2> Sort(this IEnumerable<Vector2> source, Vector2 center, bool clockwise = true)
+    {
+        var list = source.ToList();
+        Sort(CollectionsMarshal.AsSpan(list), center, clockwise);
+        return list;
     }
 
     /// <summary>
