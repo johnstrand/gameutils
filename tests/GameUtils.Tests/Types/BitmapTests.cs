@@ -18,6 +18,60 @@ namespace GameUtils.Tests.Types
         }
 
         [TestMethod]
+        public void Write_WithAbsolutePathOutsideCurrentDir_ThrowsUnauthorizedAccessException()
+        {
+            var bitmap = new Bitmap(10, 10);
+            var outsidePath = Path.Combine(Path.GetTempPath(), "test_bitmap_outside.bmp");
+
+            Assert.ThrowsExactly<UnauthorizedAccessException>(() => bitmap.Write(outsidePath));
+        }
+
+        [TestMethod]
+        public void Write_WithAbsolutePathInsideCurrentDir_Succeeds()
+        {
+            var bitmap = new Bitmap(10, 10);
+            var validAbsolutePath = Path.GetFullPath("test_bitmap_abs.bmp");
+            try
+            {
+                bitmap.Write(validAbsolutePath);
+                Assert.IsTrue(File.Exists(validAbsolutePath));
+            }
+            finally
+            {
+                if (File.Exists(validAbsolutePath))
+                {
+                    File.Delete(validAbsolutePath);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Write_InSubdirectory_Succeeds()
+        {
+            var bitmap = new Bitmap(10, 10);
+            var subDir = Path.Combine(Environment.CurrentDirectory, "test_sub_dir");
+            Directory.CreateDirectory(subDir);
+            var subDirPath = Path.Combine("test_sub_dir", "test_bitmap_sub.bmp");
+            try
+            {
+                bitmap.Write(subDirPath);
+                Assert.IsTrue(File.Exists(subDirPath));
+            }
+            finally
+            {
+                if (File.Exists(subDirPath))
+                {
+                    File.Delete(subDirPath);
+                }
+
+                if (Directory.Exists(subDir))
+                {
+                    Directory.Delete(subDir, true);
+                }
+            }
+        }
+
+        [TestMethod]
         [DataRow(-1, 10)]
         [DataRow(0, 10)]
         [DataRow(10, -1)]
