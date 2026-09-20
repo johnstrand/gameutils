@@ -16,6 +16,7 @@ dotnet add package JST.GameUtils
 ## Contents
 
 - [Contributing](#notes-for-contributing-to-this-project)
+- [Versioning](#versioning)
 - [Math](#math)
 - [Vector extensions](#vector-extensions)
 - [Geometry](#geometry)
@@ -35,6 +36,15 @@ dotnet add package JST.GameUtils
 - Add XML documentation comments to all public members for better IntelliSense support.
 - Add tests for all public APIs, covering edge cases and typical usage patterns.
 - Update the README with usage examples for any new features or types added.
+
+---
+
+## Versioning
+
+This project uses an automated versioning scheme managed by the publish pipeline:
+- The **minor** version is incremented automatically on each publish (e.g. `1.0.x` &rarr; `1.1.0` &rarr; `1.2.0`).
+- When the minor version passes 9, the **major** version is incremented and the minor version resets to 0 (e.g. `1.9.0` &rarr; `2.0.0`).
+- Releases default to patch version `0`.
 
 ## Math
 
