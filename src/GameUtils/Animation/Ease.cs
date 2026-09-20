@@ -1,6 +1,4 @@
 ﻿namespace GameUtils.Animation;
-#pragma warning disable S3358 // Ternary operators should not be nested
-#pragma warning disable S1121 // Assignments should not be made from within sub-expressions
 
 /// <summary>
 /// Easing functions for interpolation. Based on <see href="https://easings.net/"/>, check them out for visual samples of most of the functions.
@@ -317,5 +315,3 @@ public static class Ease
     }
     #endregion
 }
-#pragma warning restore S1121 // Assignments should not be made from within sub-expressions
-#pragma warning restore S3358 // Ternary operators should not be nested
