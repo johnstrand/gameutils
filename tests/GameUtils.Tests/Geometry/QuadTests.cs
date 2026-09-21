@@ -81,6 +81,44 @@ public class QuadTests
     }
 
     [TestMethod]
+    public void Equality_CopiedStruct_ReturnsTrue()
+    {
+        var quad1 = new Quad(0, 0, 10, 10);
+        var quad2 = quad1;
+
+        Assert.AreEqual(quad1, quad2);
+        Assert.IsTrue(quad1 == quad2);
+        Assert.IsFalse(quad1 != quad2);
+        Assert.AreEqual(quad1.GetHashCode(), quad2.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Equality_SeparatelyConstructedInstances_VerifiesExistingSemantics()
+    {
+        // Due to internal _edges array, separately constructed instances have different array references
+        var quad1 = new Quad(0, 0, 10, 10);
+        var quad2 = new Quad(0, 0, 10, 10);
+
+        Assert.AreNotEqual(quad1, quad2);
+        Assert.IsFalse(quad1 == quad2);
+        Assert.IsTrue(quad1 != quad2);
+    }
+
+    [TestMethod]
+    public void Equals_ObjectOverload_ReturnsExpectedResult()
+    {
+        var quad = new Quad(0, 0, 10, 10);
+        object sameQuadCopy = quad;
+        object diffQuad = new Quad(1, 1, 10, 10);
+        object notAQuad = "string";
+
+        Assert.IsTrue(quad.Equals(sameQuadCopy));
+        Assert.IsFalse(quad.Equals(diffQuad));
+        Assert.IsFalse(quad.Equals(notAQuad));
+        Assert.IsFalse(quad.Equals(null));
+    }
+
+    [TestMethod]
     public void Intersects_LineIntersectingQuad_ReturnsTrueAndNearestPoint()
     {
         var quad = new Quad(0, 0, 10, 10);
@@ -91,6 +129,83 @@ public class QuadTests
         Assert.IsTrue(intersects);
         Assert.IsNotNull(nearest);
         Assert.AreEqual(new Vector2(0, 5), nearest.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_DiagonalLinePassingThroughMultipleEdges_ReturnsNearestIntersectionPoint()
+    {
+        var quad = new Quad(0, 0, 10, 10);
+        var line = new Line(new Vector2(-5, -5), new Vector2(15, 15));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsTrue(intersects);
+        Assert.IsNotNull(nearest);
+        Assert.AreEqual(new Vector2(0, 0), nearest.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_LineStartingInsideQuadAndExiting_ReturnsExitPoint()
+    {
+        var quad = new Quad(0, 0, 10, 10);
+        var line = new Line(new Vector2(5, 5), new Vector2(15, 5));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsTrue(intersects);
+        Assert.IsNotNull(nearest);
+        Assert.AreEqual(new Vector2(10, 5), nearest.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_LineEntirelyInsideQuad_ReturnsFalseAndNull()
+    {
+        var quad = new Quad(0, 0, 10, 10);
+        var line = new Line(new Vector2(2, 2), new Vector2(8, 8));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsFalse(intersects);
+        Assert.IsNull(nearest);
+    }
+
+    [TestMethod]
+    public void Intersects_LineTouchingCorner_ReturnsTrueAndCornerPoint()
+    {
+        var quad = new Quad(0, 0, 10, 10);
+        var line = new Line(new Vector2(-5, 5), new Vector2(0, 0));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsTrue(intersects);
+        Assert.IsNotNull(nearest);
+        Assert.AreEqual(new Vector2(0, 0), nearest.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_ArbitraryRotatedQuad_ReturnsTrueAndNearestIntersection()
+    {
+        var quad = new Quad(new Vector2(0, 5), new Vector2(5, 10), new Vector2(5, 0), new Vector2(10, 5));
+        var line = new Line(new Vector2(-5, 5), new Vector2(15, 5));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsTrue(intersects);
+        Assert.IsNotNull(nearest);
+        Assert.AreEqual(new Vector2(0, 5), nearest.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_TrapezoidalQuad_ReturnsTrueAndNearestIntersection()
+    {
+        var quad = new Quad(new Vector2(2, 0), new Vector2(8, 0), new Vector2(0, 10), new Vector2(10, 10));
+        var line = new Line(new Vector2(1, -2), new Vector2(1, 12));
+
+        bool intersects = quad.Intersects(line, out var nearest);
+
+        Assert.IsTrue(intersects);
+        Assert.IsNotNull(nearest);
+        Assert.AreEqual(new Vector2(1, 5), nearest.Value);
     }
 
     [TestMethod]

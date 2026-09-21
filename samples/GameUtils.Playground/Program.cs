@@ -1,9 +1,8 @@
-using GameUtils.Types;
 using System.Numerics;
+using GameUtils.Types;
 
-namespace GameUtils;
+namespace GameUtils.Playground;
 
-// This file only exists to manually test the library. It is not included in the library itself.
 internal static class Program
 {
     private static void Main()
