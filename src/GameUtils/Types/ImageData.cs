@@ -96,16 +96,10 @@ public class ImageData
     /// <summary>
     /// Writes the image to a file
     /// </summary>
-    public void Write(string path)
+    public void Write(string path, string? baseDirectory = null)
     {
-        var fullPath = Path.GetFullPath(path);
-        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
-        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
-        {
-            throw new UnauthorizedAccessException("Cannot write outside the current directory.");
-        }
-
-        using var stream = File.OpenWrite(path);
+        var validatedPath = ValidatePath(path, baseDirectory, isWrite: true);
+        using var stream = File.OpenWrite(validatedPath);
         Write(stream);
     }
 
@@ -127,16 +121,10 @@ public class ImageData
     /// <summary>
     /// Reads an image from a file
     /// </summary>
-    public static ImageData Read(string path)
+    public static ImageData Read(string path, string? baseDirectory = null)
     {
-        var fullPath = Path.GetFullPath(path);
-        var relPath = Path.GetRelativePath(Environment.CurrentDirectory, fullPath);
-        if (Path.IsPathRooted(relPath) || relPath.StartsWith(".."))
-        {
-            throw new UnauthorizedAccessException("Cannot read outside the current directory.");
-        }
-
-        using var stream = File.OpenRead(path);
+        var validatedPath = ValidatePath(path, baseDirectory, isWrite: false);
+        using var stream = File.OpenRead(validatedPath);
         return Read(stream);
     }
 
@@ -171,5 +159,74 @@ public class ImageData
         decompressor.ReadExactly(bytes);
 
         return new ImageData(width, height, data);
+    }
+
+    private static string ValidatePath(string path, string? baseDirectory, bool isWrite)
+    {
+        var baseDir = GetCanonicalPath(baseDirectory ?? Environment.CurrentDirectory);
+        var baseDirWithSeparator = baseDir.EndsWith(Path.DirectorySeparatorChar) || baseDir.EndsWith(Path.AltDirectorySeparatorChar)
+            ? baseDir
+            : baseDir + Path.DirectorySeparatorChar;
+
+        var fullPath = Path.GetFullPath(path, baseDir);
+        var resolvedPath = GetCanonicalPath(fullPath);
+
+        var comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+
+        var baseDirTrimmed = baseDir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+        if (!resolvedPath.Equals(baseDirTrimmed, comparison) &&
+            !resolvedPath.StartsWith(baseDirWithSeparator, comparison))
+        {
+            throw new UnauthorizedAccessException(isWrite
+                ? "Cannot write outside the current directory."
+                : "Cannot read outside the current directory.");
+        }
+
+        return resolvedPath;
+    }
+
+    private static string GetCanonicalPath(string path)
+    {
+        var fullPath = Path.GetFullPath(path);
+        try
+        {
+            if (File.Exists(fullPath))
+            {
+                var target = new FileInfo(fullPath).ResolveLinkTarget(returnFinalTarget: true);
+                if (target != null)
+                {
+                    return Path.GetFullPath(target.FullName);
+                }
+            }
+            else if (Directory.Exists(fullPath))
+            {
+                var target = new DirectoryInfo(fullPath).ResolveLinkTarget(returnFinalTarget: true);
+                if (target != null)
+                {
+                    return Path.GetFullPath(target.FullName);
+                }
+            }
+            else
+            {
+                var parent = Path.GetDirectoryName(fullPath);
+                if (!string.IsNullOrEmpty(parent) && Directory.Exists(parent))
+                {
+                    var target = new DirectoryInfo(parent).ResolveLinkTarget(returnFinalTarget: true);
+                    if (target != null)
+                    {
+                        return Path.GetFullPath(Path.Combine(target.FullName, Path.GetFileName(fullPath)));
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Fallback to fullPath if symlink resolution is not supported or fails
+        }
+
+        return fullPath;
     }
 }

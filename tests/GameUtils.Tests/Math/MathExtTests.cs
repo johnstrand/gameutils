@@ -171,4 +171,47 @@ public class MathExtTests
         Assert.AreEqual(0f, result.X, Tolerance);
         Assert.AreEqual(0f, result.Y, Tolerance);
     }
+
+    [TestMethod]
+    public void RandomOnCircle_DefaultRadius_ReturnsPointOnUnitCircle()
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            Vector2 result = MathExt.RandomOnCircle();
+            float distance = result.Length();
+            Assert.AreEqual(1f, distance, Tolerance, $"Expected point on circle of radius 1, but length was {distance}.");
+        }
+    }
+
+    [TestMethod]
+    public void RandomOnCircle_CustomRadius_ReturnsPointOnCustomCircle()
+    {
+        float radius = 5f;
+        for (int i = 0; i < 100; i++)
+        {
+            Vector2 result = MathExt.RandomOnCircle(radius);
+            float distance = result.Length();
+            Assert.AreEqual(radius, distance, Tolerance, $"Expected point on circle of radius {radius}, but length was {distance}.");
+        }
+    }
+
+    [TestMethod]
+    public void RandomOnCircle_ZeroRadius_ReturnsOrigin()
+    {
+        Vector2 result = MathExt.RandomOnCircle(0f);
+        Assert.AreEqual(0f, result.X, Tolerance);
+        Assert.AreEqual(0f, result.Y, Tolerance);
+    }
+
+    [TestMethod]
+    public void RandomOnCircle_NegativeRadius_ReturnsPointWithAbsoluteRadiusLength()
+    {
+        float radius = -5f;
+        for (int i = 0; i < 100; i++)
+        {
+            Vector2 result = MathExt.RandomOnCircle(radius);
+            float distance = result.Length();
+            Assert.AreEqual(MathF.Abs(radius), distance, Tolerance, $"Expected point with distance {MathF.Abs(radius)}, but length was {distance}.");
+        }
+    }
 }

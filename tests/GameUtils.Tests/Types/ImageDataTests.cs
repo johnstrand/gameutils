@@ -52,6 +52,125 @@ namespace GameUtils.Tests.Types
         }
 
         [TestMethod]
+        public void Read_WithTraversalPath_ThrowsUnauthorizedAccessException()
+        {
+            var invalidPath = Path.Combine("..", "test_image.dat");
+
+            Assert.ThrowsExactly<UnauthorizedAccessException>(() => ImageData.Read(invalidPath));
+        }
+
+        [TestMethod]
+        public void Write_WithAbsolutePathOutsideDirectory_ThrowsUnauthorizedAccessException()
+        {
+            var imageData = new ImageData(10, 10);
+            var outsidePath = Path.Combine(Path.GetTempPath(), "outside_image.dat");
+
+            Assert.ThrowsExactly<UnauthorizedAccessException>(() => imageData.Write(outsidePath));
+        }
+
+        [TestMethod]
+        public void Read_WithAbsolutePathOutsideDirectory_ThrowsUnauthorizedAccessException()
+        {
+            var outsidePath = Path.Combine(Path.GetTempPath(), "outside_image.dat");
+
+            Assert.ThrowsExactly<UnauthorizedAccessException>(() => ImageData.Read(outsidePath));
+        }
+
+        [TestMethod]
+        public void WriteAndRead_WithCustomBaseDirectory_SucceedsWithinBaseDirectory()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            var imageFile = Path.Combine(tempDir, "subfolder", "image.dat");
+            Directory.CreateDirectory(Path.GetDirectoryName(imageFile)!);
+
+            try
+            {
+                var imageData = new ImageData(2, 2);
+                imageData.Write(imageFile, tempDir);
+
+                Assert.IsTrue(File.Exists(imageFile));
+
+                var loaded = ImageData.Read(imageFile, tempDir);
+                Assert.AreEqual(2, loaded.Width);
+                Assert.AreEqual(2, loaded.Height);
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Read_WithCustomBaseDirectory_TraversalThrowsUnauthorizedAccessException()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                var escapePath = Path.Combine(tempDir, "..", "escaped.dat");
+
+                Assert.ThrowsExactly<UnauthorizedAccessException>(() => ImageData.Read(escapePath, tempDir));
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void Write_WithCustomBaseDirectory_TraversalThrowsUnauthorizedAccessException()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                var imageData = new ImageData(2, 2);
+                var escapePath = Path.Combine(tempDir, "..", "escaped.dat");
+
+                Assert.ThrowsExactly<UnauthorizedAccessException>(() => imageData.Write(escapePath, tempDir));
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void WriteAndRead_WithDotPrefixedFilename_SucceedsWithinDirectory()
+        {
+            var imageData = new ImageData(2, 2);
+            var validPath = "..valid_image_name.dat";
+
+            try
+            {
+                imageData.Write(validPath);
+                Assert.IsTrue(File.Exists(validPath));
+
+                var loaded = ImageData.Read(validPath);
+                Assert.AreEqual(2, loaded.Width);
+            }
+            finally
+            {
+                if (File.Exists(validPath))
+                {
+                    File.Delete(validPath);
+                }
+            }
+        }
+
+        [TestMethod]
         public void Write_WithValidPath_DoesNotThrow()
         {
             var imageData = new ImageData(10, 10);
