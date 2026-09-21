@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GameUtils.Types.Collections;
 
@@ -81,7 +82,7 @@ public class RingBuffer<T> : IEnumerable<T>
     /// <summary>
     /// Tries to read and remove the oldest item from the buffer.
     /// </summary>
-    public bool TryRead([System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out T item)
+    public bool TryRead([MaybeNullWhen(false)] out T item)
     {
         if (IsEmpty)
         {
