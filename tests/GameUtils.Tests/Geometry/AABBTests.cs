@@ -297,4 +297,117 @@ public class AABBTests
         Assert.AreEqual(new Vector2(15, 20), aabb.Center);
         Assert.AreEqual(new Vector2(10, 10), aabb.Size);
     }
+
+    [TestMethod]
+    public void Intersects_Line_Intersecting_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(5, 15), new Vector2(25, 15));
+
+        Assert.IsTrue(aabb.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_Line_Inside_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(12, 12), new Vector2(18, 18));
+
+        Assert.IsTrue(aabb.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_Line_Outside_ReturnsFalse()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(0, 0), new Vector2(5, 5));
+
+        Assert.IsFalse(aabb.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_Line_AxisAlignedVertical_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(15, 0), new Vector2(15, 30));
+
+        Assert.IsTrue(aabb.Intersects(line));
+    }
+
+    [TestMethod]
+    public void Intersects_LineOutPoints_Intersecting_ReturnsTrueAndPoints()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(5, 15), new Vector2(25, 15));
+
+        bool result = aabb.Intersects(line, out Vector2[] points);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(2, points.Length);
+        Assert.AreEqual(new Vector2(10, 15), points[0]);
+        Assert.AreEqual(new Vector2(20, 15), points[1]);
+    }
+
+    [TestMethod]
+    public void Intersects_LineOutPoints_StartInside_ReturnsTrueAndOnePoint()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(15, 15), new Vector2(25, 15));
+
+        bool result = aabb.Intersects(line, out Vector2[] points);
+
+        Assert.IsTrue(result);
+        Assert.AreEqual(1, points.Length);
+        Assert.AreEqual(new Vector2(20, 15), points[0]);
+    }
+
+    [TestMethod]
+    public void Intersects_LineOutPoints_NonIntersecting_ReturnsFalseAndEmptyArray()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var line = new Line(new Vector2(0, 0), new Vector2(5, 5));
+
+        bool result = aabb.Intersects(line, out Vector2[] points);
+
+        Assert.IsFalse(result);
+        Assert.AreEqual(0, points.Length);
+    }
+
+    [TestMethod]
+    public void Intersects_VerticesArray_AnyVertexInside_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var vertices = new Vector2[] { new Vector2(0, 0), new Vector2(15, 15), new Vector2(30, 30) };
+
+        Assert.IsTrue(aabb.Intersects(vertices));
+    }
+
+    [TestMethod]
+    public void Intersects_VerticesArray_AllVerticesOutside_ReturnsFalse()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var vertices = new Vector2[] { new Vector2(0, 0), new Vector2(5, 5), new Vector2(30, 30) };
+
+        Assert.IsFalse(aabb.Intersects(vertices));
+    }
+
+    [TestMethod]
+    public void Intersects_VerticesArrayWithSort_Intersecting_ReturnsTrue()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var vertices = new Vector2[] { new Vector2(5, 15), new Vector2(15, 25), new Vector2(15, 5) };
+
+        Assert.IsTrue(aabb.Intersects(vertices, sort: true));
+        Assert.IsTrue(aabb.Intersects(vertices, sort: false));
+    }
+
+    [TestMethod]
+    public void Intersects_VerticesArrayWithSort_NonIntersecting_ReturnsFalse()
+    {
+        var aabb = new AABB(new Vector2(10, 10), new Vector2(20, 20));
+        var vertices = new Vector2[] { new Vector2(0, 0), new Vector2(5, 0), new Vector2(2.5f, 5) };
+
+        Assert.IsFalse(aabb.Intersects(vertices, sort: true));
+        Assert.IsFalse(aabb.Intersects(vertices, sort: false));
+    }
 }
