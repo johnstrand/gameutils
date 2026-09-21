@@ -7,6 +7,7 @@ namespace GameUtils.Tests.Term;
 [TestClass]
 public class AnsiTests
 {
+    private static readonly object ConsoleLock = new();
     [TestMethod]
     public void Write_WithNoArgsAndFormatTokens_DoesNotThrow()
     {
@@ -144,5 +145,291 @@ public class AnsiTests
     {
         var ex = Assert.ThrowsExactly<ArgumentException>(() => Ansi.Format("Hello [invalid_tag]"));
         Assert.IsTrue(ex.Message.Contains("Unknown ANSI sequence 'invalid_tag' starting at position 19"));
+    }
+
+    [TestMethod]
+    public void CursorUp_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorUp();
+                Ansi.CursorUp(3);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1A{Ansi.SEQUENCE_START}3A", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorDown_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorDown();
+                Ansi.CursorDown(5);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1B{Ansi.SEQUENCE_START}5B", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorForward_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorForward();
+                Ansi.CursorForward(4);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1C{Ansi.SEQUENCE_START}4C", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorBack_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorBack();
+                Ansi.CursorBack(2);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1D{Ansi.SEQUENCE_START}2D", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorNextLine_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorNextLine();
+                Ansi.CursorNextLine(3);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1E{Ansi.SEQUENCE_START}3E", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorPreviousLine_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorPreviousLine();
+                Ansi.CursorPreviousLine(3);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1F{Ansi.SEQUENCE_START}3F", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorHorizontalAbsolute_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorHorizontalAbsolute(10);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}10G", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CursorPosition_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.CursorPosition(12, 34);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}12;34H", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void Clear_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.Clear();
+                Ansi.Clear(0);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}2J{Ansi.SEQUENCE_START}0J", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void ClearLine_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.ClearLine();
+                Ansi.ClearLine(1);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}2K{Ansi.SEQUENCE_START}1K", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void ScrollUp_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.ScrollUp();
+                Ansi.ScrollUp(5);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1S{Ansi.SEQUENCE_START}5S", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void ScrollDown_WritesCorrectSequence()
+    {
+        lock (ConsoleLock)
+        {
+            var originalOut = Console.Out;
+            using var stringWriter = new System.IO.StringWriter();
+            try
+            {
+                Console.SetOut(stringWriter);
+
+                Ansi.ScrollDown();
+                Ansi.ScrollDown(5);
+
+                var output = stringWriter.ToString();
+                Assert.AreEqual($"{Ansi.SEQUENCE_START}1T{Ansi.SEQUENCE_START}5T", output);
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+            }
+        }
     }
 }
