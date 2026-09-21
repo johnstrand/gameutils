@@ -56,12 +56,39 @@ public class LineTests
     }
 
     [TestMethod]
+    public void Constructor_NonZeroAngle_InitializesPropertiesCorrectly()
+    {
+        var start = new Vector2(1, 2);
+        var angle = MathF.PI / 2f; // 90 degrees pointing along +Y
+        var line = new Line(start, angle, 5f);
+
+        Assert.AreEqual(start, line.Start);
+        Assert.AreEqual(1f, line.End.X, 1e-5f);
+        Assert.AreEqual(7f, line.End.Y, 1e-5f);
+        Assert.AreEqual(5f, line.Length, 1e-5f);
+    }
+
+    [TestMethod]
     public void Constructor_Floats_InitializesProperties()
     {
         var line = new Line(1f, 2f, 4f, 6f);
         Assert.AreEqual(new Vector2(1f, 2f), line.Start);
         Assert.AreEqual(new Vector2(4f, 6f), line.End);
         Assert.AreEqual(5f, line.Length);
+    }
+
+    [TestMethod]
+    public void Constructor_DegenerateLine_ZeroLength()
+    {
+        var point = new Vector2(3, 3);
+        var line = new Line(point, point);
+
+        Assert.AreEqual(point, line.Start);
+        Assert.AreEqual(point, line.End);
+        Assert.AreEqual(0f, line.Length);
+        Assert.AreEqual(point, line.Midpoint);
+        Assert.AreEqual(Vector2.Zero, line.NormalA);
+        Assert.AreEqual(Vector2.Zero, line.NormalB);
     }
 
     [TestMethod]
@@ -117,6 +144,17 @@ public class LineTests
     }
 
     [TestMethod]
+    public void Cast_WithZeroDistanceAndNoMaxLength_ReturnsZeroLengthLine()
+    {
+        var point = new Vector2(4, 4);
+        var line = Line.Cast(point, point);
+
+        Assert.AreEqual(point, line.Start);
+        Assert.AreEqual(point, line.End);
+        Assert.AreEqual(0f, line.Length);
+    }
+
+    [TestMethod]
     public void Intersects_IntersectingLines_ReturnsTrue()
     {
         var line1 = new Line(new Vector2(0, 0), new Vector2(10, 10));
@@ -124,6 +162,23 @@ public class LineTests
         Assert.IsTrue(line1.Intersects(line2));
         Assert.IsTrue(line1.Intersects(line2, out var pt));
         Assert.AreEqual(new Vector2(5, 5), pt);
+    }
+
+    [TestMethod]
+    public void Intersects_PositiveDenominator_OutOfBounds_ReturnsFalse()
+    {
+        var line1 = new Line(new Vector2(0, 0), new Vector2(10, 0));
+        // Line2 is parallel-shifted or beyond line1 limits
+        var line2Below = new Line(new Vector2(15, -5), new Vector2(15, 5));
+        var line2Behind = new Line(new Vector2(-5, -5), new Vector2(-5, 5));
+
+        Assert.IsFalse(line1.Intersects(line2Below));
+        Assert.IsFalse(line1.Intersects(line2Below, out var ptBelow));
+        Assert.IsNull(ptBelow);
+
+        Assert.IsFalse(line1.Intersects(line2Behind));
+        Assert.IsFalse(line1.Intersects(line2Behind, out var ptBehind));
+        Assert.IsNull(ptBehind);
     }
 
     [TestMethod]
@@ -141,9 +196,15 @@ public class LineTests
     {
         var line1 = new Line(new Vector2(10, 0), new Vector2(0, 0));
         var line2 = new Line(new Vector2(15, -5), new Vector2(15, 5));
+        var line2Behind = new Line(new Vector2(-5, -5), new Vector2(-5, 5));
+
         Assert.IsFalse(line1.Intersects(line2));
         Assert.IsFalse(line1.Intersects(line2, out var pt));
         Assert.IsNull(pt);
+
+        Assert.IsFalse(line1.Intersects(line2Behind));
+        Assert.IsFalse(line1.Intersects(line2Behind, out var ptBehind));
+        Assert.IsNull(ptBehind);
     }
 
     [TestMethod]
@@ -235,5 +296,19 @@ public class LineTests
         var result = line.IntersectsAny(rays, out var nearest);
         Assert.IsTrue(result);
         Assert.AreEqual(new Vector2(0, 0), nearest);
+    }
+
+    [TestMethod]
+    public void Equality_SameValues_AreEqual()
+    {
+        var line1 = new Line(new Vector2(0, 0), new Vector2(10, 5));
+        var line2 = new Line(new Vector2(0, 0), new Vector2(10, 5));
+        var line3 = new Line(new Vector2(1, 1), new Vector2(10, 5));
+
+        Assert.AreEqual(line1, line2);
+        Assert.IsTrue(line1 == line2);
+        Assert.IsFalse(line1 != line2);
+        Assert.AreNotEqual(line1, line3);
+        Assert.IsTrue(line1 != line3);
     }
 }

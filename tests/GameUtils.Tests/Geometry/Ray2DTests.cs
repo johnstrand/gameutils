@@ -202,4 +202,115 @@ public class Ray2DTests
         Assert.IsFalse(hit);
         Assert.IsNull(point);
     }
+
+    [TestMethod]
+    public void RecordStruct_EqualityAndInitProperties_WorkAsExpected()
+    {
+        var ray1 = new Ray2D(new Vector2(1, 2), new Vector2(1, 0));
+        var ray2 = new Ray2D { Origin = new Vector2(1, 2), Direction = new Vector2(1, 0) };
+        var ray3 = new Ray2D(new Vector2(1, 2), new Vector2(0, 1));
+
+        Assert.AreEqual(ray1, ray2);
+        Assert.AreNotEqual(ray1, ray3);
+    }
+
+    [TestMethod]
+    public void Intersects_Line_AtSegmentEndpoints_ReturnsTrue()
+    {
+        var rayStartPoint = new Ray2D(new Vector2(0, 0), new Vector2(1, 0));
+        var line = new Line(new Vector2(5, 0), new Vector2(5, 10));
+
+        bool hitStart = rayStartPoint.Intersects(line, out float tStart, out Vector2? pointStart);
+
+        Assert.IsTrue(hitStart);
+        Assert.AreEqual(5f, tStart, 1e-5f);
+        Assert.IsNotNull(pointStart);
+        Assert.AreEqual(new Vector2(5, 0), pointStart.Value);
+
+        var lineEnd = new Line(new Vector2(5, -10), new Vector2(5, 0));
+        bool hitEnd = rayStartPoint.Intersects(lineEnd, out float tEnd, out Vector2? pointEnd);
+
+        Assert.IsTrue(hitEnd);
+        Assert.AreEqual(5f, tEnd, 1e-5f);
+        Assert.IsNotNull(pointEnd);
+        Assert.AreEqual(new Vector2(5, 0), pointEnd.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_Line_RayOriginOnLine_ReturnsTrueWithZeroDistance()
+    {
+        var ray = new Ray2D(new Vector2(5, 0), new Vector2(1, 0));
+        var line = new Line(new Vector2(5, -5), new Vector2(5, 5));
+
+        bool hit = ray.Intersects(line, out float t, out Vector2? point);
+
+        Assert.IsTrue(hit);
+        Assert.AreEqual(0f, t, 1e-5f);
+        Assert.IsNotNull(point);
+        Assert.AreEqual(new Vector2(5, 0), point.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_Circle_TangentRay_ReturnsTrueAndTangentPoint()
+    {
+        var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+        var circle = new Circle(new Vector2(5, 0), 5f);
+
+        bool hit = ray.Intersects(circle, out float t, out Vector2? point);
+
+        Assert.IsTrue(hit);
+        Assert.AreEqual(5f, t, 1e-5f);
+        Assert.IsNotNull(point);
+        Assert.AreEqual(new Vector2(5, 5), point.Value);
+    }
+
+    [TestMethod]
+    public void Intersects_Circle_EntirelyBehindRay_ReturnsFalse()
+    {
+        var ray = new Ray2D(new Vector2(20, 0), new Vector2(1, 0));
+        var circle = new Circle(new Vector2(0, 0), 5f);
+
+        bool hit = ray.Intersects(circle, out _, out Vector2? point);
+
+        Assert.IsFalse(hit);
+        Assert.IsNull(point);
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_AxisAlignedRayX_MissingBox_ReturnsFalse()
+    {
+        var ray = new Ray2D(new Vector2(-5, 15), new Vector2(1, 0));
+        var aabb = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+
+        bool hit = ray.Intersects(aabb, out _, out Vector2? point);
+
+        Assert.IsFalse(hit);
+        Assert.IsNull(point);
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_AxisAlignedRayY_MissingBox_ReturnsFalse()
+    {
+        var ray = new Ray2D(new Vector2(15, -5), new Vector2(0, 1));
+        var aabb = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+
+        bool hit = ray.Intersects(aabb, out _, out Vector2? point);
+
+        Assert.IsFalse(hit);
+        Assert.IsNull(point);
+    }
+
+    [TestMethod]
+    public void Intersects_AABB_RayOriginOnBoundary_ReturnsTrueWithZeroDistance()
+    {
+        var ray = new Ray2D(new Vector2(0, 5), new Vector2(1, 0));
+        var aabb = new AABB(new Vector2(0, 0), new Vector2(10, 10));
+
+        bool hit = ray.Intersects(aabb, out float t, out Vector2? point);
+
+        Assert.IsTrue(hit);
+        Assert.AreEqual(0f, t, 1e-5f);
+        Assert.IsNotNull(point);
+        Assert.AreEqual(new Vector2(0, 5), point.Value);
+    }
 }

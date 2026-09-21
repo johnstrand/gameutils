@@ -18,12 +18,7 @@
 		<WarningLevel>9999</WarningLevel>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutputType>Exe</OutputType>
-	</PropertyGroup>
-
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<OutputType>Library</OutputType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
@@ -31,10 +26,6 @@
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
 			<_Parameter1>GameUtils.Tests</_Parameter1>
 		</AssemblyAttribute>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<Compile Remove="Program.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
