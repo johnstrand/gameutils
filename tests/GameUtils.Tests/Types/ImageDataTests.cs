@@ -105,6 +105,27 @@ namespace GameUtils.Tests.Types
         }
 
         [TestMethod]
+        public void Read_WithCustomBaseDirectory_TraversalThrowsUnauthorizedAccessException()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+
+            try
+            {
+                var escapePath = Path.Combine(tempDir, "..", "escaped.dat");
+
+                Assert.ThrowsExactly<UnauthorizedAccessException>(() => ImageData.Read(escapePath, tempDir));
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
+            }
+        }
+
+        [TestMethod]
         public void Write_WithCustomBaseDirectory_TraversalThrowsUnauthorizedAccessException()
         {
             var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
